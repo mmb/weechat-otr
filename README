@@ -1,0 +1,6 @@
+Weechat script for Off-the-Record messaging
+
+See http://www.cypherpunks.ca/otr/
+
+NOTE: integration with OTR is not done yet, will use Python bindings for libotr
+at http://python-otr.pentabarf.de/
