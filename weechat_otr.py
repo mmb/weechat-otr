@@ -64,13 +64,25 @@ class OtrOps:
         return 0
 
     def gone_secure(self, opdata=None, context=None):
-        trust = 'unverified'
-        if context is not None and \
-                context.active_fingerprint is not None and \
-                context.active_fingerprint.trust:
-            trust = context.active_fingerprint.trust
+        if context and context.active_fingerprint:
+            if context.active_fingerprint.trust == 'verified':
+                opdata['informer'].inform('verified OTR connection started')
+            else:
+                opdata['informer'].inform('unverified OTR connection started')
 
-        opdata['informer'].inform('%s OTR connection started' % trust)
+                contact_fingerprint = otr.otrl_privkey_hash_to_human(
+                    context.active_fingerprint.fingerprint)
+                opdata['informer'].inform("%s's fingerprint is %s" % (
+                        opdata['remote_user'], contact_fingerprint))
+
+                your_fingerprint = otr.otrl_privkey_fingerprint(
+                    USERSTATE, opdata['local_user'], 'irc')
+                opdata['informer'].inform(
+                    'your fingerprint is %s' % your_fingerprint)
+
+                opdata['informer'].inform(
+                    "please verify %s's fingerprint through a secure channel" %
+                    opdata['remote_user'])
 
     def inject_message(self, opdata=None, accountname=None, protocol=None,
                        recipient=None, message=None):
@@ -124,11 +136,13 @@ def otr_irc_in_privmsg(data, message_type, server_name, args):
             account_namer=AccountNamer(),
             commander=Commander(),
             informer=Informer(nick, server_name),
+            local_user=current_user(server_name),
+            remote_user=sender,
             )
 
         is_internal, decrypted_message, tlvs = otr.otrl_message_receiving(
-            USERSTATE, (OPS, opdata), current_user(server_name), 'irc',
-            sender, message)
+            USERSTATE, (OPS, opdata), opdata['local_user'], 'irc', sender,
+            message)
 
         # TODO: check tlvs
 
@@ -153,10 +167,14 @@ def otr_irc_out_privmsg(data, message_type, server_name, args):
 
             recipient = irc_user(recipient_nick, server_name)
 
+            informer=Informer(recipient_nick, server_name)
+
             opdata = dict(
                 account_namer=AccountNamer(),
                 commander=Commander(),
-                informer=Informer(recipient_nick, server_name),
+                informer=informer,
+                local_user=sender,
+                remote_user=recipient,
                 )
 
             message = otr.otrl_message_sending(
