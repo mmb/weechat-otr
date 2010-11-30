@@ -109,6 +109,8 @@ def shutdown():
     pass
 
 def otr_irc_in_privmsg(data, message_type, server_name, args):
+    result = ''
+
     match = IRC_IN_PRIVMSG_RE.match(args)
     if match:
         hostmask, channel, message = match.groups()
@@ -129,13 +131,15 @@ def otr_irc_in_privmsg(data, message_type, server_name, args):
         # TODO: check tlvs
 
         if not is_internal:
-            return '%s PRIVMSG %s :%s' % (hostmask, channel, decrypted_message)
-        else:
-            return ''
+            result = '%s PRIVMSG %s :%s' % (hostmask, channel, decrypted_message)
     else:
         weechat.prnt('', 'error parsing privmsg in')
 
+    return result
+
 def otr_irc_out_privmsg(data, message_type, server_name, args):
+    result = ''
+
     match = IRC_OUT_PRIVMSG_RE.match(args)
     if match:
         recipient_nick, message = match.groups()
@@ -164,7 +168,6 @@ def otr_irc_out_privmsg(data, message_type, server_name, args):
                 (OPS, opdata), context, message, otr.OTRL_FRAGMENT_SEND_ALL)
 
             # TODO: check for return None
-            result = ''
     else:
         weechat.prnt('', 'error parsing privmsg out')
 
