@@ -32,7 +32,7 @@ OTR_PREFIX = '?OTR'
 
 class AccountNamer:
 
-    def name(account, protocol):
+    def name(self, account, protocol):
         return account
 
 class Commander:
