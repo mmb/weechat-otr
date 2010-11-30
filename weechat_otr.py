@@ -30,6 +30,8 @@ IRC_OUT_PRIVMSG_RE = re.compile('PRIVMSG (.+?) :(.*)')
 OTR_DIR_NAME = 'otr'
 OTR_PREFIX = '?OTR'
 
+PROTOCOL = 'irc'
+
 class AccountNamer:
 
     def name(self, account, protocol):
@@ -76,7 +78,7 @@ class OtrOps:
                         opdata['remote_user'], contact_fingerprint))
 
                 your_fingerprint = otr.otrl_privkey_fingerprint(
-                    USERSTATE, opdata['local_user'], 'irc')
+                    USERSTATE, opdata['local_user'], PROTOCOL)
                 opdata['informer'].inform(
                     'your fingerprint is %s' % your_fingerprint)
 
@@ -141,7 +143,7 @@ def otr_irc_in_privmsg(data, message_type, server_name, args):
             )
 
         is_internal, decrypted_message, tlvs = otr.otrl_message_receiving(
-            USERSTATE, (OPS, opdata), opdata['local_user'], 'irc', sender,
+            USERSTATE, (OPS, opdata), opdata['local_user'], PROTOCOL, sender,
             message)
 
         # TODO: check tlvs
@@ -178,11 +180,11 @@ def otr_irc_out_privmsg(data, message_type, server_name, args):
                 )
 
             message = otr.otrl_message_sending(
-                USERSTATE, (OPS, opdata), sender, 'irc', recipient, message,
+                USERSTATE, (OPS, opdata), sender, PROTOCOL, recipient, message,
                 None)
 
             context, added = otr.otrl_context_find(
-                USERSTATE, recipient, sender, 'irc', 1)
+                USERSTATE, recipient, sender, PROTOCOL, 1)
 
             otr.otrl_message_fragment_and_send(
                 (OPS, opdata), context, message, otr.OTRL_FRAGMENT_SEND_ALL)
