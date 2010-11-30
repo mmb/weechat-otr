@@ -4,4 +4,7 @@ NOTE: This is a work in progress and should not be considered secure.
 
 Basic encryption seems to be working but there is more work to be done.
 
+Requires python-otr http://python-otr.pentabarf.de/
+On Debian-based distros sudo apt-get install python-otr
+
 Questions and comments: matthewm@boedicker.org
