@@ -1,6 +1,7 @@
 Weechat script for Off-the-Record messaging
 
-See http://www.cypherpunks.ca/otr/
+NOTE: This is a work in progress and should not be considered secure.
 
-NOTE: integration with OTR is not done yet, will use Python bindings for libotr
-at http://python-otr.pentabarf.de/
+Basic encryption seems to be working but there is more work to be done.
+
+Questions and comments: matthewm@boedicker.org
