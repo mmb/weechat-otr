@@ -65,7 +65,9 @@ class OtrOps:
 
     def gone_secure(self, opdata=None, context=None):
         trust = 'unverified'
-        if context is not None and context.active_fingerprint is not None:
+        if context is not None and \
+                context.active_fingerprint is not None and \
+                context.active_fingerprint.trust:
             trust = context.active_fingerprint.trust
 
         opdata['informer'].inform('%s OTR connection started' % trust)
