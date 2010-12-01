@@ -97,7 +97,9 @@ class OtrOps:
         opdata['informer'].inform(message)
 
     def max_message_size(self, opdata=None, context=None):
-        return 256
+        # see http://www.cypherpunks.ca/otr/UPGRADING-libotr-3.2.0.txt
+        # section 3.1.1
+        return 417
 
     def new_fingerprint(self, opdata=None, userstate=None, accountname=None,
                         protocol=None, username=None, fingerprint=None):
