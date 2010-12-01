@@ -197,6 +197,25 @@ def otr_irc_out_privmsg(data, message_type, server_name, args):
 
     return result
 
+def otr_trust(nick, server):
+    context = otr.otrl_context_find(
+        USERSTATE, irc_user(nick, server), current_user(server), PROTOCOL, 0)[0]
+
+    if context and context.active_fingerprint:
+	context.active_fingerprint.trust = 'verified'
+	otr.otrl_privkey_write_fingerprints(USERSTATE, FINGERPRINT_FILE)
+
+def otr_command(data, buffer, args):
+    result = weechat.WEECHAT_RC_ERROR
+
+    arg_parts = args.split()
+
+    if arg_parts[0] == 'trust':
+        otr_trust(*arg_parts[1:3])
+        result = weechat.WEECHAT_RC_OK
+
+    return result
+
 # otr setup
 USERSTATE = otr.otrl_userstate_create()
 OPS = OtrOps()
@@ -220,3 +239,11 @@ if os.path.exists(FINGERPRINT_FILE):
 
 weechat.hook_modifier('irc_in_privmsg', 'otr_irc_in_privmsg', '')
 weechat.hook_modifier('irc_out_privmsg', 'otr_irc_out_privmsg', '')
+
+weechat.hook_command(
+    'otr', 'Off-the-Record',
+    '[trust nick server]',
+    '',
+    '',
+    'otr_command',
+    '')
