@@ -29,6 +29,7 @@ IRC_OUT_PRIVMSG_RE = re.compile('PRIVMSG (.+?) :(.*)')
 
 OTR_DIR_NAME = 'otr'
 OTR_PREFIX = '?OTR'
+OTR_QUERY_RE = re.compile('\?OTR\??v[a-z\d]*\?$')
 
 PROTOCOL = 'irc'
 
@@ -36,6 +37,37 @@ class AccountNamer:
 
     def name(self, account, protocol):
         return account
+
+class Assembler:
+    """Reassemble fragmented OTR messages.
+
+    This does not deal with OTR fragmentation, which is handled by the otr
+    module, but fragmentation of received OTR messages that are too large for
+    IRC (bitlbee does this).
+    """
+    def __init__(self):
+        self.__clear()
+
+    def add(self, s):
+        self.value += s
+
+    def __is_query(self):
+        return OTR_QUERY_RE.match(self.value)
+
+    def done(self):
+        return self.__is_query() or \
+            not self.value.startswith(OTR_PREFIX) or \
+            self.value.endswith('.') or \
+            self.value.endswith(',')
+
+    def get(self):
+        result = self.value
+        self.__clear()
+
+        return result
+
+    def __clear(self):
+        self.value = ''
 
 class Commander:
 
@@ -131,19 +163,25 @@ def otr_irc_in_privmsg(data, message_type, server_name, args):
 
         opdata = otr_opdata(nick, server_name)
 
-        is_internal, decrypted_message, tlvs = otr.otrl_message_receiving(
-            USERSTATE, (OPS, opdata), opdata['local_user'], PROTOCOL, sender,
-            message)
-
         context = otr_context_find(sender, opdata['local_user'])
 
-        if context and context.smstate:
-            otr_check_tlvs(opdata, tlvs, context)
-        else:
-            opdata['informer'].inform('Invalid context')
+        assembler = context.app_data['assembler']
 
-        if not is_internal:
-            result = '%s PRIVMSG %s :%s' % (hostmask, channel, decrypted_message)
+        assembler.add(message)
+
+        if assembler.done():
+            is_internal, decrypted_message, tlvs = otr.otrl_message_receiving(
+                USERSTATE, (OPS, opdata), opdata['local_user'], PROTOCOL,
+                sender, assembler.get())
+
+            if context.smstate:
+                otr_check_tlvs(opdata, tlvs, context)
+            else:
+                opdata['informer'].inform('Invalid context')
+
+            if not is_internal:
+                result = '%s PRIVMSG %s :%s' % (
+                    hostmask, channel, decrypted_message)
     else:
         weechat.prnt('', 'error parsing privmsg in')
 
@@ -205,9 +243,14 @@ def otr_command(data, buffer, args):
 
     return result
 
+def otr_add_app_data(data=None, context=None):
+    data['assembler'] = Assembler()
+    context.app_data = data
+
 def otr_context_find(remote_user, local_user, add=1):
     return otr.otrl_context_find(
-        USERSTATE, remote_user, local_user, PROTOCOL, add)[0]
+        USERSTATE, remote_user, local_user, PROTOCOL, add,
+        (otr_add_app_data, {}))[0]
 
 def otr_check_tlvs(opdata, tlvs, context):
     if otr.otrl_tlv_find(tlvs, otr.OTRL_TLV_SMP_ABORT):
@@ -274,7 +317,7 @@ def otr_smp_abort(opdata, context, detail=None):
     otr.otrl_message_abort_smp(USERSTATE, (OPS, opdata), context)
 
 def otr_smp_ask(nick, server, secret, question=None):
-    context = otr_context_find(irc_user(nick, server), current_user(server), 1)
+    context = otr_context_find(irc_user(nick, server), current_user(server))
 
     opdata = otr_opdata(nick, server)
 
@@ -293,7 +336,7 @@ def otr_smp_inform(opdata, context):
     opdata['informer'].inform(message)
 
 def otr_smp_respond(nick, server, secret):
-    context = otr_context_find(irc_user(nick, server), current_user(server), 1)
+    context = otr_context_find(irc_user(nick, server), current_user(server))
 
     otr.otrl_message_respond_smp(
         USERSTATE, (OPS, otr_opdata(nick, server)), context, secret)
@@ -352,7 +395,8 @@ if os.path.exists(KEY_FILE):
 
 FINGERPRINT_FILE = os.path.join(OTR_DIR, 'fingerprints')
 if os.path.exists(FINGERPRINT_FILE):
-    otr.otrl_privkey_read_fingerprints(USERSTATE, FINGERPRINT_FILE)
+    otr.otrl_privkey_read_fingerprints(
+        USERSTATE, FINGERPRINT_FILE, (otr_add_app_data, {}))
 
 weechat.hook_modifier('irc_in_privmsg', 'otr_irc_in_privmsg', '')
 weechat.hook_modifier('irc_out_privmsg', 'otr_irc_out_privmsg', '')
