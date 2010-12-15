@@ -244,13 +244,12 @@ def otr_command(data, buffer, args):
     return result
 
 def otr_add_app_data(data=None, context=None):
-    data['assembler'] = Assembler()
-    context.app_data = data
+    context.app_data = dict(assembler=Assembler())
 
 def otr_context_find(remote_user, local_user, add=1):
     return otr.otrl_context_find(
         USERSTATE, remote_user, local_user, PROTOCOL, add,
-        (otr_add_app_data, {}))[0]
+        (otr_add_app_data, None))[0]
 
 def otr_check_tlvs(opdata, tlvs, context):
     if otr.otrl_tlv_find(tlvs, otr.OTRL_TLV_SMP_ABORT):
@@ -396,7 +395,7 @@ if os.path.exists(KEY_FILE):
 FINGERPRINT_FILE = os.path.join(OTR_DIR, 'fingerprints')
 if os.path.exists(FINGERPRINT_FILE):
     otr.otrl_privkey_read_fingerprints(
-        USERSTATE, FINGERPRINT_FILE, (otr_add_app_data, {}))
+        USERSTATE, FINGERPRINT_FILE, (otr_add_app_data, None))
 
 weechat.hook_modifier('irc_in_privmsg', 'otr_irc_in_privmsg', '')
 weechat.hook_modifier('irc_out_privmsg', 'otr_irc_out_privmsg', '')
