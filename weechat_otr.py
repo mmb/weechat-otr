@@ -1,6 +1,8 @@
 # weechat-otr - WeeChat script for Off-the-Record messaging
 #
-# NOTE: This is a work in progress and should not be considered secure.
+# DISCLAIMER: To the best of my knowledge this script securely provides OTR
+# messaging in WeeChat, but I offer no guarantee. Please report any security
+# holes you find.
 #
 # Copyright (c) 2010 Matthew M. Boedicker <matthewm@boedicker.org>
 #
