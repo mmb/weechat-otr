@@ -1,10 +1,19 @@
 WeeChat script for Off-the-Record messaging
 
-NOTE: This is a work in progress and should not be considered secure.
+DISCLAIMER: To the best of my knowledge this script securely provides OTR
+messaging in WeeChat, but I offer no guarantee. Please report any security
+holes you find.
 
-Basic encryption seems to be working but there is more work to be done.
+Still a few bugs but all the basics are working.
 
 Requires python-otr http://python-otr.pentabarf.de/
 On Debian-based distros sudo apt-get install python-otr
+
+To install:
+
+Copy weechat_otr.py to ~/.weechat/python/
+
+Then either symlink it into ~/.weechat/python/autload
+or '/python load python/weechat_otr.py' in WeeChat
 
 Questions and comments: matthewm@boedicker.org
