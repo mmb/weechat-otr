@@ -240,6 +240,11 @@ def otr_command(data, buffer, args):
                 question = None
             otr_smp_ask(nick, server, secret, question)
             result = weechat.WEECHAT_RC_OK
+    elif arg_parts[0] == 'endprivate':
+        nick, server = arg_parts[1:3]
+        context = otr_context_find(irc_user(nick, server), current_user(server))
+        otr.otrl_context_force_plaintext(context)
+        result = weechat.WEECHAT_RC_OK
 
     return result
 
@@ -404,7 +409,8 @@ weechat.hook_command(
     'otr', 'Off-the-Record',
     '[trust nick server] | '
     '[smp respond nick server secret] | '
-    '[smp ask nick server secret [question]]',
+    '[smp ask nick server secret [question]]'
+    '[endprivate nick server]',
     '',
     '',
     'otr_command',
