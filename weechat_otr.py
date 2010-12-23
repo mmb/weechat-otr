@@ -132,7 +132,7 @@ class OtrOps:
     def policy(self, opdata=None, context=None):
         return otr.OTRL_POLICY_DEFAULT
 
-    def still_secure(self, context=None, is_reply=None):
+    def still_secure(self, opdata=None, context=None, is_reply=None):
         # TODO find out what this is for
         opdata['informer'].inform('Still secure %s' % is_reply)
 
