@@ -6,14 +6,23 @@ holes you find.
 
 Still a few bugs but all the basics are working.
 
-Requires python-otr http://python-otr.pentabarf.de/
-On Debian-based distros sudo apt-get install python-otr
+Installation:
 
-To install:
+Requires python-otr 0.2.2 which has not been officially released yet. Until
+it is released:
+
+wget http://python-otr.pentabarf.de/releases/python-otr-0.2.1.1.tar.gz
+tar xvzf python-otr-0.2.1.1.tar.gz
+cd python-otr-0.2.1.1
+wget http://python-otr.pentabarf.de/releases/patches/python-otr-0.2.2.patch
+patch -p0 < python-otr-0.2.2.patch
+sudo python setup.py install
+
+To install script:
 
 Copy weechat_otr.py to ~/.weechat/python/
 
 Then either symlink it into ~/.weechat/python/autload
 or '/python load python/weechat_otr.py' in WeeChat
 
-Questions and comments: matthewm@boedicker.org
+Questions, comments and patches welcome: matthewm@boedicker.org
