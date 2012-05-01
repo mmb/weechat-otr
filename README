@@ -1,22 +1,14 @@
 WeeChat script for Off-the-Record messaging
 
-DISCLAIMER: To the best of my knowledge this script securely provides OTR
-messaging in WeeChat, but I offer no guarantee. Please report any security
-holes you find.
+This script is under active development and many features have not been
+implemented yet. It has not been tested very much or audited for security.
 
-Still a few bugs but all the basics are working.
+It requires the pure Python OTR implementation (potr):
 
-Installation:
+https://github.com/afflux/pure-python-otr
 
-Requires python-otr 0.2.2 which has not been officially released yet. Until
-it is released:
-
-wget http://python-otr.pentabarf.de/releases/python-otr-0.2.1.1.tar.gz
-tar xvzf python-otr-0.2.1.1.tar.gz
-cd python-otr-0.2.1.1
-wget http://python-otr.pentabarf.de/releases/patches/python-otr-0.2.2.patch
-patch -p0 < python-otr-0.2.2.patch
-sudo python setup.py install
+Thanks to Kjell Braden for the Python OTR library and the Gajim Python plugin
+which I used as a reference.
 
 To install script:
 
