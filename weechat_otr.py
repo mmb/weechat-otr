@@ -141,13 +141,13 @@ class IrcContext(potr.context.Context):
                 self.print_buffer('New fingerprint: %s' % fpr)
                 self.setCurrentTrust('')
 
-                if bool(trust):
-                    trust_str = 'Authenticated'
-                else:
-                    trust_str = 'Unauthenticated'
+            if bool(trust):
+                trust_str = 'Authenticated'
+            else:
+                trust_str = 'Unauthenticated'
 
-                self.print_buffer(
-                    '%s secured OTR conversation started.' % trust_str)
+            self.print_buffer(
+                '%s secured OTR conversation started.' % trust_str)
 
         if self.state != potr.context.STATE_PLAINTEXT and \
                 newstate == potr.context.STATE_PLAINTEXT:
