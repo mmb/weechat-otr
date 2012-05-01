@@ -318,6 +318,34 @@ def shutdown():
 
     return weechat.WEECHAT_RC_OK
 
+def command(data, buf, args):
+    """Parse and dispatch WeeChat OTR commands."""
+    result = weechat.WEECHAT_RC_ERROR
+
+    arg_parts = args.split(None, 5)
+
+    if arg_parts[0] == 'trust':
+        nick, server = arg_parts[1:3]
+
+        context = ACCOUNTS[current_user(server)].getContext(
+            irc_user(nick, server))
+        context.setCurrentTrust('verified')
+
+        result = weechat.WEECHAT_RC_OK
+    elif arg_parts[0] == 'smp':
+        # not implemented yet
+        result = weechat.WEECHAT_RC_OK
+    elif arg_parts[0] == 'endprivate':
+        nick, server = arg_parts[1:3]
+
+        context = ACCOUNTS[current_user(server)].getContext(
+            irc_user(nick, server))
+        context.disconnect(appdata=dict(nick=nick, server=server))
+
+        result = weechat.WEECHAT_RC_OK
+
+    return result
+
 weechat.register(
     'otr', 'Matthew M. Boedicker', '0.0.2', 'GPL3', '', 'shutdown', '')
 
@@ -337,5 +365,5 @@ weechat.hook_command(
     '[endprivate nick server]',
     '',
     '',
-    'otr_command',
+    'command',
     '')
