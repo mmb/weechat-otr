@@ -26,6 +26,12 @@ import weechat
 
 import potr
 
+SCRIPT_NAME = 'otr'
+SCRIPT_DESC = 'Off-the-Record'
+SCRIPT_AUTHOR = 'Matthew M. Boedicker'
+SCRIPT_LICENCE = 'GPL3'
+SCRIPT_VERSION = '0.0.2'
+
 OTR_DIR_NAME = 'otr'
 OTR_QUERY_RE = re.compile('\?OTR\??v[a-z\d]*\?$')
 
@@ -36,7 +42,7 @@ DEBUG = True
 def debug(msg):
     """Send a debug message to the WeeChat core buffer."""
     if DEBUG:
-        weechat.prnt('OTR debug: %s', str(msg))
+        weechat.prnt('','OTR debug:\t%s' % str(msg))
 
 def current_user(server_name):
     """Get the nick and server of the current user on a server."""
@@ -223,9 +229,9 @@ class IrcOtrAccount(potr.context.Account):
                              trust)))
                     fpr_file.write('\n')
 
-def message_in(data, modifier, modifier_data, string):
+def message_in_cb(data, modifier, modifier_data, string):
     """Incoming message callback"""
-    debug(('message_in', data, modifier, modifier_data, string))
+    debug(('message_in_cb', data, modifier, modifier_data, string))
 
     parsed = weechat.info_get_hashtable(
         'irc_message_parse', dict(message=string))
@@ -267,9 +273,9 @@ def message_in(data, modifier, modifier_data, string):
 
     return result
 
-def message_out(data, modifier, modifier_data, string):
+def message_out_cb(data, modifier, modifier_data, string):
     """Outgoing message callback."""
-    debug(('message_out', data, modifier, modifier_data, string))
+    debug(('message_out_cb', data, modifier, modifier_data, string))
 
     parsed = weechat.info_get_hashtable(
         'irc_message_parse', dict(message=string))
@@ -318,13 +324,13 @@ def shutdown():
 
     return weechat.WEECHAT_RC_OK
 
-def command(data, buf, args):
+def command_cb(data, buf, args):
     """Parse and dispatch WeeChat OTR commands."""
     result = weechat.WEECHAT_RC_ERROR
 
     arg_parts = args.split(None, 5)
 
-    if arg_parts[0] == 'trust':
+    if len(arg_parts) == 3 and arg_parts[0] == 'trust':
         nick, server = arg_parts[1:3]
 
         context = ACCOUNTS[current_user(server)].getContext(
@@ -332,10 +338,10 @@ def command(data, buf, args):
         context.setCurrentTrust('verified')
 
         result = weechat.WEECHAT_RC_OK
-    elif arg_parts[0] == 'smp':
+    elif len(arg_parts) in (5, 6) and arg_parts[0] == 'smp':
         # not implemented yet
         result = weechat.WEECHAT_RC_OK
-    elif arg_parts[0] == 'endprivate':
+    elif len(arg_parts) == 3 and arg_parts[0] == 'endprivate':
         nick, server = arg_parts[1:3]
 
         context = ACCOUNTS[current_user(server)].getContext(
@@ -347,23 +353,22 @@ def command(data, buf, args):
     return result
 
 weechat.register(
-    'otr', 'Matthew M. Boedicker', '0.0.2', 'GPL3', '', 'shutdown', '')
+    SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, '', 'shutdown', '')
 
 WEECHAT_DIR = weechat.info_get('weechat_dir', '')
 OTR_DIR = os.path.join(WEECHAT_DIR, OTR_DIR_NAME)
 if not os.path.exists(OTR_DIR):
     weechat.mkdir_home(OTR_DIR_NAME, 0700)
 
-weechat.hook_modifier('irc_in_privmsg', 'message_in', '')
-weechat.hook_modifier('irc_out_privmsg', 'message_out', '')
+weechat.hook_modifier('irc_in_privmsg', 'message_in_cb', '')
+weechat.hook_modifier('irc_out_privmsg', 'message_out_cb', '')
 
 weechat.hook_command(
-    'otr', 'Off-the-Record',
-    '[trust nick server] | '
-    '[smp respond nick server secret] | '
-    '[smp ask nick server secret [question]]'
-    '[endprivate nick server]',
+    SCRIPT_NAME, SCRIPT_DESC,
+    'trust [<nick> <server>] || smp respond [<nick> <server> <secret>] || smp ask [<nick> <server> <secret> [question]] || endprivate [<nick> <server>]',
     '',
-    '',
-    'command',
+    'trust %-||'
+    'smp ask|respond %-||'
+    'endprivate %-||',
+    'command_cb',
     '')
