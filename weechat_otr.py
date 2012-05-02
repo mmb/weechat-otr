@@ -182,6 +182,10 @@ class IrcOtrAccount(potr.context.Account):
         super(IrcOtrAccount, self).__init__(
             name, IrcOtrAccount.PROTOCOL, IrcOtrAccount.MAX_MSG_SIZE)
 
+        # IRC messages cannot have newlines, OTR query and "no plugin" text
+        # need to be one message
+        self.defaultQuery = self.defaultQuery.replace("\n", ' ')
+
         self.key_file_path = os.path.join(OTR_DIR, '%s.%s' % (name, 'key3'))
         self.fpr_file_path = os.path.join(OTR_DIR, '%s.%s' % (name, 'fpr'))
 
