@@ -5,6 +5,7 @@
 # holes you find.
 #
 # Copyright (c) 2012 Matthew M. Boedicker <matthewm@boedicker.org>
+#                    Nils Görs <weechatter@arcor.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
