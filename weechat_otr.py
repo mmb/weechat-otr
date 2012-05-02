@@ -8,6 +8,8 @@
 # Copyright (c) 2012 Matthew M. Boedicker <matthewm@boedicker.org>
 #                    Nils Görs <weechatter@arcor.de>
 #
+# Report issues at https://github.com/mmb/weechat-otr
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
