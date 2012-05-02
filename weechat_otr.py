@@ -61,6 +61,12 @@ def has_otr_end(msg):
     """Return True if the message is the end of an OTR message."""
     return msg.endswith('.') or msg.endswith(',')
 
+def first_instance(objs, klass):
+    """Return the first object in the list that is an instance of a class."""
+    for obj in objs:
+        if isinstance(obj, klass):
+            return obj
+
 class Assembler:
     """Reassemble fragmented OTR messages.
 
@@ -105,6 +111,8 @@ class IrcContext(potr.context.Context):
         self.peer_nick, self.peer_server = peername.split('@')
         self.in_assembler = Assembler()
         self.in_otr_message = False
+        self.in_smp = False
+        self.smp_question = False
 
     def getPolicy(self, key):
         debug('get policy %s' % key)
@@ -170,6 +178,61 @@ class IrcContext(potr.context.Context):
     def print_buffer(self, msg):
         """Print a message to the buffer for this context."""
         weechat.prnt(self.buffer(), msg)
+
+    def smp_finish(self, message):
+        """Reset SMP state and send a message to the user."""
+        self.in_smp = False
+        self.smp_question = False
+
+        self.user.saveTrusts()
+        self.print_buffer(message)
+
+    def handle_tlvs(self, tlvs):
+        """Handle SMP states."""
+        if tlvs:
+            smp1q = first_instance(tlvs, potr.proto.SMP1QTLV)
+            smp3 = first_instance(tlvs, potr.proto.SMP3TLV)
+            smp4 = first_instance(tlvs, potr.proto.SMP4TLV)
+
+            if self.in_smp and not self.smpIsValid():
+                debug('SMP aborted')
+                self.smp_finish('SMP aborted.')
+            elif first_instance(tlvs, potr.proto.SMP1TLV):
+                debug('SMP1')
+                self.in_smp = True
+
+                self.print_buffer(
+                    """Peer has requested SMP verification.
+Respond with: /otr smp respond %s %s <secret>""" % (
+                        self.peer_nick, self.peer_server))
+            elif smp1q:
+                debug(('SMP1Q', smp1q.msg))
+                self.in_smp = True
+                self.smp_question = True
+
+                self.print_buffer(
+                    """Peer has requested SMP verification: %s
+Respond with: /otr smp respond %s %s <answer>""" % (
+                        smp1q.msg, self.peer_nick, self.peer_server))
+            elif first_instance(tlvs, potr.proto.SMP2TLV):
+                debug('SMP2')
+                self.print_buffer('SMP progressing.')
+            elif smp3 or smp4:
+                if smp3:
+                    debug('SMP3')
+                elif smp4:
+                    debug('SMP4')
+
+                if self.smpIsSuccess():
+                    self.smp_finish('SMP verification succeeded.')
+
+                    if self.smp_question:
+                        self.print_buffer(
+                            """You may want to authenticate your peer by asking your own question:
+/otr smp ask %s %s <secret> <question>
+""" % (self.peer_nick, self.peer_server))
+                else:
+                    self.smp_finish('SMP verification failed.')
 
 class IrcOtrAccount(potr.context.Account):
     """Account class for OTR over IRC."""
@@ -270,6 +333,8 @@ def message_in_cb(data, modifier, modifier_data, string):
             if msg:
                 result = ':%s PRIVMSG %s :%s' % (
                     parsed['host'], parsed['channel'], msg)
+
+            context.handle_tlvs(tlvs)
         except potr.context.UnencryptedMessage, e:
             result = string
         except potr.context.NotEncryptedError, e:
@@ -344,8 +409,30 @@ def command_cb(data, buf, args):
 
         result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) in (5, 6) and arg_parts[0] == 'smp':
-        # not implemented yet
-        result = weechat.WEECHAT_RC_OK
+        action = arg_parts[1]
+
+        if action == 'respond':
+            nick, server, secret = arg_parts[2:5]
+
+            context = ACCOUNTS[current_user(server)].getContext(
+                irc_user(nick, server))
+            context.smpGotSecret(secret, appdata=dict(nick=nick, server=server))
+
+            result = weechat.WEECHAT_RC_OK
+        elif action == 'ask':
+            nick, server, secret = arg_parts[2:5]
+
+            if len(arg_parts) > 5:
+                question = arg_parts[5]
+            else:
+                question = None
+
+            context = ACCOUNTS[current_user(server)].getContext(
+                irc_user(nick, server))
+            context.smpInit(
+                secret, question, appdata=dict(nick=nick, server=server))
+
+            result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) == 3 and arg_parts[0] == 'endprivate':
         nick, server = arg_parts[1:3]
 
@@ -358,7 +445,8 @@ def command_cb(data, buf, args):
     return result
 
 weechat.register(
-    SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, '', 'shutdown', '')
+    SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, '', 'shutdown',
+    '')
 
 WEECHAT_DIR = weechat.info_get('weechat_dir', '')
 OTR_DIR = os.path.join(WEECHAT_DIR, OTR_DIR_NAME)
