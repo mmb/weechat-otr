@@ -186,7 +186,7 @@ class IrcContext(potr.context.Context):
 
     def print_buffer(self, msg):
         """Print a message to the buffer for this context."""
-        weechat.prnt(self.buffer(), msg)
+        weechat.prnt(self.buffer(), '%s\t%s' % (SCRIPT_NAME, msg))
 
     def smp_finish(self, message):
         """Reset SMP state and send a message to the user."""
