@@ -154,8 +154,9 @@ class IrcContext(potr.context.Context):
                 self.print_buffer(
                     'Private conversation has been refreshed.')
             elif newstate == potr.context.STATE_FINISHED:
-                self.print_buffer(
-                    'Remote peer has ended the private conversation. You should do the same.')
+                self.print_buffer("""%s has ended the private conversation. You should do the same:
+/otr endprivate %s %s
+""" % (self.peer, self.peer_nick, self.peer_server))
         elif newstate == potr.context.STATE_ENCRYPTED:
             # unencrypted => encrypted
             trust = self.getCurrentTrust()
