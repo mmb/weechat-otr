@@ -1,7 +1,11 @@
 WeeChat script for Off-the-Record messaging
 
-This script is under active development and many features have not been
-implemented yet. It has not been tested very much or audited for security.
+DISCLAIMER: To the best of my knowledge this script securely provides OTR
+messaging in WeeChat, but I offer no guarantee. Please report any security
+holes you find.
+
+The basics are working and new features are being added. Testing and
+security auditing are appreciated.
 
 It requires the pure Python OTR implementation (potr):
 
