@@ -366,6 +366,10 @@ def message_out_cb(data, modifier, modifier_data, string):
 
     server = modifier_data
 
+    # skip processing messages to public channels
+    if parsed['nick'] == '':
+        return string
+
     to_user = irc_user(parsed['nick'], server)
     local_user = current_user(server)
 
