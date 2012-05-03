@@ -362,13 +362,13 @@ def message_out_cb(data, modifier, modifier_data, string):
         'irc_message_parse', dict(message=string))
     debug(('parsed message', parsed))
 
-    msg_text = extract_privmsg_text(parsed['arguments'])
-
-    server = modifier_data
-
     # skip processing messages to public channels
     if parsed['nick'] == '':
         return string
+
+    msg_text = extract_privmsg_text(parsed['arguments'])
+
+    server = modifier_data
 
     to_user = irc_user(parsed['nick'], server)
     local_user = current_user(server)
