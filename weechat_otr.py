@@ -41,12 +41,17 @@ OTR_QUERY_RE = re.compile('\?OTR\??v[a-z\d]*\?$')
 
 ACCOUNTS = {}
 
-DEBUG = True
+OPTIONS         = { 'debug'            : ('off', 'switch debug mode on/off'),
+                  }
 
 def debug(msg):
     """Send a debug message to the WeeChat core buffer."""
-    if DEBUG:
-        weechat.prnt('','OTR debug:\t%s' % str(msg))
+    if OPTIONS['debug'] == 'on':
+        weechat.prnt('', '%s debug\t%s' % (SCRIPT_NAME, str(msg)))
+
+def info(msg):
+    """Send an info message to the WeeChat core buffer."""
+    weechat.prnt('', '%s\t%s' % (SCRIPT_NAME, str(msg)))
 
 def current_user(server_name):
     """Get the nick and server of the current user on a server."""
@@ -344,6 +349,8 @@ def message_in_cb(data, modifier, modifier_data, string):
             context.print_buffer(
                 'Received encrypted data but no private session established.')
 
+    weechat.bar_item_update(SCRIPT_NAME)
+
     return result
 
 def message_out_cb(data, modifier, modifier_data, string):
@@ -389,11 +396,15 @@ def message_out_cb(data, modifier, modifier_data, string):
 
         result = ''
 
+    weechat.bar_item_update(SCRIPT_NAME)
+
     return result
 
 def shutdown():
     """Script unload callback."""
     debug('shutdown')
+
+    weechat.bar_item_remove(OTR_STATUSBAR)
 
     return weechat.WEECHAT_RC_OK
 
@@ -444,8 +455,48 @@ def command_cb(data, buf, args):
         context.disconnect(appdata=dict(nick=nick, server=server))
 
         result = weechat.WEECHAT_RC_OK
+    elif len(arg_parts) == 1 and arg_parts[0] == 'debug':
+        if OPTIONS['debug'] == 'on':
+            weechat.config_set_plugin('debug', 'off')
+        elif OPTIONS['debug'] == 'off':
+            weechat.config_set_plugin('debug', 'on')
+
+        info('debug status is now: %s' % weechat.config_get_plugin('debug'))
+
+        result = weechat.WEECHAT_RC_OK
 
     return result
+
+def otr_statusbar_cb(data, item, window):
+    """Update the statusbar."""
+    buf = weechat.window_get_pointer(window, 'buffer')
+    buf_type = weechat.buffer_get_string(buf, 'localvar_type')
+
+    bar_parts = []
+
+    if buf_type == 'private':
+        channel = weechat.buffer_get_string(buf, 'localvar_channel')
+
+        if channel in ACCOUNTS:
+            bar_parts.append('OTR capable')
+
+    return ','.join(bar_parts)
+
+def init_options():
+    """Load options."""
+    for option, value in OPTIONS.iteritems():
+        if not weechat.config_is_set_plugin(option):
+            weechat.config_set_plugin(option, value[0])
+            weechat.config_set_desc_plugin(
+                option, '%s (default: %s)' % (value[1], value[0]))
+        else:
+            OPTIONS[option] = weechat.config_get_plugin(option)
+
+def toggle_refresh(pointer, name, value):
+    option = name[len('plugins.var.python.%s.' % SCRIPT_NAME):]
+    OPTIONS[option] = value
+
+    return weechat.WEECHAT_RC_OK
 
 weechat.register(
     SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, '', 'shutdown',
@@ -458,13 +509,21 @@ if not os.path.exists(OTR_DIR):
 
 weechat.hook_modifier('irc_in_privmsg', 'message_in_cb', '')
 weechat.hook_modifier('irc_out_privmsg', 'message_out_cb', '')
+weechat.hook_config(
+    'plugins.var.python.%s.*' % SCRIPT_NAME, 'toggle_refresh', '')
 
 weechat.hook_command(
     SCRIPT_NAME, SCRIPT_DESC,
-    'trust [<nick> <server>] || smp respond [<nick> <server> <secret>] || smp ask [<nick> <server> <secret> [question]] || endprivate [<nick> <server>]',
+    'trust [<nick> <server>] || smp respond [<nick> <server> <secret>] || smp ask [<nick> <server> <secret> [question]] || endprivate [<nick> <server>] || debug',
     '',
-    'trust %-||'
-    'smp ask|respond %-||'
-    'endprivate %-||',
+    'debug %-||'
+    'endprivate %(nick) %(irc_servers) %-||'
+    'smp ask|respond %(nick) %(irc_servers) %-||'
+    'trust %(nick) %(irc_servers) %-||',
     'command_cb',
     '')
+
+init_options()
+
+OTR_STATUSBAR = weechat.bar_item_new(SCRIPT_NAME, 'otr_statusbar_cb', '')
+weechat.bar_item_update(SCRIPT_NAME)
