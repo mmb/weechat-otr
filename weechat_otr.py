@@ -175,12 +175,12 @@ class IrcContext(potr.context.Context):
                 self.setCurrentTrust('')
 
             if bool(trust):
-                trust_str = 'Authenticated'
+                self.print_buffer(
+                    'Authenticated secured OTR conversation started.')
             else:
-                trust_str = 'Unauthenticated'
-
-            self.print_buffer(
-                '%s secured OTR conversation started.' % trust_str)
+                self.print_buffer(
+                    'Unauthenticated secured OTR conversation started.')
+                self.print_buffer(self.verify_instructions())
 
         if self.state != potr.context.STATE_PLAINTEXT and \
                 newstate == potr.context.STATE_PLAINTEXT:
@@ -252,6 +252,29 @@ Respond with: /otr smp respond %s %s <answer>""" % (
 """ % (self.peer_nick, self.peer_server))
                 else:
                     self.smp_finish('SMP verification failed.')
+
+    def verify_instructions(self):
+        """Generate verification instructions for user."""
+        return """You can verify that this contact is who they claim to be in one of the following ways:
+
+1) Verify each other's fingerprints using a secure channel:
+  Your fingerprint : %(your_fingerprint)s
+  %(peer)s's fingerprint : %(peer_fingerprint)s
+  then use the command: /otr trust %(peer_nick)s %(peer_server)s
+
+2) SMP pre-shared secret that you both know:
+  /otr smp ask %(peer_nick)s %(peer_server)s <secret>
+
+3) SMP pre-shared secret that you both know with a question:
+  /otr smp ask %(peer_nick)s %(peer_server)s <secret> <question>
+""" % dict(
+            your_fingerprint=self.user.getPrivkey(),
+            peer=self.peer,
+            peer_fingerprint=potr.human_hash(
+        self.crypto.theirPubkey.cfingerprint()),
+            peer_nick=self.peer_nick,
+            peer_server=self.peer_server,
+            )
 
 class IrcOtrAccount(potr.context.Account):
     """Account class for OTR over IRC."""
