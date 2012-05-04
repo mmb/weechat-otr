@@ -503,16 +503,22 @@ def toggle_refresh(pointer, name, value):
 
     return weechat.WEECHAT_RC_OK
 
+def create_dir():
+    """Create the OTR subdirectory in the WeeChat config directory if it does
+    not exist."""
+    weechat_dir = weechat.info_get('weechat_dir', '')
+    otr_dir = os.path.join(WEECHAT_DIR, OTR_DIR_NAME)
+
+    if not os.path.exists(otr_dir):
+        weechat.mkdir_home(OTR_DIR_NAME, 0700)
+
 weechat.register(
     SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, '', 'shutdown',
     '')
 
 ACCOUNTS = AccountDict()
 
-WEECHAT_DIR = weechat.info_get('weechat_dir', '')
-OTR_DIR = os.path.join(WEECHAT_DIR, OTR_DIR_NAME)
-if not os.path.exists(OTR_DIR):
-    weechat.mkdir_home(OTR_DIR_NAME, 0700)
+create_dir()
 
 weechat.hook_modifier('irc_in_privmsg', 'message_in_cb', '')
 weechat.hook_modifier('irc_out_privmsg', 'message_out_cb', '')
