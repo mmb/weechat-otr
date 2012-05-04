@@ -38,6 +38,7 @@ SCRIPT_LICENCE = 'GPL3'
 SCRIPT_VERSION = '0.0.2'
 
 OTR_DIR_NAME = 'otr'
+
 OTR_QUERY_RE = re.compile('\?OTR\??v[a-z\d]*\?$')
 
 OPTIONS         = { 'debug'            : ('off', 'switch debug mode on/off'),
@@ -507,15 +508,14 @@ def toggle_refresh(pointer, name, value):
 def create_dir():
     """Create the OTR subdirectory in the WeeChat config directory if it does
     not exist."""
-    weechat_dir = weechat.info_get('weechat_dir', '')
-    otr_dir = os.path.join(WEECHAT_DIR, OTR_DIR_NAME)
-
-    if not os.path.exists(otr_dir):
+    if not os.path.exists(OTR_DIR):
         weechat.mkdir_home(OTR_DIR_NAME, 0700)
 
 weechat.register(
     SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, '', 'shutdown',
     '')
+
+OTR_DIR = os.path.join(weechat.info_get('weechat_dir', ''), OTR_DIR_NAME)
 
 ACCOUNTS = AccountDict()
 
