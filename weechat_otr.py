@@ -511,33 +511,32 @@ def create_dir():
     if not os.path.exists(OTR_DIR):
         weechat.mkdir_home(OTR_DIR_NAME, 0700)
 
-weechat.register(
+if weechat.register(
     SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, '', 'shutdown',
-    '')
+    ''):
+    OTR_DIR = os.path.join(weechat.info_get('weechat_dir', ''), OTR_DIR_NAME)
+    create_dir()
 
-OTR_DIR = os.path.join(weechat.info_get('weechat_dir', ''), OTR_DIR_NAME)
+    ACCOUNTS = AccountDict()
 
-ACCOUNTS = AccountDict()
+    weechat.hook_modifier('irc_in_privmsg', 'message_in_cb', '')
+    weechat.hook_modifier('irc_out_privmsg', 'message_out_cb', '')
 
-create_dir()
+    weechat.hook_config(
+        'plugins.var.python.%s.*' % SCRIPT_NAME, 'toggle_refresh', '')
 
-weechat.hook_modifier('irc_in_privmsg', 'message_in_cb', '')
-weechat.hook_modifier('irc_out_privmsg', 'message_out_cb', '')
-weechat.hook_config(
-    'plugins.var.python.%s.*' % SCRIPT_NAME, 'toggle_refresh', '')
+    weechat.hook_command(
+        SCRIPT_NAME, SCRIPT_DESC,
+        'trust [<nick> <server>] || smp respond [<nick> <server> <secret>] || smp ask [<nick> <server> <secret> [question]] || endprivate [<nick> <server>] || debug',
+        '',
+        'debug %-||'
+        'endprivate %(nick) %(irc_servers) %-||'
+        'smp ask|respond %(nick) %(irc_servers) %-||'
+        'trust %(nick) %(irc_servers) %-||',
+        'command_cb',
+        '')
 
-weechat.hook_command(
-    SCRIPT_NAME, SCRIPT_DESC,
-    'trust [<nick> <server>] || smp respond [<nick> <server> <secret>] || smp ask [<nick> <server> <secret> [question]] || endprivate [<nick> <server>] || debug',
-    '',
-    'debug %-||'
-    'endprivate %(nick) %(irc_servers) %-||'
-    'smp ask|respond %(nick) %(irc_servers) %-||'
-    'trust %(nick) %(irc_servers) %-||',
-    'command_cb',
-    '')
+    init_options()
 
-init_options()
-
-OTR_STATUSBAR = weechat.bar_item_new(SCRIPT_NAME, 'otr_statusbar_cb', '')
-weechat.bar_item_update(SCRIPT_NAME)
+    OTR_STATUSBAR = weechat.bar_item_new(SCRIPT_NAME, 'otr_statusbar_cb', '')
+    weechat.bar_item_update(SCRIPT_NAME)
