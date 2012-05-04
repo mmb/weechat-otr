@@ -75,6 +75,7 @@ def first_instance(objs, klass):
             return obj
 
 class AccountDict(collections.defaultdict):
+    """Dictionary that adds missing keys as IrcOtrAccount instances."""
 
     def __missing__(self, key):
         debug(('add account', key))
