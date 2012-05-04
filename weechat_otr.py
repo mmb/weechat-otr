@@ -500,6 +500,7 @@ def init_options():
             OPTIONS[option] = weechat.config_get_plugin(option)
 
 def toggle_refresh(pointer, name, value):
+    """Update OPTIONS dictionary when WeeChat config variables change."""
     option = name[len('plugins.var.python.%s.' % SCRIPT_NAME):]
     OPTIONS[option] = value
 
