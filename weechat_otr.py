@@ -23,6 +23,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import collections
 import os
 import re
 
@@ -38,8 +39,6 @@ SCRIPT_VERSION = '0.0.2'
 
 OTR_DIR_NAME = 'otr'
 OTR_QUERY_RE = re.compile('\?OTR\??v[a-z\d]*\?$')
-
-ACCOUNTS = {}
 
 OPTIONS         = { 'debug'            : ('off', 'switch debug mode on/off'),
                   }
@@ -74,6 +73,14 @@ def first_instance(objs, klass):
     for obj in objs:
         if isinstance(obj, klass):
             return obj
+
+class AccountDict(collections.defaultdict):
+
+    def __missing__(self, key):
+        debug(('add account', key))
+        self[key] = IrcOtrAccount(key)
+
+        return self[key]
 
 class Assembler:
     """Reassemble fragmented OTR messages.
@@ -321,10 +328,6 @@ def message_in_cb(data, modifier, modifier_data, string):
     from_user = irc_user(parsed['nick'], server)
     local_user = current_user(server)
 
-    if local_user not in ACCOUNTS:
-        debug(('add account', local_user))
-        ACCOUNTS[local_user] = IrcOtrAccount(local_user)
-
     context = ACCOUNTS[local_user].getContext(from_user)
 
     context.in_assembler.add(msg_text)
@@ -372,9 +375,6 @@ def message_out_cb(data, modifier, modifier_data, string):
 
     to_user = irc_user(parsed['nick'], server)
     local_user = current_user(server)
-
-    if local_user not in ACCOUNTS:
-        ACCOUNTS[local_user] = IrcOtrAccount(local_user)
 
     context = ACCOUNTS[local_user].getContext(to_user)
 
@@ -506,6 +506,8 @@ def toggle_refresh(pointer, name, value):
 weechat.register(
     SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, '', 'shutdown',
     '')
+
+ACCOUNTS = AccountDict()
 
 WEECHAT_DIR = weechat.info_get('weechat_dir', '')
 OTR_DIR = os.path.join(WEECHAT_DIR, OTR_DIR_NAME)
