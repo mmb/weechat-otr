@@ -135,7 +135,7 @@ class IrcContext(potr.context.Context):
         debug('get policy %s' % key)
 
         return {
-            'ALLOW_V1' : True,
+            'ALLOW_V1' : False,
             'ALLOW_V2' : True,
             'REQUIRE_ENCRYPTION' : True,
             'SEND_TAG' : True,
