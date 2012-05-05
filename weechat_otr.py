@@ -44,6 +44,29 @@ OTR_QUERY_RE = re.compile('\?OTR\??v[a-z\d]*\?$')
 OPTIONS         = { 'debug'            : ('off', 'switch debug mode on/off'),
                   }
 
+potr.proto.TaggedPlaintextOrig = potr.proto.TaggedPlaintext
+
+class WeechatTaggedPlaintext(potr.proto.TaggedPlaintextOrig):
+    """Patch potr.proto.TaggedPlaintext to not end plaintext tags in a space.
+
+    When POTR adds OTR tags to plaintext it puts them at the end of the message.
+    The tags end in a space which gets stripped off by WeeChat because it
+    strips trailing spaces from commands. This causes OTR initiation to fail so
+    the following code adds an extra tab at the end of the plaintext tags if
+    they end in a space.
+    """
+
+    def __bytes__(self):
+        # old style because parent class is old style
+        result = potr.proto.TaggedPlaintextOrig.__bytes__(self)
+
+        if result.endswith(' '):
+            result = '%s\t' % result
+
+        return result
+
+potr.proto.TaggedPlaintext = WeechatTaggedPlaintext
+
 def debug(msg):
     """Send a debug message to the WeeChat core buffer."""
     if OPTIONS['debug'] == 'on':
