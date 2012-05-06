@@ -468,9 +468,17 @@ def message_out_cb(data, modifier, modifier_data, string):
     else:
         debug(('context send message', msg_text, parsed['nick'], server))
 
-        context.sendMessage(
-            potr.context.FRAGMENT_SEND_ALL, msg_text,
-            appdata=dict(nick=parsed['nick'], server=server))
+        try:
+            context.sendMessage(
+                potr.context.FRAGMENT_SEND_ALL, msg_text,
+                appdata=dict(nick=parsed['nick'], server=server))
+        except potr.context.NotEncryptedError, err:
+            if err.args[0] == potr.context.EXC_FINISHED:
+                context.print_buffer(
+                    """Your message was not sent. End your private conversation:\n/otr endprivate %s %s""" % (
+                        parsed['nick'], server))
+            else:
+                raise
 
         result = ''
 
