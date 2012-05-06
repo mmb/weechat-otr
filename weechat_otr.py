@@ -41,8 +41,19 @@ OTR_DIR_NAME = 'otr'
 
 OTR_QUERY_RE = re.compile('\?OTR\??v[a-z\d]*\?$')
 
-OPTIONS         = { 'debug'            : ('off', 'switch debug mode on/off'),
-                  }
+OPTIONS = {
+    'debug'                        : ('off', 'switch debug mode on/off'),
+
+    'status_color_default'         : ('default', 'status bar default color'),
+    'status_color_encrypted'       : (
+        'lightgreen', 'status bar encrypted indicator color'),
+    'status_color_unencrypted'     : (
+        'lightred', 'status bar unencrypted indicator color'),
+    'status_color_authenticated'   : (
+        'green', 'status bar authenticated indicator color'),
+    'status_color_unauthenticated' : (
+        'red', 'status bar unauthenticated indicator color'),
+    }
 
 potr.proto.TaggedPlaintextOrig = potr.proto.TaggedPlaintext
 
@@ -97,6 +108,10 @@ def first_instance(objs, klass):
     for obj in objs:
         if isinstance(obj, klass):
             return obj
+
+def color_wrap(text, color, reset_color):
+    """Colorize a string and reset the color back to another color."""
+    return '%s%s%s' % (weechat.color(color), text, weechat.color(reset_color))
 
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
@@ -181,7 +196,7 @@ class IrcContext(potr.context.Context):
         """Handle state transition."""
         debug(('state', self.state, newstate))
 
-        if self.state == potr.context.STATE_ENCRYPTED:
+        if self.is_encrypted():
             if newstate == potr.context.STATE_ENCRYPTED:
                 self.print_buffer(
                     'Private conversation has been refreshed.')
@@ -298,6 +313,15 @@ Respond with: /otr smp respond %s %s <answer>""" % (
             peer_nick=self.peer_nick,
             peer_server=self.peer_server,
             )
+
+    def is_encrypted(self):
+        """Return True if the conversation with this context's peer is
+        currently encrypted."""
+        return self.state == potr.context.STATE_ENCRYPTED
+
+    def is_verified(self):
+        """Return True if this context's peer is verified."""
+        return bool(self.getCurrentTrust())
 
 class IrcOtrAccount(potr.context.Account):
     """Account class for OTR over IRC."""
@@ -526,15 +550,50 @@ def otr_statusbar_cb(data, item, window):
     buf = weechat.window_get_pointer(window, 'buffer')
     buf_type = weechat.buffer_get_string(buf, 'localvar_type')
 
-    bar_parts = []
+    result = ''
 
     if buf_type == 'private':
-        channel = weechat.buffer_get_string(buf, 'localvar_channel')
+        local_user = irc_user(
+            weechat.buffer_get_string(buf, 'localvar_nick'),
+            weechat.buffer_get_string(buf, 'localvar_server'))
 
-        if channel in ACCOUNTS:
-            bar_parts.append('OTR capable')
+        remote_user = irc_user(
+            weechat.buffer_get_string(buf, 'localvar_channel'),
+            weechat.buffer_get_string(buf, 'localvar_server'))
 
-    return ','.join(bar_parts)
+        context = ACCOUNTS[local_user].getContext(remote_user)
+
+        result = weechat.color(OPTIONS['status_color_default'])
+
+        if context.tagOffer == potr.context.OFFER_SENT:
+            result += 'OTR?'
+        elif context.tagOffer == potr.context.OFFER_ACCEPTED:
+            result += 'OTR:'
+
+            if context.is_encrypted():
+                result += color_wrap(
+                    'encrypted',
+                    OPTIONS['status_color_encrypted'],
+                    OPTIONS['status_color_default'])
+                result += ','
+
+                if context.is_verified():
+                    result += color_wrap(
+                        'authenticated',
+                        OPTIONS['status_color_authenticated'],
+                        OPTIONS['status_color_default'])
+                else:
+                    result += color_wrap(
+                        'unauthenticated',
+                        OPTIONS['status_color_unauthenticated'],
+                        OPTIONS['status_color_default'])
+            else:
+                result += color_wrap(
+                    'unencrypted',
+                    OPTIONS['status_color_unencrypted'],
+                    OPTIONS['status_color_default'])
+
+    return result
 
 def init_options():
     """Load options."""
