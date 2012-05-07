@@ -443,6 +443,8 @@ def message_in_cb(data, modifier, modifier_data, string):
                     parsed['host'], parsed['channel'], msg)
 
             context.handle_tlvs(tlvs)
+        except potr.context.NotOTRMessage:
+            result = string
         except potr.context.UnencryptedMessage, e:
             result = string
         except potr.context.NotEncryptedError, e:
