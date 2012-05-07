@@ -4,10 +4,10 @@ DISCLAIMER: To the best of my knowledge this script securely provides OTR
 messaging in WeeChat, but I offer no guarantee. Please report any security
 holes you find.
 
-The basics are working and new features are being added. Testing and
-security auditing are appreciated.
+Testing and security auditing are appreciated.
 
-It requires the pure Python OTR implementation (potr):
+It requires the most recent master branch of the pure Python OTR
+implementation (potr):
 
 https://github.com/afflux/pure-python-otr
 
