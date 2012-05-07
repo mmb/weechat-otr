@@ -41,7 +41,7 @@ OTR_DIR_NAME = 'otr'
 
 OTR_QUERY_RE = re.compile('\?OTR\??v[a-z\d]*\?$')
 
-OPTIONS = {
+OPTION_DEFAULTS = {
     'debug'                        : ('off', 'switch debug mode on/off'),
 
     'status_color_default'         : ('default', 'status bar default color'),
@@ -53,6 +53,13 @@ OPTIONS = {
         'green', 'status bar authenticated indicator color'),
     'status_color_unauthenticated' : (
         'red', 'status bar unauthenticated indicator color'),
+    }
+
+POLICY_DEFAULTS = {
+    'ALLOW_V1' : False,
+    'ALLOW_V2' : True,
+    'REQUIRE_ENCRYPTION' : False,
+    'SEND_TAG' : True,
     }
 
 potr.proto.TaggedPlaintextOrig = potr.proto.TaggedPlaintext
@@ -80,7 +87,7 @@ potr.proto.TaggedPlaintext = WeechatTaggedPlaintext
 
 def debug(msg):
     """Send a debug message to the WeeChat core buffer."""
-    if OPTIONS['debug'] == 'on':
+    if plugin_config_boolean('debug'):
         weechat.prnt('', '%s debug\t%s' % (SCRIPT_NAME, str(msg)))
 
 def info(msg):
@@ -109,9 +116,14 @@ def first_instance(objs, klass):
         if isinstance(obj, klass):
             return obj
 
-def color_wrap(text, color, reset_color):
-    """Colorize a string and reset the color back to another color."""
-    return '%s%s%s' % (weechat.color(color), text, weechat.color(reset_color))
+def plugin_config_boolean(option):
+    """Get the boolean value of a plugin config option."""
+    return bool(weechat.config_string_to_boolean(
+            weechat.config_get_plugin(option)))
+
+def plugin_config_color(option):
+    """Get the color value of a plugin config option."""
+    return weechat.color(weechat.config_get_plugin(option))
 
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
@@ -169,15 +181,23 @@ class IrcContext(potr.context.Context):
         self.in_smp = False
         self.smp_question = False
 
-    def getPolicy(self, key):
-        debug('get policy %s' % key)
+    def policy_config_option(self, policy):
+        """Get the option name of a policy option for this context."""
+        return 'policy_%s_%s_%s_%s' % (
+            self.peer_server, self.user.nick, self.peer_nick, policy.lower())
 
-        return {
-            'ALLOW_V1' : False,
-            'ALLOW_V2' : True,
-            'REQUIRE_ENCRYPTION' : True,
-            'SEND_TAG' : True,
-            }[key]
+    def getPolicy(self, key):
+        """Get the value of a policy option for this context."""
+        option = self.policy_config_option(key)
+
+        if weechat.config_is_set_plugin(option):
+            result = plugin_config_boolean(option)
+        else:
+            result = POLICY_DEFAULTS[key]
+
+        debug(('getPolicy', key, result))
+
+        return result
 
     def inject(self, msg, appdata=None):
         """Send a message to the remote peer."""
@@ -201,7 +221,8 @@ class IrcContext(potr.context.Context):
                 self.print_buffer(
                     'Private conversation has been refreshed.')
             elif newstate == potr.context.STATE_FINISHED:
-                self.print_buffer("""%s has ended the private conversation. You should do the same:
+                self.print_buffer(
+                    """%s has ended the private conversation. You should do the same:
 /otr endprivate %s %s
 """ % (self.peer, self.peer_nick, self.peer_server))
         elif newstate == potr.context.STATE_ENCRYPTED:
@@ -334,6 +355,8 @@ class IrcOtrAccount(potr.context.Account):
     def __init__(self, name):
         super(IrcOtrAccount, self).__init__(
             name, IrcOtrAccount.PROTOCOL, IrcOtrAccount.MAX_MSG_SIZE)
+
+        self.nick, self.server = self.name.split('@')
 
         # IRC messages cannot have newlines, OTR query and "no plugin" text
         # need to be one message
@@ -542,9 +565,9 @@ def command_cb(data, buf, args):
 
         result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) == 1 and arg_parts[0] == 'debug':
-        if OPTIONS['debug'] == 'on':
+        if plugin_config_boolean('debug'):
             weechat.config_set_plugin('debug', 'off')
-        elif OPTIONS['debug'] == 'off':
+        else:
             weechat.config_set_plugin('debug', 'on')
 
         info('debug status is now: %s' % weechat.config_get_plugin('debug'))
@@ -571,7 +594,7 @@ def otr_statusbar_cb(data, item, window):
 
         context = ACCOUNTS[local_user].getContext(remote_user)
 
-        result = weechat.color(OPTIONS['status_color_default'])
+        result = plugin_config_color('status_color_default')
 
         if context.tagOffer == potr.context.OFFER_SENT:
             result += 'OTR?'
@@ -579,46 +602,37 @@ def otr_statusbar_cb(data, item, window):
             result += 'OTR:'
 
             if context.is_encrypted():
-                result += color_wrap(
+                result += ''.join([
+                    plugin_config_color('status_color_encrypted'),
                     'encrypted',
-                    OPTIONS['status_color_encrypted'],
-                    OPTIONS['status_color_default'])
+                    plugin_config_color('status_color_default')])
                 result += ','
 
                 if context.is_verified():
-                    result += color_wrap(
+                    result += ''.join([
+                        plugin_config_color('status_color_authenticated'),
                         'authenticated',
-                        OPTIONS['status_color_authenticated'],
-                        OPTIONS['status_color_default'])
+                        plugin_config_color('status_color_default')])
                 else:
-                    result += color_wrap(
+                    result += ''.join([
+                        plugin_config_color('status_color_unauthenticated'),
                         'unauthenticated',
-                        OPTIONS['status_color_unauthenticated'],
-                        OPTIONS['status_color_default'])
+                        plugin_config_color('status_color_default')])
             else:
-                result += color_wrap(
+                result += ''.join([
+                    plugin_config_color('status_color_unencrypted'),
                     'unencrypted',
-                    OPTIONS['status_color_unencrypted'],
-                    OPTIONS['status_color_default'])
+                    plugin_config_color('status_color_default')])
 
     return result
 
-def init_options():
-    """Load options."""
-    for option, value in OPTIONS.iteritems():
+def init_option_defaults():
+    """Set unset plugin config options to default values."""
+    for option, value in OPTION_DEFAULTS.iteritems():
         if not weechat.config_is_set_plugin(option):
             weechat.config_set_plugin(option, value[0])
             weechat.config_set_desc_plugin(
                 option, '%s (default: %s)' % (value[1], value[0]))
-        else:
-            OPTIONS[option] = weechat.config_get_plugin(option)
-
-def toggle_refresh(pointer, name, value):
-    """Update OPTIONS dictionary when WeeChat config variables change."""
-    option = name[len('plugins.var.python.%s.' % SCRIPT_NAME):]
-    OPTIONS[option] = value
-
-    return weechat.WEECHAT_RC_OK
 
 def create_dir():
     """Create the OTR subdirectory in the WeeChat config directory if it does
@@ -637,9 +651,6 @@ if weechat.register(
     weechat.hook_modifier('irc_in_privmsg', 'message_in_cb', '')
     weechat.hook_modifier('irc_out_privmsg', 'message_out_cb', '')
 
-    weechat.hook_config(
-        'plugins.var.python.%s.*' % SCRIPT_NAME, 'toggle_refresh', '')
-
     weechat.hook_command(
         SCRIPT_NAME, SCRIPT_DESC,
         'trust [<nick> <server>] || smp respond [<nick> <server> <secret>] || smp ask [<nick> <server> <secret> [question]] || endprivate [<nick> <server>] || debug',
@@ -651,7 +662,7 @@ if weechat.register(
         'command_cb',
         '')
 
-    init_options()
+    init_option_defaults()
 
     OTR_STATUSBAR = weechat.bar_item_new(SCRIPT_NAME, 'otr_statusbar_cb', '')
     weechat.bar_item_update(SCRIPT_NAME)
