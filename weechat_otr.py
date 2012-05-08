@@ -680,7 +680,5 @@ if weechat.register(
         'command_cb',
         '')
 
-    # TODO need hook to save plugin config on WeeChat exit
-
     OTR_STATUSBAR = weechat.bar_item_new(SCRIPT_NAME, 'otr_statusbar_cb', '')
     weechat.bar_item_update(SCRIPT_NAME)
