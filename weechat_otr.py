@@ -69,7 +69,9 @@ def debug(msg):
     debug_option = weechat.config_get(config_prefix('general.debug'))
 
     if weechat.config_boolean(debug_option):
-        weechat.prnt('', '%s debug\t%s' % (SCRIPT_NAME, str(msg)))
+        weechat.prnt(
+            u'', (u'%s debug\t%s' % (SCRIPT_NAME, unicode(msg))).encode(
+                u'utf-8'))
 
 def info(msg):
     """Send an info message to the WeeChat core buffer."""
@@ -183,16 +185,19 @@ class IrcContext(potr.context.Context):
 
     def inject(self, msg, appdata=None):
         """Send a message to the remote peer."""
-        unicode_msg = unicode(msg)
+        if isinstance(msg, potr.proto.OTRMessage):
+            msg = unicode(msg)
+        else:
+            msg = msg.decode(u'utf-8')
 
-        debug(('inject', unicode_msg, 'len %d' % len(unicode_msg), appdata))
+        debug((u'inject', msg, u'len %d' % len(msg), appdata))
 
-        for line in unicode_msg.split("\n"):
+        for line in msg.split(u'\n'):
             command = '/quote -server %s PRIVMSG %s :%s' % (
                 appdata['server'], appdata['nick'], line)
 
             debug(command)
-            weechat.command('', command)
+            weechat.command(u'', command.encode(u'utf-8'))
 
     def setState(self, newstate):
         """Handle state transition."""
@@ -447,6 +452,8 @@ def message_out_cb(data, modifier, modifier_data, string):
         'irc_message_parse', dict(message=string))
     debug(('parsed message', parsed))
 
+    parsed[u'arguments'] = parsed[u'arguments'].decode(u'utf-8')
+
     # skip processing messages to public channels
     if parsed['nick'] == '':
         return string
@@ -479,7 +486,7 @@ def message_out_cb(data, modifier, modifier_data, string):
 
         try:
             context.sendMessage(
-                potr.context.FRAGMENT_SEND_ALL, msg_text,
+                potr.context.FRAGMENT_SEND_ALL, msg_text.encode(u'utf-8'),
                 appdata=dict(nick=parsed['nick'], server=server))
         except potr.context.NotEncryptedError, err:
             if err.args[0] == potr.context.EXC_FINISHED:
