@@ -574,7 +574,7 @@ def otr_statusbar_cb(data, item, window):
 
         context = ACCOUNTS[local_user].getContext(remote_user)
         
-        result = config_color('status_default')
+        result = config_color('status.default')
 
         if context.tagOffer == potr.context.OFFER_SENT:
             result += 'OTR?'
@@ -583,26 +583,26 @@ def otr_statusbar_cb(data, item, window):
 
             if context.is_encrypted():
                 result += ''.join([
-                        config_color('status_encrypted'),
+                        config_color('status.encrypted'),
                         'encrypted',
-                        config_color('status_default')])
+                        config_color('status.default')])
                 result += ','
 
                 if context.is_verified():
                     result += ''.join([
-                            config_color('status_authenticated'),
+                            config_color('status.authenticated'),
                             'authenticated',
-                            config_color('status_default')])
+                            config_color('status.default')])
                 else:
                     result += ''.join([
-                            config_color('status_unauthenticated'),
+                            config_color('status.unauthenticated'),
                             'unauthenticated',
-                            config_color('status_default')])
+                            config_color('status.default')])
             else:
                 result += ''.join([
-                        config_color('status_unencrypted'),
+                        config_color('status.unencrypted'),
                         'unencrypted',
-                        config_color('status_default')])
+                        config_color('status.default')])
 
     return result
 
@@ -637,14 +637,14 @@ def init_config():
         CONFIG_FILE, 'color', 0, 0, '', '', '', '', '', '', '', '', '', '')
 
     for option, desc, default in [
-        ('status_default', 'status bar default color', 'default'),
-        ('status_encrypted', 'status bar encrypted indicator color',
+        ('status.default', 'status bar default color', 'default'),
+        ('status.encrypted', 'status bar encrypted indicator color',
          'lightgreen'),
-        ('status_unencrypted', 'status bar unencrypted indicator color',
+        ('status.unencrypted', 'status bar unencrypted indicator color',
          'lightred'),
-        ('status_authenticated', 'status bar authenticated indicator color',
+        ('status.authenticated', 'status bar authenticated indicator color',
          'green'),
-        ('status_unauthenticated', 'status bar unauthenticated indicator color',
+        ('status.unauthenticated', 'status bar unauthenticated indicator color',
          'red'),
         ]:
         weechat.config_new_option(
