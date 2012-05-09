@@ -164,9 +164,9 @@ class IrcContext(potr.context.Context):
 
     def policy_config_option(self, policy):
         """Get the option name of a policy option for this context."""
-        return config_prefix('policy.%s_%s_%s_%s' % (
-            self.peer_server, self.user.nick, self.peer_nick,
-            policy.lower()))
+        return config_prefix('.'.join([
+                    'policy', self.peer_server, self.user.nick, self.peer_nick,
+                    policy.lower()]))
 
     def getPolicy(self, key):
         """Get the value of a policy option for this context."""
@@ -500,6 +500,8 @@ def shutdown():
 
     weechat.config_write(CONFIG_FILE)
 
+    free_all_config()
+
     weechat.bar_item_remove(OTR_STATUSBAR)
 
     return weechat.WEECHAT_RC_OK
@@ -604,19 +606,34 @@ def otr_statusbar_cb(data, item, window):
 
     return result
 
+def policy_create_option_cb(data, config_file, section, name, value):
+    """Callback for creating a new policy option when the user sets one
+    that doesn't exist."""
+    weechat.config_new_option(
+        config_file, section, name, 'boolean', '', '', 0, 0, value, value, 0,
+        '', '', '', '', '', '')
+
+    return weechat.WEECHAT_CONFIG_OPTION_SET_OK_CHANGED
+
 def init_config():
     """Set up configuration options and load config file."""
-    general_section = weechat.config_new_section(
+    global CONFIG_FILE
+    CONFIG_FILE = weechat.config_new(SCRIPT_NAME, 'config_reload_cb', '')
+
+    global CONFIG_SECTIONS
+    CONFIG_SECTIONS = {}
+
+    CONFIG_SECTIONS['general'] = weechat.config_new_section(
         CONFIG_FILE, 'general', 0, 0, '', '', '', '', '', '', '', '', '', '')
 
     for option, typ, desc, default in [
         ('debug', 'boolean', 'OTR script debugging', 'off'),
         ]:
         weechat.config_new_option(
-            CONFIG_FILE, general_section, option, typ, desc, '', 0, 0, default,
-            default, 0, '', '', '', '', '', '')
+            CONFIG_FILE, CONFIG_SECTIONS['general'], option, typ, desc, '', 0,
+            0, default, default, 0, '', '', '', '', '', '')
 
-    color_section = weechat.config_new_section(
+    CONFIG_SECTIONS['color'] = weechat.config_new_section(
         CONFIG_FILE, 'color', 0, 0, '', '', '', '', '', '', '', '', '', '')
 
     for option, desc, default in [
@@ -631,11 +648,12 @@ def init_config():
          'red'),
         ]:
         weechat.config_new_option(
-            CONFIG_FILE, color_section, option, 'color', desc, '', 0, 0,
-            default, default, 0, '', '', '', '', '', '')
+            CONFIG_FILE, CONFIG_SECTIONS['color'], option, 'color', desc, '', 0,
+            0, default, default, 0, '', '', '', '', '', '')
 
-    policy_section = weechat.config_new_section(
-        CONFIG_FILE, 'policy', 1, 1, '', '', '', '', '', '', '', '', '', '')
+    CONFIG_SECTIONS['policy'] = weechat.config_new_section(
+        CONFIG_FILE, 'policy', 1, 1, '', '', '', '', '', '',
+        'policy_create_option_cb', '', '', '')
 
     for option, desc, default in [
         ('default_allow_v1', 'default allow OTR v1 policy', 'off'),
@@ -645,10 +663,25 @@ def init_config():
         ('default_send_tag', 'default send tag policy', 'on'),
         ]:
         weechat.config_new_option(
-            CONFIG_FILE, policy_section, option, 'boolean', desc, '', 0, 0,
-            default, default, 0, '', '', '', '', '', '')
+            CONFIG_FILE, CONFIG_SECTIONS['policy'], option, 'boolean', desc, '',
+            0, 0, default, default, 0, '', '', '', '', '', '')
 
     weechat.config_read(CONFIG_FILE)
+
+def config_reload_cb(data, config_file):
+    """/reload callback to reload config from file."""
+    free_all_config()
+    init_config()
+
+    return weechat.WEECHAT_CONFIG_READ_OK
+
+def free_all_config():
+    """Free all config options, sections and config file."""
+    for section in CONFIG_SECTIONS.itervalues():
+        weechat.config_section_free_options(section)
+        weechat.config_section_free(section)
+
+    weechat.config_free(CONFIG_FILE)
 
 def create_dir():
     """Create the OTR subdirectory in the WeeChat config directory if it does
@@ -659,7 +692,6 @@ def create_dir():
 if weechat.register(
     SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, '', 'shutdown',
     ''):
-    CONFIG_FILE = weechat.config_new(SCRIPT_NAME, '', '')
     init_config()
 
     OTR_DIR = os.path.join(weechat.info_get('weechat_dir', ''), OTR_DIR_NAME)
@@ -672,7 +704,13 @@ if weechat.register(
 
     weechat.hook_command(
         SCRIPT_NAME, SCRIPT_DESC,
-        'trust [<nick> <server>] || smp respond [<nick> <server> <secret>] || smp ask [<nick> <server> <secret> [question]] || endprivate [<nick> <server>]',
+        """trust NICK SERVER || smp ask NICK SERVER SECRET [QUESTION] || smp respond NICK SERVER SECRET || endprivate NICK SERVER
+
+To view default OTR policies: /set otr.policy.default*
+
+To set OTR policies for specific users:
+/set otr.policy.<server>.<your nick>.<peer nick>.<policy>
+""",
         '',
         'endprivate %(nick) %(irc_servers) %-||'
         'smp ask|respond %(nick) %(irc_servers) %-||'
