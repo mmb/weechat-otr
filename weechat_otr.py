@@ -576,12 +576,12 @@ def otr_statusbar_cb(data, item, window):
 
         context = ACCOUNTS[local_user].getContext(remote_user)
         
-        result = config_color('status.default')
+        result = ''
 
         if context.tagOffer == potr.context.OFFER_SENT:
-            result += 'OTR?'
+            result += '%sOTR?' % config_color('status.default')
         elif context.tagOffer == potr.context.OFFER_ACCEPTED:
-            result += 'OTR:'
+            result += '%sOTR:' % config_color('status.default')
 
             if context.is_encrypted():
                 result += ''.join([
