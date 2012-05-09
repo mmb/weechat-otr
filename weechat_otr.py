@@ -136,8 +136,7 @@ class Assembler:
         """Return True if the buffer is a complete message."""
         return self.is_query() or \
             not self.value.startswith(potr.proto.OTRTAG) or \
-            self.value.endswith('.') or \
-            self.value.endswith(',')
+            has_otr_end(self.value)
 
     def get(self):
         """Return the current value of the buffer and empty it."""
