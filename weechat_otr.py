@@ -108,6 +108,10 @@ def config_color(option):
     return weechat.color(weechat.config_color(weechat.config_get(
             config_prefix('color.%s' % option))))
 
+def buffer_is_private(buf):
+    """Return True if a buffer is private."""
+    return weechat.buffer_get_string(buf, 'localvar_type') == 'private'
+
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
 
@@ -520,14 +524,28 @@ def command_cb(data, buf, args):
 
     arg_parts = args.split(None, 5)
 
-    if len(arg_parts) == 3 and arg_parts[0] == 'trust':
-        nick, server = arg_parts[1:3]
+    if arg_parts[0] == 'trust':
+        nick, server = None, None
 
-        context = ACCOUNTS[current_user(server)].getContext(
-            irc_user(nick, server))
-        context.setCurrentTrust('verified')
+        if len(arg_parts) == 1:
+            # no args, default args to remote peer of current buffer
+            buf = weechat.current_buffer()
 
-        result = weechat.WEECHAT_RC_OK
+            if buffer_is_private(buf):
+                nick = weechat.buffer_get_string(buf, 'localvar_channel')
+                server = weechat.buffer_get_string(buf, 'localvar_server')
+        elif len(arg_parts) == 3:
+            nick, server = arg_parts[1:3]
+
+        if nick is not None and server is not None:
+            context = ACCOUNTS[current_user(server)].getContext(
+                irc_user(nick, server))
+            context.setCurrentTrust('verified')
+            context.print_buffer('%s is now authenticated.' % context.peer)
+
+            weechat.bar_item_update(SCRIPT_NAME)
+
+            result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) in (5, 6) and arg_parts[0] == 'smp':
         action = arg_parts[1]
 
@@ -567,11 +585,10 @@ def command_cb(data, buf, args):
 def otr_statusbar_cb(data, item, window):
     """Update the statusbar."""
     buf = weechat.window_get_pointer(window, 'buffer')
-    buf_type = weechat.buffer_get_string(buf, 'localvar_type')
 
     result = ''
 
-    if buf_type == 'private':
+    if buffer_is_private(buf):
         local_user = irc_user(
             weechat.buffer_get_string(buf, 'localvar_nick'),
             weechat.buffer_get_string(buf, 'localvar_server'))
@@ -712,7 +729,7 @@ if weechat.register(
 
     weechat.hook_command(
         SCRIPT_NAME, SCRIPT_DESC,
-        """trust NICK SERVER || smp ask NICK SERVER SECRET [QUESTION] || smp respond NICK SERVER SECRET || endprivate NICK SERVER
+        """trust [NICK SERVER] || smp ask NICK SERVER SECRET [QUESTION] || smp respond NICK SERVER SECRET || endprivate NICK SERVER
 
 To view default OTR policies: /set otr.policy.default*
 
