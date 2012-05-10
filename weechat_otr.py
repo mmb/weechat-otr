@@ -571,14 +571,25 @@ def command_cb(data, buf, args):
                 secret, question, appdata=dict(nick=nick, server=server))
 
             result = weechat.WEECHAT_RC_OK
-    elif len(arg_parts) == 3 and arg_parts[0] == 'endprivate':
-        nick, server = arg_parts[1:3]
+    elif arg_parts[0] == 'endprivate':
+        nick, server = None, None
 
-        context = ACCOUNTS[current_user(server)].getContext(
-            irc_user(nick, server))
-        context.disconnect(appdata=dict(nick=nick, server=server))
+        if len(arg_parts) == 1:
+            # no args, default args to remote peer of current buffer
+            buf = weechat.current_buffer()
 
-        result = weechat.WEECHAT_RC_OK
+            if buffer_is_private(buf):
+                nick = weechat.buffer_get_string(buf, 'localvar_channel')
+                server = weechat.buffer_get_string(buf, 'localvar_server')
+        elif len(arg_parts) == 3:
+            nick, server = arg_parts[1:3]
+
+        if nick is not None and server is not None:
+            context = ACCOUNTS[current_user(server)].getContext(
+                irc_user(nick, server))
+            context.disconnect(appdata=dict(nick=nick, server=server))
+
+            result = weechat.WEECHAT_RC_OK
 
     return result
 
@@ -729,7 +740,7 @@ if weechat.register(
 
     weechat.hook_command(
         SCRIPT_NAME, SCRIPT_DESC,
-        """trust [NICK SERVER] || smp ask NICK SERVER SECRET [QUESTION] || smp respond NICK SERVER SECRET || endprivate NICK SERVER
+        """trust [NICK SERVER] || smp ask NICK SERVER SECRET [QUESTION] || smp respond NICK SERVER SECRET || endprivate [NICK SERVER]
 
 To view default OTR policies: /set otr.policy.default*
 
