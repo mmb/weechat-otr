@@ -32,7 +32,7 @@ import weechat
 import potr
 
 SCRIPT_NAME = 'otr'
-SCRIPT_DESC = 'Off-the-Record'
+SCRIPT_DESC = 'Off-the-Record messaging for IRC'
 SCRIPT_AUTHOR = 'Matthew M. Boedicker'
 SCRIPT_LICENCE = 'GPL3'
 SCRIPT_VERSION = '0.0.2'
