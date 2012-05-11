@@ -658,36 +658,31 @@ def otr_statusbar_cb(data, item, window):
             weechat.buffer_get_string(buf, 'localvar_server'))
 
         context = ACCOUNTS[local_user].getContext(remote_user)
-        
-        result = ''
 
-        if context.tagOffer == potr.context.OFFER_SENT:
-            result += '%sOTR?' % config_color('status.default')
-        elif context.tagOffer == potr.context.OFFER_ACCEPTED:
-            result += '%sOTR:' % config_color('status.default')
+        result = '%sOTR:' % config_color('status.default')
 
-            if context.is_encrypted():
+        if context.is_encrypted():
+            result += ''.join([
+                    config_color('status.encrypted'),
+                    'SEC',
+                    config_color('status.default')])
+            result += ','
+
+            if context.is_verified():
                 result += ''.join([
-                        config_color('status.encrypted'),
-                        'SEC',
+                        config_color('status.authenticated'),
+                        'AUTH',
                         config_color('status.default')])
-                result += ','
-
-                if context.is_verified():
-                    result += ''.join([
-                            config_color('status.authenticated'),
-                            'AUTH',
-                            config_color('status.default')])
-                else:
-                    result += ''.join([
-                            config_color('status.unauthenticated'),
-                            '!AUTH',
-                            config_color('status.default')])
             else:
                 result += ''.join([
-                        config_color('status.unencrypted'),
-                        '!SEC',
+                        config_color('status.unauthenticated'),
+                        '!AUTH',
                         config_color('status.default')])
+        else:
+            result += ''.join([
+                    config_color('status.unencrypted'),
+                    '!SEC',
+                    config_color('status.default')])
 
     return result
 
