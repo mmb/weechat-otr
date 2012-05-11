@@ -24,6 +24,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
+import cStringIO
 import os
 import re
 
@@ -40,6 +41,13 @@ SCRIPT_VERSION = '0.0.2'
 OTR_DIR_NAME = 'otr'
 
 OTR_QUERY_RE = re.compile('\?OTR\??v[a-z\d]*\?$')
+
+POLICIES = {
+    'allow_v1' : 'allow OTR protocol version 1',
+    'allow_v2' : 'allow OTR protocol version 2',
+    'require_encryption' : 'refuse to send unencrypted messages',
+    'send_tag' : 'advertise your OTR capability using the whitespace tag',
+    }
 
 potr.proto.TaggedPlaintextOrig = potr.proto.TaggedPlaintext
 
@@ -357,6 +365,20 @@ Respond with: /otr smp respond %s %s <answer>""" % (
         """Return True if this context's peer is verified."""
         return bool(self.getCurrentTrust())
 
+    def format_policies(self):
+        buf = cStringIO.StringIO()
+
+        buf.write('Current OTR policies for %s:\n' % self.peer)
+        
+        for policy, desc in sorted(POLICIES.iteritems()):
+            buf.write('  %s (%s) : %s\n' % (
+                    policy, desc,
+                    { True : 'on', False : 'off'}[self.getPolicy(policy)]))
+
+        buf.write('Change policies with: /otr policy NAME on|off')
+
+        return buf.getvalue()
+
 class IrcOtrAccount(potr.context.Account):
     """Account class for OTR over IRC."""
 
@@ -592,9 +614,31 @@ def command_cb(data, buf, args):
             context.disconnect(appdata=dict(nick=nick, server=server))
 
             result = weechat.WEECHAT_RC_OK
-    elif arg_part[0] == 'policy':
-        
-        
+    elif arg_parts[0] == 'policy':
+        if len(arg_parts) == 1:
+            nick, server = default_peer_args([])
+
+            if nick is not None and server is not None:
+                context = ACCOUNTS[current_user(server)].getContext(
+                    irc_user(nick, server))
+
+                context.print_buffer(context.format_policies())
+
+                result = weechat.WEECHAT_RC_OK
+        elif len(arg_parts) == 3 and arg_parts[1].lower() in POLICIES:
+            nick, server = default_peer_args([])
+
+            if nick is not None and server is not None:
+                context = ACCOUNTS[current_user(server)].getContext(
+                    irc_user(nick, server))
+
+                policy_var = context.policy_config_option(arg_parts[1].lower())
+
+                weechat.command('', '/set %s %s' % (policy_var, arg_parts[2]))
+
+                context.print_buffer(context.format_policies())
+                
+                result = weechat.WEECHAT_RC_OK
 
     return result
 
@@ -646,6 +690,14 @@ def otr_statusbar_cb(data, item, window):
                         config_color('status.default')])
 
     return result
+
+def policy_completion_cb(data, completion_item, buf, completion):
+    """Callback for policy tab completion."""
+    for policy in POLICIES:
+        weechat.hook_completion_list_add(
+            completion, policy, 0, weechat.WEECHAT_LIST_POS_SORT)
+
+    return weechat.WEECHAT_RC_OK
 
 def policy_create_option_cb(data, config_file, section, name, value):
     """Callback for creating a new policy option when the user sets one
@@ -745,19 +797,18 @@ if weechat.register(
 
     weechat.hook_command(
         SCRIPT_NAME, SCRIPT_DESC,
-        """trust [NICK SERVER] || smp ask NICK SERVER SECRET [QUESTION] || smp respond NICK SERVER SECRET || endprivate [NICK SERVER]
-
-To view default OTR policies: /set otr.policy.default*
-
-To set OTR policies for specific users:
-/set otr.policy.<server>.<your nick>.<peer nick>.<policy>
+        """trust [NICK SERVER] || smp ask NICK SERVER SECRET [QUESTION] || smp respond NICK SERVER SECRET || endprivate [NICK SERVER] || policy [POLICY on|off]
 """,
         '',
         'endprivate %(nick) %(irc_servers) %-||'
         'smp ask|respond %(nick) %(irc_servers) %-||'
-        'trust %(nick) %(irc_servers) %-||',
+        'trust %(nick) %(irc_servers) %-||'
+        'policy %(otr_policy) on|off %-||',
         'command_cb',
         '')
+
+    weechat.hook_completion(
+        'otr_policy', 'OTR policies', 'policy_completion_cb', '')
 
     OTR_STATUSBAR = weechat.bar_item_new(SCRIPT_NAME, 'otr_statusbar_cb', '')
     weechat.bar_item_update(SCRIPT_NAME)
