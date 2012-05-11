@@ -112,6 +112,28 @@ def buffer_is_private(buf):
     """Return True if a buffer is private."""
     return weechat.buffer_get_string(buf, 'localvar_type') == 'private'
 
+def default_peer_args(args):
+    """Get the nick and server of a remote peer from command arguments or
+    the current buffer.
+
+    Passed in args are the [nick, server] slice of arguments from a command.
+    If these are present, return them. If args is empty and the current buffer
+    is private, return the remote nick and server of the current buffer.
+    """
+    result = None, None
+
+    if len(args) == 2:
+        result = tuple(args)
+    else:
+        buf = weechat.current_buffer()
+
+        if buffer_is_private(buf):
+            result = (
+                weechat.buffer_get_string(buf, 'localvar_channel'),
+                weechat.buffer_get_string(buf, 'localvar_server'))
+
+    return result
+
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
 
@@ -525,17 +547,7 @@ def command_cb(data, buf, args):
     arg_parts = args.split(None, 5)
 
     if arg_parts[0] == 'trust':
-        nick, server = None, None
-
-        if len(arg_parts) == 1:
-            # no args, default args to remote peer of current buffer
-            buf = weechat.current_buffer()
-
-            if buffer_is_private(buf):
-                nick = weechat.buffer_get_string(buf, 'localvar_channel')
-                server = weechat.buffer_get_string(buf, 'localvar_server')
-        elif len(arg_parts) == 3:
-            nick, server = arg_parts[1:3]
+        nick, server = default_peer_args(arg_parts[1:3])
 
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
@@ -572,17 +584,7 @@ def command_cb(data, buf, args):
 
             result = weechat.WEECHAT_RC_OK
     elif arg_parts[0] == 'endprivate':
-        nick, server = None, None
-
-        if len(arg_parts) == 1:
-            # no args, default args to remote peer of current buffer
-            buf = weechat.current_buffer()
-
-            if buffer_is_private(buf):
-                nick = weechat.buffer_get_string(buf, 'localvar_channel')
-                server = weechat.buffer_get_string(buf, 'localvar_server')
-        elif len(arg_parts) == 3:
-            nick, server = arg_parts[1:3]
+        nick, server = default_peer_args(arg_parts[1:3])
 
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
