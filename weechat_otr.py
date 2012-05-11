@@ -669,24 +669,24 @@ def otr_statusbar_cb(data, item, window):
             if context.is_encrypted():
                 result += ''.join([
                         config_color('status.encrypted'),
-                        'encrypted',
+                        'SEC',
                         config_color('status.default')])
                 result += ','
 
                 if context.is_verified():
                     result += ''.join([
                             config_color('status.authenticated'),
-                            'authenticated',
+                            'AUTH',
                             config_color('status.default')])
                 else:
                     result += ''.join([
                             config_color('status.unauthenticated'),
-                            'unauthenticated',
+                            '!AUTH',
                             config_color('status.default')])
             else:
                 result += ''.join([
                         config_color('status.unencrypted'),
-                        'unencrypted',
+                        '!SEC',
                         config_color('status.default')])
 
     return result
