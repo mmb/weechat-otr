@@ -201,7 +201,7 @@ class IrcContext(potr.context.Context):
 
         if option == '':
             option = weechat.config_get(
-                config_prefix('policy.default_%s' % key.lower()))
+                config_prefix('policy.default.%s' % key.lower()))
 
         result = bool(weechat.config_boolean(option))
 
@@ -592,6 +592,9 @@ def command_cb(data, buf, args):
             context.disconnect(appdata=dict(nick=nick, server=server))
 
             result = weechat.WEECHAT_RC_OK
+    elif arg_part[0] == 'policy':
+        
+        
 
     return result
 
@@ -694,11 +697,11 @@ def init_config():
         'policy_create_option_cb', '', '', '')
 
     for option, desc, default in [
-        ('default_allow_v1', 'default allow OTR v1 policy', 'off'),
-        ('default_allow_v2', 'default allow OTR v2 policy', 'on'),
-        ('default_require_encryption', 'default require encryption policy',
+        ('default.allow_v1', 'default allow OTR v1 policy', 'off'),
+        ('default.allow_v2', 'default allow OTR v2 policy', 'on'),
+        ('default.require_encryption', 'default require encryption policy',
          'off'),
-        ('default_send_tag', 'default send tag policy', 'on'),
+        ('default.send_tag', 'default send tag policy', 'on'),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['policy'], option, 'boolean', desc, '',
