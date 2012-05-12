@@ -116,6 +116,10 @@ def config_color(option):
     return weechat.color(weechat.config_color(weechat.config_get(
             config_prefix('color.%s' % option))))
 
+def config_string(option):
+    """Get the string value of a config option."""
+    return weechat.config_string(weechat.config_get(config_prefix(option)))
+
 def buffer_is_private(buf):
     """Return True if a buffer is private."""
     return weechat.buffer_get_string(buf, 'localvar_type') == 'private'
@@ -659,29 +663,30 @@ def otr_statusbar_cb(data, item, window):
 
         context = ACCOUNTS[local_user].getContext(remote_user)
 
-        result = '%sOTR:' % config_color('status.default')
+        result = '%s%s' % (
+            config_color('status.default'), config_string('look.bar.prefix'))
 
         if context.is_encrypted():
             result += ''.join([
                     config_color('status.encrypted'),
-                    'SEC',
+                    config_string('look.bar.state.encrypted'),
                     config_color('status.default')])
-            result += ','
+            result += config_string('look.bar.state.separator')
 
             if context.is_verified():
                 result += ''.join([
                         config_color('status.authenticated'),
-                        'AUTH',
+                        config_string('look.bar.state.authenticated'),
                         config_color('status.default')])
             else:
                 result += ''.join([
                         config_color('status.unauthenticated'),
-                        '!AUTH',
+                        config_string('look.bar.state.unauthenticated'),
                         config_color('status.default')])
         else:
             result += ''.join([
                     config_color('status.unencrypted'),
-                    '!SEC',
+                    config_string('look.bar.state.unencrypted'),
                     config_color('status.default')])
 
     return result
@@ -738,6 +743,25 @@ def init_config():
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['color'], option, 'color', desc, '', 0,
             0, default, default, 0, '', '', '', '', '', '')
+
+    CONFIG_SECTIONS['look'] = weechat.config_new_section(
+        CONFIG_FILE, 'look', 0, 0, '', '', '', '', '', '', '', '', '', '')
+
+    for option, desc, default in [
+        ('bar.prefix', 'prefix for OTR status bar item', 'OTR:'),
+        ('bar.state.encrypted',
+         'shown in status bar when conversation is encrypted', 'SEC'),
+        ('bar.state.unencrypted',
+         'shown in status bar when conversation is not encrypted', '!SEC'),
+        ('bar.state.authenticated',
+         'shown in status bar when peer is authenticated', 'AUTH'),
+        ('bar.state.unauthenticated',
+         'shown in status bar when peer is not authenticated', '!AUTH'),
+        ('bar.state.separator', 'separator for states in the status bar', ','),
+        ]:
+        weechat.config_new_option(
+            CONFIG_FILE, CONFIG_SECTIONS['look'], option, 'string', desc, '',
+            0, 0, default, default, 0, '', '', '', '', '', '')
 
     CONFIG_SECTIONS['policy'] = weechat.config_new_section(
         CONFIG_FILE, 'policy', 1, 1, '', '', '', '', '', '',
