@@ -704,33 +704,51 @@ def otr_statusbar_cb(data, item, window):
 
         context = ACCOUNTS[local_user].getContext(remote_user)
 
-        result = '%s%s' % (
-            config_color('status.default'), config_string('look.bar.prefix'))
+        encrypted_str = config_string('look.bar.state.encrypted')
+        unencrypted_str = config_string('look.bar.state.unencrypted')
+        authenticated_str = config_string('look.bar.state.authenticated')
+        unauthenticated_str = config_string('look.bar.state.unauthenticated')
+
+        bar_parts = []
 
         if context.is_encrypted():
-            result += ''.join([
-                    config_color('status.encrypted'),
-                    config_string('look.bar.state.encrypted'),
-                    config_color('status.default')])
-            result += config_string('look.bar.state.separator')
+            if encrypted_str:
+                bar_parts.append(''.join([
+                            config_color('status.encrypted'),
+                            encrypted_str,
+                            config_color('status.default')]))
 
             if context.is_verified():
-                result += ''.join([
-                        config_color('status.authenticated'),
-                        config_string('look.bar.state.authenticated'),
-                        config_color('status.default')])
-            else:
-                result += ''.join([
-                        config_color('status.unauthenticated'),
-                        config_string('look.bar.state.unauthenticated'),
-                        config_color('status.default')])
-        else:
-            result += ''.join([
-                    config_color('status.unencrypted'),
-                    config_string('look.bar.state.unencrypted'),
-                    config_color('status.default')])
+                if authenticated_str:
+                    bar_parts.append(''.join([
+                                config_color('status.authenticated'),
+                                authenticated_str,
+                                config_color('status.default')]))
+            elif unauthenticated_str:
+                bar_parts.append(''.join([
+                            config_color('status.unauthenticated'),
+                            unauthenticated_str,
+                            config_color('status.default')]))
+        elif unencrypted_str:
+            bar_parts.append(''.join([
+                        config_color('status.unencrypted'),
+                        unencrypted_str,
+                        config_color('status.default')]))
+
+        result = config_string('look.bar.state.separator').join(bar_parts)
+
+        if result:
+            result = '%s%s%s' % (
+                config_color('status.default'),
+                config_string('look.bar.prefix'), result)
 
     return result
+
+def bar_config_update_cb(data, option):
+    """Callback for updating the status bar when its config changes."""
+    weechat.bar_item_update(SCRIPT_NAME)
+
+    return weechat.WEECHAT_RC_OK
 
 def policy_completion_cb(data, completion_item, buf, completion):
     """Callback for policy tab completion."""
@@ -770,39 +788,46 @@ def init_config():
     CONFIG_SECTIONS['color'] = weechat.config_new_section(
         CONFIG_FILE, 'color', 0, 0, '', '', '', '', '', '', '', '', '', '')
 
-    for option, desc, default in [
-        ('status.default', 'status bar default color', 'default'),
+    for option, desc, default, update_cb in [
+        ('status.default', 'status bar default color', 'default',
+         'bar_config_update_cb'),
         ('status.encrypted', 'status bar encrypted indicator color',
-         'lightgreen'),
+         'lightgreen', 'bar_config_update_cb'),
         ('status.unencrypted', 'status bar unencrypted indicator color',
-         'lightred'),
+         'lightred', 'bar_config_update_cb'),
         ('status.authenticated', 'status bar authenticated indicator color',
-         'green'),
+         'green', 'bar_config_update_cb'),
         ('status.unauthenticated', 'status bar unauthenticated indicator color',
-         'red'),
+         'red', 'bar_config_update_cb'),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['color'], option, 'color', desc, '', 0,
-            0, default, default, 0, '', '', '', '', '', '')
+            0, default, default, 0, '', '', update_cb, '', '', '')
 
     CONFIG_SECTIONS['look'] = weechat.config_new_section(
         CONFIG_FILE, 'look', 0, 0, '', '', '', '', '', '', '', '', '', '')
 
-    for option, desc, default in [
-        ('bar.prefix', 'prefix for OTR status bar item', 'OTR:'),
+    for option, desc, default, update_cb in [
+        ('bar.prefix', 'prefix for OTR status bar item', 'OTR:',
+         'bar_config_update_cb'),
         ('bar.state.encrypted',
-         'shown in status bar when conversation is encrypted', 'SEC'),
+         'shown in status bar when conversation is encrypted', 'SEC',
+         'bar_config_update_cb'),
         ('bar.state.unencrypted',
-         'shown in status bar when conversation is not encrypted', '!SEC'),
+         'shown in status bar when conversation is not encrypted', '!SEC',
+         'bar_config_update_cb'),
         ('bar.state.authenticated',
-         'shown in status bar when peer is authenticated', 'AUTH'),
+         'shown in status bar when peer is authenticated', 'AUTH',
+         'bar_config_update_cb'),
         ('bar.state.unauthenticated',
-         'shown in status bar when peer is not authenticated', '!AUTH'),
-        ('bar.state.separator', 'separator for states in the status bar', ','),
+         'shown in status bar when peer is not authenticated', '!AUTH',
+         'bar_config_update_cb'),
+        ('bar.state.separator', 'separator for states in the status bar', ',',
+         'bar_config_update_cb'),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['look'], option, 'string', desc, '',
-            0, 0, default, default, 0, '', '', '', '', '', '')
+            0, 0, default, default, 0, '', '', update_cb, '', '', '')
 
     CONFIG_SECTIONS['policy'] = weechat.config_new_section(
         CONFIG_FILE, 'policy', 1, 1, '', '', '', '', '', '',
