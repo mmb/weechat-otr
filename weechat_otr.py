@@ -49,6 +49,23 @@ POLICIES = {
     'send_tag' : 'advertise your OTR capability using the whitespace tag',
     }
 
+IRC_PRIVMSG_RE = re.compile(r"""
+(
+    :
+    (?P<from>
+        (?P<from_nick>.+?)
+        !
+        (?P<from_user>.+?)
+        @
+        (?P<from_host>.+?)
+    )
+\ )?
+PRIVMSG
+\ (?P<to>.+?)
+\ :
+(?P<text>.+)
+""", re.VERBOSE)
+
 potr.proto.TaggedPlaintextOrig = potr.proto.TaggedPlaintext
 
 class WeechatTaggedPlaintext(potr.proto.TaggedPlaintextOrig):
@@ -93,9 +110,40 @@ def irc_user(nick, server):
     """Build an IRC user string from a nick and server."""
     return '%s@%s' % (nick, server)
 
-def extract_privmsg_text(args):
-    """Get the message part of PRIVMSG command arguments."""
-    return args.split(' :', 1)[1]
+def parse_irc_privmsg(message):
+    """Parse an IRC PRIVMSG command and return a dictionary.
+
+    Either the to_channel key or the to_nick key will be set depending on
+    whether the message is to a nick or a channel. The other will be None.
+
+    Example input:
+
+    :nick!user@host PRIVMSG #weechat :message here
+
+    Output:
+
+    {'from': 'nick!user@host',
+    'from_nick': 'nick',
+    'from_user': 'user',
+    'from_host': 'host',
+    'to': '#weechat',
+    'to_channel': '#weechat',
+    'to_nick': None,
+    'text': 'message here'}
+    """
+
+    match = IRC_PRIVMSG_RE.match(message)
+    if match:
+        result = match.groupdict()
+
+        if result['to'].startswith('#'):
+            result['to_channel'] = result['to']
+            result['to_nick'] = None
+        else:
+            result['to_channel'] = None
+            result['to_nick'] = result['to']
+
+        return result
 
 def has_otr_end(msg):
     """Return True if the message is the end of an OTR message."""
@@ -452,20 +500,17 @@ def message_in_cb(data, modifier, modifier_data, string):
     """Incoming message callback"""
     debug(('message_in_cb', data, modifier, modifier_data, string))
 
-    parsed = weechat.info_get_hashtable(
-        'irc_message_parse', dict(message=string))
+    parsed = parse_irc_privmsg(string)
     debug(('parsed message', parsed))
-
-    msg_text = extract_privmsg_text(parsed['arguments'])
 
     server = modifier_data
 
-    from_user = irc_user(parsed['nick'], server)
+    from_user = irc_user(parsed['from_nick'], server)
     local_user = current_user(server)
 
     context = ACCOUNTS[local_user].getContext(from_user)
 
-    context.in_assembler.add(msg_text)
+    context.in_assembler.add(parsed['text'])
 
     result = ''
 
@@ -473,13 +518,13 @@ def message_in_cb(data, modifier, modifier_data, string):
         try:
             msg, tlvs = context.receiveMessage(
                 context.in_assembler.get(),
-                appdata=dict(nick=parsed['nick'], server=server))
+                appdata=dict(nick=parsed['from_nick'], server=server))
 
             debug(('receive', msg, tlvs))
 
             if msg:
                 result = ':%s PRIVMSG %s :%s' % (
-                    parsed['host'], parsed['channel'], msg)
+                    parsed['from'], parsed['to'], msg)
 
             context.handle_tlvs(tlvs)
         except potr.context.ErrorReceived, e:
@@ -500,51 +545,47 @@ def message_out_cb(data, modifier, modifier_data, string):
     """Outgoing message callback."""
     debug(('message_out_cb', data, modifier, modifier_data, string))
 
-    parsed = weechat.info_get_hashtable(
-        'irc_message_parse', dict(message=string))
+    parsed = parse_irc_privmsg(string)
     debug(('parsed message', parsed))
 
-    parsed[u'arguments'] = parsed[u'arguments'].decode(u'utf-8')
-
     # skip processing messages to public channels
-    if parsed['nick'] == '':
+    if parsed['to_channel']:
         return string
-
-    msg_text = extract_privmsg_text(parsed['arguments'])
 
     server = modifier_data
 
-    to_user = irc_user(parsed['nick'], server)
+    to_user = irc_user(parsed['to_nick'], server)
     local_user = current_user(server)
 
     context = ACCOUNTS[local_user].getContext(to_user)
 
     result = string
 
-    if OTR_QUERY_RE.match(msg_text):
+    if OTR_QUERY_RE.match(parsed['text']):
         debug('matched OTR query')
-    elif msg_text.startswith(potr.proto.OTRTAG):
-        if not has_otr_end(msg_text):
+    elif parsed['text'].startswith(potr.proto.OTRTAG):
+        if not has_otr_end(parsed['text']):
             debug('in OTR message')
             context.in_otr_message = True
         else:
             debug('complete OTR message')
     elif context.in_otr_message:
-        if has_otr_end(msg_text):
+        if has_otr_end(parsed['text']):
             context.in_otr_message = False
             debug('in OTR message end')
     else:
-        debug(('context send message', msg_text, parsed['nick'], server))
+        debug(('context send message', parsed['text'], parsed['to_nick'],
+               server))
 
         try:
             context.sendMessage(
-                potr.context.FRAGMENT_SEND_ALL, msg_text.encode(u'utf-8'),
-                appdata=dict(nick=parsed['nick'], server=server))
+                potr.context.FRAGMENT_SEND_ALL, parsed['text'].encode(u'utf-8'),
+                appdata=dict(nick=parsed['to_nick'], server=server))
         except potr.context.NotEncryptedError, err:
             if err.args[0] == potr.context.EXC_FINISHED:
                 context.print_buffer(
                     """Your message was not sent. End your private conversation:\n/otr endprivate %s %s""" % (
-                        parsed['nick'], server))
+                        parsed['to_nick'], server))
             else:
                 raise
 
