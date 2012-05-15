@@ -418,6 +418,8 @@ Respond with: /otr smp respond %s %s <answer>""" % (
         return bool(self.getCurrentTrust())
 
     def format_policies(self):
+        """Return current policies for this context formatted as a string for
+        the user."""
         buf = cStringIO.StringIO()
 
         buf.write('Current OTR policies for %s:\n' % self.peer)
