@@ -579,10 +579,16 @@ def message_out_cb(data, modifier, modifier_data, string):
         debug(('context send message', parsed['text'], parsed['to_nick'],
                server))
 
+        result = ''
+
         try:
-            context.sendMessage(
+            ret = context.sendMessage(
                 potr.context.FRAGMENT_SEND_ALL, parsed['text'].encode(u'utf-8'),
                 appdata=dict(nick=parsed['to_nick'], server=server))
+
+            if ret:
+                result = 'PRIVMSG %s :%s' % (parsed['to_nick'], ret)
+
         except potr.context.NotEncryptedError, err:
             if err.args[0] == potr.context.EXC_FINISHED:
                 context.print_buffer(
@@ -590,8 +596,6 @@ def message_out_cb(data, modifier, modifier_data, string):
                         parsed['to_nick'], server))
             else:
                 raise
-
-        result = ''
 
     weechat.bar_item_update(SCRIPT_NAME)
 
