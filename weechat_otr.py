@@ -656,7 +656,7 @@ def command_cb(data, buf, args):
                 secret, question, appdata=dict(nick=nick, server=server))
 
             result = weechat.WEECHAT_RC_OK
-    elif arg_parts[0] == 'endprivate':
+    elif arg_parts[0] in ('endprivate', 'finish'):
         nick, server = default_peer_args(arg_parts[1:3])
 
         if nick is not None and server is not None:
