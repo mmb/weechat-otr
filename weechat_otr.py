@@ -320,6 +320,14 @@ class IrcContext(potr.context.Context):
 
         super(IrcContext, self).setState(newstate)
 
+    def maxMessageSize(self, appdata=None):
+        """Return the max message size for this context."""
+        # remove 'PRIVMSG <nick> :' from max message size
+        result = self.user.maxMessageSize - 10 - len(self.peer_nick)
+        debug('max message size %d' % result)
+
+        return result
+
     def buffer(self):
         """Get the buffer for this context."""
         # TODO open a new private buffer for this user if there isn't one
@@ -439,7 +447,7 @@ class IrcOtrAccount(potr.context.Account):
     contextclass = IrcContext
 
     PROTOCOL = 'irc'
-    MAX_MSG_SIZE = 417
+    MAX_MSG_SIZE = 415
 
     def __init__(self, name):
         super(IrcOtrAccount, self).__init__(
