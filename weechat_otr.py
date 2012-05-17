@@ -92,17 +92,20 @@ class WeechatTaggedPlaintext(potr.proto.TaggedPlaintextOrig):
 
 potr.proto.TaggedPlaintext = WeechatTaggedPlaintext
 
+def prnt(buf, message):
+    """Wrap weechat.prnt() with utf-8 encode."""
+    weechat.prnt(buf, message.encode('utf-8'))
+
 def debug(msg):
     """Send a debug message to the WeeChat core buffer."""
     debug_option = weechat.config_get(config_prefix('general.debug'))
 
     if weechat.config_boolean(debug_option):
-        weechat.prnt('', (
-                '%s debug\t%s' % (SCRIPT_NAME, unicode(msg))).encode('utf-8'))
+        prnt('', ('%s debug\t%s' % (SCRIPT_NAME, unicode(msg))))
 
 def current_user(server_name):
     """Get the nick and server of the current user on a server."""
-    return irc_user(weechat.info_get('irc_nick', server_name), server_name)
+    return irc_user(info_get('irc_nick', server_name), server_name)
 
 def irc_user(nick, server):
     """Build an IRC user string from a nick and server."""
@@ -163,12 +166,22 @@ def config_color(option):
             config_prefix('color.%s' % option))))
 
 def config_string(option):
-    """Get the string value of a config option."""
-    return weechat.config_string(weechat.config_get(config_prefix(option)))
+    """Get the string value of a config option with utf-8 decode."""
+    return weechat.config_string(
+        weechat.config_get(config_prefix(option))).decode('utf-8')
+
+def buffer_get_string(buf, prop):
+    """Wrap weechat.buffer_get_string() with utf-8 encode/decode."""
+    return weechat.buffer_get_string(buf, prop.encode('utf-8')).decode('utf-8')
 
 def buffer_is_private(buf):
     """Return True if a buffer is private."""
-    return weechat.buffer_get_string(buf, 'localvar_type') == 'private'
+    return buffer_get_string(buf, 'localvar_type') == 'private'
+
+def info_get(info_name, arguments):
+    """Wrap weechat.info_get() with utf-8 encode/decode."""
+    return weechat.info_get(info_name, arguments.encode('utf-8')).decode(
+        'utf-8')
 
 def default_peer_args(args):
     """Get the nick and server of a remote peer from command arguments or
@@ -187,8 +200,8 @@ def default_peer_args(args):
 
         if buffer_is_private(buf):
             result = (
-                weechat.buffer_get_string(buf, 'localvar_channel'),
-                weechat.buffer_get_string(buf, 'localvar_server'))
+                buffer_get_string(buf, 'localvar_channel'),
+                buffer_get_string(buf, 'localvar_server'))
 
     return result
 
@@ -329,12 +342,12 @@ class IrcContext(potr.context.Context):
     def buffer(self):
         """Get the buffer for this context."""
         # TODO open a new private buffer for this user if there isn't one
-        return weechat.info_get(
+        return info_get(
             'irc_buffer', '%s,%s' % (self.peer_server, self.peer_nick))
 
     def print_buffer(self, msg):
         """Print a message to the buffer for this context."""
-        weechat.prnt(self.buffer(), '%s\t%s' % (SCRIPT_NAME, msg))
+        prnt(self.buffer(), '%s\t%s' % (SCRIPT_NAME, msg))
 
     def smp_finish(self, message):
         """Reset SMP state and send a message to the user."""
@@ -511,7 +524,7 @@ def message_in_cb(data, modifier, modifier_data, string):
     parsed = parse_irc_privmsg(string.decode('utf-8'))
     debug(('parsed message', parsed))
 
-    server = modifier_data
+    server = modifier_data.decode('utf-8')
 
     from_user = irc_user(parsed['from_nick'], server)
     local_user = current_user(server)
@@ -531,8 +544,9 @@ def message_in_cb(data, modifier, modifier_data, string):
             debug(('receive', msg, tlvs))
 
             if msg:
-                result = ':%s PRIVMSG %s :%s' % (
-                    parsed['from'], parsed['to'], msg.decode('utf-8'))
+                result = (':%s PRIVMSG %s :%s' % (
+                    parsed['from'], parsed['to'], msg.decode('utf-8'))).encode(
+                    'utf-8')
 
             context.handle_tlvs(tlvs)
         except potr.context.ErrorReceived, e:
@@ -567,7 +581,7 @@ def message_out_cb(data, modifier, modifier_data, string):
         if parsed['to_channel']:
             return string
 
-        server = modifier_data
+        server = modifier_data.decode('utf-8')
 
         to_user = irc_user(parsed['to_nick'], server)
         local_user = current_user(server)
@@ -600,8 +614,9 @@ def message_out_cb(data, modifier, modifier_data, string):
                     appdata=dict(nick=parsed['to_nick'], server=server))
 
                 if ret:
-                    result = 'PRIVMSG %s :%s' % (
-                        parsed['to_nick'], ret.decode('utf-8'))
+                    result = ('PRIVMSG %s :%s' % (
+                            parsed['to_nick'], ret.decode('utf-8'))).encode(
+                        'utf-8')
             except potr.context.NotEncryptedError, err:
                 if err.args[0] == potr.context.EXC_FINISHED:
                     context.print_buffer(
@@ -613,7 +628,7 @@ def message_out_cb(data, modifier, modifier_data, string):
         weechat.bar_item_update(SCRIPT_NAME)
     except:
         try:
-            weechat.prnt('', traceback.format_exc())
+            prnt('', traceback.format_exc())
             context.print_buffer(
                 'Failed to send message. See core buffer for traceback.')
         except:
@@ -705,7 +720,9 @@ def command_cb(data, buf, args):
 
                 policy_var = context.policy_config_option(arg_parts[1].lower())
 
-                weechat.command('', '/set %s %s' % (policy_var, arg_parts[2]))
+                weechat.command('', (
+                        '/set %s %s' % (policy_var, arg_parts[2])).encode(
+                        'utf-8'))
 
                 context.print_buffer(context.format_policies())
                 
@@ -721,12 +738,12 @@ def otr_statusbar_cb(data, item, window):
 
     if buffer_is_private(buf):
         local_user = irc_user(
-            weechat.buffer_get_string(buf, 'localvar_nick'),
-            weechat.buffer_get_string(buf, 'localvar_server'))
+            buffer_get_string(buf, 'localvar_nick'),
+            buffer_get_string(buf, 'localvar_server'))
 
         remote_user = irc_user(
-            weechat.buffer_get_string(buf, 'localvar_channel'),
-            weechat.buffer_get_string(buf, 'localvar_server'))
+            buffer_get_string(buf, 'localvar_channel'),
+            buffer_get_string(buf, 'localvar_server'))
 
         context = ACCOUNTS[local_user].getContext(remote_user)
 
@@ -898,7 +915,7 @@ if weechat.register(
     ''):
     init_config()
 
-    OTR_DIR = os.path.join(weechat.info_get('weechat_dir', ''), OTR_DIR_NAME)
+    OTR_DIR = os.path.join(info_get('weechat_dir', ''), OTR_DIR_NAME)
     create_dir()
 
     ACCOUNTS = AccountDict()
