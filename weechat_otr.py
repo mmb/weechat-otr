@@ -100,10 +100,6 @@ def debug(msg):
         weechat.prnt('', (
                 '%s debug\t%s' % (SCRIPT_NAME, unicode(msg))).encode('utf-8'))
 
-def info(msg):
-    """Send an info message to the WeeChat core buffer."""
-    weechat.prnt('', '%s\t%s' % (SCRIPT_NAME, str(msg)))
-
 def current_user(server_name):
     """Get the nick and server of the current user on a server."""
     return irc_user(weechat.info_get('irc_nick', server_name), server_name)
