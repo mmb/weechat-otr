@@ -27,6 +27,7 @@ import collections
 import cStringIO
 import os
 import re
+import traceback
 
 import weechat
 
@@ -553,59 +554,72 @@ def message_in_cb(data, modifier, modifier_data, string):
 
 def message_out_cb(data, modifier, modifier_data, string):
     """Outgoing message callback."""
-    debug(('message_out_cb', data, modifier, modifier_data, string))
+    result = ''
 
-    parsed = parse_irc_privmsg(string)
-    debug(('parsed message', parsed))
+    # If any exception is raised in this function, WeeChat will send the
+    # outgoing message, which could be something that the user intended to be
+    # encrypted. This paranoid exception handling ensures that the system
+    # fails closed and not open.
+    try:
+        debug(('message_out_cb', data, modifier, modifier_data, string))
 
-    # skip processing messages to public channels
-    if parsed['to_channel']:
-        return string
+        parsed = parse_irc_privmsg(string)
+        debug(('parsed message', parsed))
 
-    server = modifier_data
+        # skip processing messages to public channels
+        if parsed['to_channel']:
+            return string
 
-    to_user = irc_user(parsed['to_nick'], server)
-    local_user = current_user(server)
+        server = modifier_data
 
-    context = ACCOUNTS[local_user].getContext(to_user)
+        to_user = irc_user(parsed['to_nick'], server)
+        local_user = current_user(server)
 
-    result = string
+        context = ACCOUNTS[local_user].getContext(to_user)
 
-    if OTR_QUERY_RE.match(parsed['text']):
-        debug('matched OTR query')
-    elif parsed['text'].startswith(potr.proto.OTRTAG):
-        if not has_otr_end(parsed['text']):
-            debug('in OTR message')
-            context.in_otr_message = True
-        else:
-            debug('complete OTR message')
-    elif context.in_otr_message:
-        if has_otr_end(parsed['text']):
-            context.in_otr_message = False
-            debug('in OTR message end')
-    else:
-        debug(('context send message', parsed['text'], parsed['to_nick'],
-               server))
-
-        result = ''
-
-        try:
-            ret = context.sendMessage(
-                potr.context.FRAGMENT_SEND_ALL, parsed['text'].encode(u'utf-8'),
-                appdata=dict(nick=parsed['to_nick'], server=server))
-
-            if ret:
-                result = 'PRIVMSG %s :%s' % (parsed['to_nick'], ret)
-
-        except potr.context.NotEncryptedError, err:
-            if err.args[0] == potr.context.EXC_FINISHED:
-                context.print_buffer(
-                    """Your message was not sent. End your private conversation:\n/otr endprivate %s %s""" % (
-                        parsed['to_nick'], server))
+        if OTR_QUERY_RE.match(parsed['text']):
+            debug('matched OTR query')
+            result = string
+        elif parsed['text'].startswith(potr.proto.OTRTAG):
+            if not has_otr_end(parsed['text']):
+                debug('in OTR message')
+                context.in_otr_message = True
             else:
-                raise
+                debug('complete OTR message')
+            result = string
+        elif context.in_otr_message:
+            if has_otr_end(parsed['text']):
+                context.in_otr_message = False
+                debug('in OTR message end')
+            result = string
+        else:
+            debug(('context send message', parsed['text'], parsed['to_nick'],
+                   server))
 
-    weechat.bar_item_update(SCRIPT_NAME)
+            try:
+                ret = context.sendMessage(
+                    potr.context.FRAGMENT_SEND_ALL, parsed['text'].encode(
+                        u'utf-8'),
+                    appdata=dict(nick=parsed['to_nick'], server=server))
+
+                if ret:
+                    result = 'PRIVMSG %s :%s' % (parsed['to_nick'], ret)
+            except potr.context.NotEncryptedError, err:
+                if err.args[0] == potr.context.EXC_FINISHED:
+                    context.print_buffer(
+                        """Your message was not sent. End your private conversation:\n/otr endprivate %s %s""" % (
+                            parsed['to_nick'], server))
+                else:
+                    raise
+
+        weechat.bar_item_update(SCRIPT_NAME)
+    except:
+        try:
+            weechat.prnt('', traceback.format_exc())
+            context.print_buffer(
+                'Failed to send message. See core buffer for traceback.')
+        except:
+            pass
 
     return result
 
