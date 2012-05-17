@@ -508,7 +508,7 @@ def message_in_cb(data, modifier, modifier_data, string):
     """Incoming message callback"""
     debug(('message_in_cb', data, modifier, modifier_data, string))
 
-    parsed = parse_irc_privmsg(string)
+    parsed = parse_irc_privmsg(string.decode('utf-8'))
     debug(('parsed message', parsed))
 
     server = modifier_data
