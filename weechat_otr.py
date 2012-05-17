@@ -83,12 +83,12 @@ class WeechatTaggedPlaintext(potr.proto.TaggedPlaintextOrig):
 
     def __bytes__(self):
         # old style because parent class is old style
-        result = potr.proto.TaggedPlaintextOrig.__bytes__(self)
+        result = potr.proto.TaggedPlaintextOrig.__bytes__(self).decode('utf-8')
 
         if result.endswith(' '):
             result = '%s\t' % result
 
-        return result
+        return result.encode('utf-8')
 
 potr.proto.TaggedPlaintext = WeechatTaggedPlaintext
 
@@ -532,7 +532,7 @@ def message_in_cb(data, modifier, modifier_data, string):
 
             if msg:
                 result = ':%s PRIVMSG %s :%s' % (
-                    parsed['from'], parsed['to'], msg)
+                    parsed['from'], parsed['to'], msg.decode('utf-8'))
 
             context.handle_tlvs(tlvs)
         except potr.context.ErrorReceived, e:
@@ -560,7 +560,7 @@ def message_out_cb(data, modifier, modifier_data, string):
     try:
         debug(('message_out_cb', data, modifier, modifier_data, string))
 
-        parsed = parse_irc_privmsg(string)
+        parsed = parse_irc_privmsg(string.decode('utf-8'))
         debug(('parsed message', parsed))
 
         # skip processing messages to public channels
@@ -600,7 +600,8 @@ def message_out_cb(data, modifier, modifier_data, string):
                     appdata=dict(nick=parsed['to_nick'], server=server))
 
                 if ret:
-                    result = 'PRIVMSG %s :%s' % (parsed['to_nick'], ret)
+                    result = 'PRIVMSG %s :%s' % (
+                        parsed['to_nick'], ret.decode('utf-8'))
             except potr.context.NotEncryptedError, err:
                 if err.args[0] == potr.context.EXC_FINISHED:
                     context.print_buffer(
