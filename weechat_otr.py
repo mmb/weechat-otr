@@ -23,6 +23,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import collections
 import cStringIO
 import os
@@ -95,9 +97,8 @@ def debug(msg):
     debug_option = weechat.config_get(config_prefix('general.debug'))
 
     if weechat.config_boolean(debug_option):
-        weechat.prnt(
-            u'', (u'%s debug\t%s' % (SCRIPT_NAME, unicode(msg))).encode(
-                u'utf-8'))
+        weechat.prnt('', (
+                '%s debug\t%s' % (SCRIPT_NAME, unicode(msg))).encode('utf-8'))
 
 def info(msg):
     """Send an info message to the WeeChat core buffer."""
@@ -275,16 +276,16 @@ class IrcContext(potr.context.Context):
         if isinstance(msg, potr.proto.OTRMessage):
             msg = unicode(msg)
         else:
-            msg = msg.decode(u'utf-8')
+            msg = msg.decode('utf-8')
 
-        debug((u'inject', msg, u'len %d' % len(msg), appdata))
+        debug(('inject', msg, 'len %d' % len(msg), appdata))
 
-        for line in msg.split(u'\n'):
+        for line in msg.split('\n'):
             command = '/quote -server %s PRIVMSG %s :%s' % (
                 appdata['server'], appdata['nick'], line)
 
             debug(command)
-            weechat.command(u'', command.encode(u'utf-8'))
+            weechat.command('', command.encode('utf-8'))
 
     def setState(self, newstate):
         """Handle state transition."""
@@ -599,7 +600,7 @@ def message_out_cb(data, modifier, modifier_data, string):
             try:
                 ret = context.sendMessage(
                     potr.context.FRAGMENT_SEND_ALL, parsed['text'].encode(
-                        u'utf-8'),
+                        'utf-8'),
                     appdata=dict(nick=parsed['to_nick'], server=server))
 
                 if ret:
