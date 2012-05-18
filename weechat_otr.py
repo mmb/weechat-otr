@@ -291,7 +291,7 @@ class IrcContext(potr.context.Context):
 
         for line in msg.split('\n'):
             command = '/quote -server %s PRIVMSG %s :%s' % (
-                appdata['server'], appdata['nick'], line)
+                self.peer_server, self.peer_nick, line)
 
             debug(command)
             weechat.command('', command.encode('utf-8'))
@@ -537,9 +537,7 @@ def message_in_cb(data, modifier, modifier_data, string):
 
     if context.in_assembler.is_done():
         try:
-            msg, tlvs = context.receiveMessage(
-                context.in_assembler.get(),
-                appdata=dict(nick=parsed['from_nick'], server=server))
+            msg, tlvs = context.receiveMessage(context.in_assembler.get())
 
             debug(('receive', msg, tlvs))
 
@@ -612,8 +610,7 @@ def message_out_cb(data, modifier, modifier_data, string):
             try:
                 ret = context.sendMessage(
                     potr.context.FRAGMENT_SEND_ALL, parsed['text'].encode(
-                        'utf-8'),
-                    appdata=dict(nick=parsed['to_nick'], server=server))
+                        'utf-8'))
 
                 if ret:
                     result = ('PRIVMSG %s :%s' % (
@@ -683,7 +680,7 @@ def command_cb(data, buf, args):
 
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
-            context.smpGotSecret(secret, appdata=dict(nick=nick, server=server))
+            context.smpGotSecret(secret)
 
             result = weechat.WEECHAT_RC_OK
         elif action == 'ask':
@@ -696,8 +693,8 @@ def command_cb(data, buf, args):
 
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
-            context.smpInit(
-                secret, question, appdata=dict(nick=nick, server=server))
+
+            context.smpInit(secret, question)
 
             result = weechat.WEECHAT_RC_OK
     elif arg_parts[0] in ('endprivate', 'finish'):
@@ -706,7 +703,7 @@ def command_cb(data, buf, args):
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
-            context.disconnect(appdata=dict(nick=nick, server=server))
+            context.disconnect()
 
             result = weechat.WEECHAT_RC_OK
     elif arg_parts[0] == 'policy':
