@@ -560,7 +560,6 @@ def message_in_cb(data, modifier, modifier_data, string):
             context.print_buffer(
                 'Unencrypted message received from %s: %s' % (
                     context.peer, err.args[0]))
-            result = string
 
     weechat.bar_item_update(SCRIPT_NAME)
 
