@@ -517,6 +517,12 @@ class IrcOtrAccount(potr.context.Account):
                              trust)))
                     fpr_file.write('\n')
 
+    def end_all_private(self):
+        """End all currently encrypted conversations."""
+        for context in self.ctxs.itervalues():
+            if context.is_encrypted():
+                context.disconnect()
+
 def message_in_cb(data, modifier, modifier_data, string):
     """Incoming message callback"""
     debug(('message_in_cb', data, modifier, modifier_data, string))
@@ -640,6 +646,9 @@ def shutdown():
     debug('shutdown')
 
     weechat.config_write(CONFIG_FILE)
+
+    for account in ACCOUNTS.itervalues():
+        account.end_all_private()
 
     free_all_config()
 
