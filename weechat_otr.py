@@ -556,7 +556,10 @@ def message_in_cb(data, modifier, modifier_data, string):
                 'Received encrypted data but no private session established.')
         except potr.context.NotOTRMessage:
             result = string
-        except potr.context.UnencryptedMessage:
+        except potr.context.UnencryptedMessage, err:
+            context.print_buffer(
+                'Unencrypted message received from %s: %s' % (
+                    context.peer, err.args[0]))
             result = string
 
     weechat.bar_item_update(SCRIPT_NAME)
