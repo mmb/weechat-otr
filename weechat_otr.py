@@ -663,12 +663,19 @@ def command_cb(data, buf, args):
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
-            context.setCurrentTrust('verified')
-            context.print_buffer('%s is now authenticated.' % context.peer)
 
-            weechat.bar_item_update(SCRIPT_NAME)
+            if context.crypto.theirPubkey is not None:
+                context.setCurrentTrust('verified')
+                context.print_buffer('%s is now authenticated.' % context.peer)
 
-            result = weechat.WEECHAT_RC_OK
+                weechat.bar_item_update(SCRIPT_NAME)
+
+                result = weechat.WEECHAT_RC_OK
+            else:
+                context.print_buffer(
+                    'No fingerprint for %s. Start an OTR conversation first.' \
+                        % context.peer)
+
     elif len(arg_parts) in (5, 6) and arg_parts[0] == 'smp':
         action = arg_parts[1]
 
