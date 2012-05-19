@@ -895,7 +895,7 @@ def init_config():
         ('default.allow_v2', 'default allow OTR v2 policy', 'on'),
         ('default.require_encryption', 'default require encryption policy',
          'off'),
-        ('default.send_tag', 'default send tag policy', 'on'),
+        ('default.send_tag', 'default send tag policy', 'off'),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['policy'], option, 'boolean', desc, '',
