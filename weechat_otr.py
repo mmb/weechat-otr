@@ -673,13 +673,12 @@ def command_cb(data, buf, args):
                 context.print_buffer('%s is now authenticated.' % context.peer)
 
                 weechat.bar_item_update(SCRIPT_NAME)
-
-                result = weechat.WEECHAT_RC_OK
             else:
                 context.print_buffer(
                     'No fingerprint for %s. Start an OTR conversation first.' \
                         % context.peer)
 
+            result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) in (5, 6) and arg_parts[0] == 'smp':
         action = arg_parts[1]
 
