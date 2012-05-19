@@ -92,6 +92,16 @@ class WeechatTaggedPlaintext(potr.proto.TaggedPlaintextOrig):
 
 potr.proto.TaggedPlaintext = WeechatTaggedPlaintext
 
+def command(buf, command_str):
+    """Wrap weechat.command() with utf-8 encode."""
+    debug(command_str)
+    weechat.command(buf, command_str.encode('utf-8'))
+
+def privmsg(server, nick, message):
+    """Send a private message to a nick."""
+    for line in message.split('\n'):
+        command('', '/quote -server %s PRIVMSG %s :%s' % (server, nick, line))
+
 def prnt(buf, message):
     """Wrap weechat.prnt() with utf-8 encode."""
     weechat.prnt(buf, message.encode('utf-8'))
@@ -289,12 +299,7 @@ class IrcContext(potr.context.Context):
 
         debug(('inject', msg, 'len %d' % len(msg), appdata))
 
-        for line in msg.split('\n'):
-            command = '/quote -server %s PRIVMSG %s :%s' % (
-                self.peer_server, self.peer_nick, line)
-
-            debug(command)
-            weechat.command('', command.encode('utf-8'))
+        privmsg(self.peer_server, self.peer_nick, msg)
 
     def setState(self, newstate):
         """Handle state transition."""
@@ -661,6 +666,21 @@ def command_cb(data, buf, args):
 
     arg_parts = args.split(None, 5)
 
+    if arg_parts[0] == 'start':
+        nick, server = default_peer_args(arg_parts[1:3])
+
+        if nick is not None and server is not None:
+            context = ACCOUNTS[current_user(server)].getContext(
+                irc_user(nick, server))
+
+            context.print_buffer('Sending OTR query...')
+            context.print_buffer(
+                'To try OTR on all conversations with %s: /otr policy send_tag on' %
+                context.peer)
+
+            privmsg(server, nick, '?OTR?')
+
+            result = weechat.WEECHAT_RC_OK
     if arg_parts[0] == 'trust':
         nick, server = default_peer_args(arg_parts[1:3])
 
@@ -675,7 +695,7 @@ def command_cb(data, buf, args):
                 weechat.bar_item_update(SCRIPT_NAME)
             else:
                 context.print_buffer(
-                    'No fingerprint for %s. Start an OTR conversation first.' \
+                    'No fingerprint for %s. Start an OTR conversation first: /otr start' \
                         % context.peer)
 
             result = weechat.WEECHAT_RC_OK
@@ -733,9 +753,7 @@ def command_cb(data, buf, args):
 
                 policy_var = context.policy_config_option(arg_parts[1].lower())
 
-                weechat.command('', (
-                        '/set %s %s' % (policy_var, arg_parts[2])).encode(
-                        'utf-8'))
+                command('', '/set %s %s' % (policy_var, arg_parts[2]))
 
                 context.print_buffer(context.format_policies())
                 
@@ -938,9 +956,14 @@ if weechat.register(
 
     weechat.hook_command(
         SCRIPT_NAME, SCRIPT_DESC,
-        """trust [NICK SERVER] || smp ask NICK SERVER SECRET [QUESTION] || smp respond NICK SERVER SECRET || endprivate [NICK SERVER] || policy [POLICY on|off]
-""",
+        'start [NICK SERVER] || '
+        'endprivate [NICK SERVER] || '
+        'smp ask NICK SERVER SECRET [QUESTION] || '
+        'smp respond NICK SERVER SECRET || '
+        'trust [NICK SERVER] || '
+        'policy [POLICY on|off]',
         '',
+        'start %(nick) %(irc_servers) %-||'
         'endprivate %(nick) %(irc_servers) %-||'
         'smp ask|respond %(nick) %(irc_servers) %-||'
         'trust %(nick) %(irc_servers) %-||'
