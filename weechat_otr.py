@@ -694,7 +694,8 @@ def command_cb(data, buf, args):
         action = arg_parts[1]
 
         if action == 'respond':
-            nick, server, secret = arg_parts[2:5]
+            nick, server = arg_parts[2:4]
+            secret = args.split(None, 4)[-1]
 
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
