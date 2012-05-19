@@ -681,22 +681,13 @@ def command_cb(data, buf, args):
             privmsg(server, nick, '?OTR?')
 
             result = weechat.WEECHAT_RC_OK
-    if arg_parts[0] == 'trust':
+    elif arg_parts[0] in ('endprivate', 'finish'):
         nick, server = default_peer_args(arg_parts[1:3])
 
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
-
-            if context.crypto.theirPubkey is not None:
-                context.setCurrentTrust('verified')
-                context.print_buffer('%s is now authenticated.' % context.peer)
-
-                weechat.bar_item_update(SCRIPT_NAME)
-            else:
-                context.print_buffer(
-                    'No fingerprint for %s. Start an OTR conversation first: /otr start' \
-                        % context.peer)
+            context.disconnect()
 
             result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) in (5, 6) and arg_parts[0] == 'smp':
@@ -724,13 +715,22 @@ def command_cb(data, buf, args):
             context.smpInit(secret, question)
 
             result = weechat.WEECHAT_RC_OK
-    elif arg_parts[0] in ('endprivate', 'finish'):
+    elif arg_parts[0] == 'trust':
         nick, server = default_peer_args(arg_parts[1:3])
 
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
-            context.disconnect()
+
+            if context.crypto.theirPubkey is not None:
+                context.setCurrentTrust('verified')
+                context.print_buffer('%s is now authenticated.' % context.peer)
+
+                weechat.bar_item_update(SCRIPT_NAME)
+            else:
+                context.print_buffer(
+                    'No fingerprint for %s. Start an OTR conversation first: /otr start' \
+                        % context.peer)
 
             result = weechat.WEECHAT_RC_OK
     elif arg_parts[0] == 'policy':
