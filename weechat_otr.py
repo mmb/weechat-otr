@@ -594,10 +594,8 @@ def message_out_cb(data, modifier, modifier_data, string):
 
         context = ACCOUNTS[local_user].getContext(to_user)
 
-        if OTR_QUERY_RE.match(parsed['text']):
-            debug('matched OTR query')
-            result = string
-        elif parsed['text'].startswith(potr.proto.OTRTAG):
+        if parsed['text'].startswith(potr.proto.OTRTAG) and \
+                not OTR_QUERY_RE.match(parsed['text']):
             if not has_otr_end(parsed['text']):
                 debug('in OTR message')
                 context.in_otr_message = True
@@ -619,6 +617,7 @@ def message_out_cb(data, modifier, modifier_data, string):
                         'utf-8'))
 
                 if ret:
+                    debug(('sendMessage returned', ret))
                     result = ('PRIVMSG %s :%s' % (
                             parsed['to_nick'], ret.decode('utf-8'))).encode(
                         'utf-8')
