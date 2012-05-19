@@ -312,7 +312,7 @@ class IrcContext(potr.context.Context):
             elif newstate == potr.context.STATE_FINISHED:
                 self.print_buffer(
                     """%s has ended the private conversation. You should do the same:
-/otr endprivate %s %s
+/otr finish %s %s
 """ % (self.peer, self.peer_nick, self.peer_server))
         elif newstate == potr.context.STATE_ENCRYPTED:
             # unencrypted => encrypted
@@ -629,7 +629,7 @@ def message_out_cb(data, modifier, modifier_data, string):
             except potr.context.NotEncryptedError, err:
                 if err.args[0] == potr.context.EXC_FINISHED:
                     context.print_buffer(
-                        """Your message was not sent. End your private conversation:\n/otr endprivate %s %s""" % (
+                        """Your message was not sent. End your private conversation:\n/otr finish %s %s""" % (
                             parsed['to_nick'], server))
                 else:
                     raise
@@ -681,7 +681,7 @@ def command_cb(data, buf, args):
             privmsg(server, nick, '?OTR?')
 
             result = weechat.WEECHAT_RC_OK
-    elif arg_parts[0] in ('endprivate', 'finish'):
+    elif arg_parts[0] == 'finish':
         nick, server = default_peer_args(arg_parts[1:3])
 
         if nick is not None and server is not None:
@@ -958,14 +958,14 @@ if weechat.register(
     weechat.hook_command(
         SCRIPT_NAME, SCRIPT_DESC,
         'start [NICK SERVER] || '
-        'endprivate [NICK SERVER] || '
+        'finish [NICK SERVER] || '
         'smp ask NICK SERVER SECRET [QUESTION] || '
         'smp respond NICK SERVER SECRET || '
         'trust [NICK SERVER] || '
         'policy [POLICY on|off]',
         '',
         'start %(nick) %(irc_servers) %-||'
-        'endprivate %(nick) %(irc_servers) %-||'
+        'finish %(nick) %(irc_servers) %-||'
         'smp ask|respond %(nick) %(irc_servers) %-||'
         'trust %(nick) %(irc_servers) %-||'
         'policy %(otr_policy) on|off %-||',
