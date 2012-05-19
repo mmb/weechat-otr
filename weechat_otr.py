@@ -43,7 +43,7 @@ SCRIPT_VERSION = '0.0.2'
 
 OTR_DIR_NAME = 'otr'
 
-OTR_QUERY_RE = re.compile('\?OTR\??v[a-z\d]*\?$')
+OTR_QUERY_RE = re.compile('\?OTR(\?|\??v[a-z\d]*\?)$')
 
 POLICIES = {
     'allow_v1' : 'allow OTR protocol version 1',
