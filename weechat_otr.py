@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# weechat-otr - WeeChat script for Off-the-Record messaging
+# weechat-otr - WeeChat script for Off-the-Record IRC messaging
 #
 # DISCLAIMER: To the best of my knowledge this script securely provides OTR
 # messaging in WeeChat, but I offer no guarantee. Please report any security
