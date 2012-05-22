@@ -535,6 +535,10 @@ def message_in_cb(data, modifier, modifier_data, string):
     parsed = parse_irc_privmsg(string.decode('utf-8'))
     debug(('parsed message', parsed))
 
+    # skip processing messages to public channels
+    if parsed['to_channel']:
+        return string
+
     server = modifier_data.decode('utf-8')
 
     from_user = irc_user(parsed['from_nick'], server)
