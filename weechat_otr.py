@@ -59,7 +59,7 @@ To end your private conversation: /otr finish
 
 SCRIPT_AUTHOR = 'Matthew M. Boedicker'
 SCRIPT_LICENCE = 'GPL3'
-SCRIPT_VERSION = '0.0.2'
+SCRIPT_VERSION = '1.0.0'
 
 OTR_DIR_NAME = 'otr'
 
