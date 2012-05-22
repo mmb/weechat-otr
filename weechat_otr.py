@@ -36,7 +36,27 @@ import weechat
 import potr
 
 SCRIPT_NAME = 'otr'
-SCRIPT_DESC = 'Off-the-Record messaging for IRC'
+SCRIPT_DESC = """Off-the-Record messaging for IRC
+
+Quick start:
+
+Add OTR to the status bar by appending ',[otr]' to the end of the config
+setting weechat.bar.status.items. This will show you whether your current
+conversation is encrypted and/or authenticated. /set otr.* for OTR status
+bar customization options.
+
+Start a private conversation with a friend who has OTR: /query yourpeer hi
+
+In the private chat buffer: /otr start
+
+If you have not authenticated your peer yet, follow the instructions for
+authentication.
+
+View OTR policies for your peer: /otr policy
+
+To end your private conversation: /otr finish
+"""
+
 SCRIPT_AUTHOR = 'Matthew M. Boedicker'
 SCRIPT_LICENCE = 'GPL3'
 SCRIPT_VERSION = '0.0.2'
