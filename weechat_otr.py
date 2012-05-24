@@ -366,7 +366,6 @@ class IrcContext(potr.context.Context):
 
     def buffer(self):
         """Get the buffer for this context."""
-        # TODO open a new private buffer for this user if there isn't one
         return info_get(
             'irc_buffer', '%s,%s' % (self.peer_server, self.peer_nick))
 
