@@ -477,6 +477,24 @@ Respond with: /otr smp respond %s %s <answer>""" % (
 
         return buf.getvalue()
 
+    def is_logged(self):
+        """Return True if conversations with this context's peer are currently
+        being logged to disk."""
+        infolist = weechat.infolist_get('logger_buffer', '', '')
+
+        buf = self.buffer()
+
+        result = False
+
+        while weechat.infolist_next(infolist):
+            if weechat.infolist_pointer(infolist, 'buffer') == buf:
+                result = bool(weechat.infolist_integer(infolist, 'log_enabled'))
+                break
+
+        weechat.infolist_free(infolist)
+
+        return result
+
 class IrcOtrAccount(potr.context.Account):
     """Account class for OTR over IRC."""
 
@@ -807,6 +825,8 @@ def otr_statusbar_cb(data, item, window):
         unencrypted_str = config_string('look.bar.state.unencrypted')
         authenticated_str = config_string('look.bar.state.authenticated')
         unauthenticated_str = config_string('look.bar.state.unauthenticated')
+        logged_str = config_string('look.bar.state.logged')
+        notlogged_str = config_string('look.bar.state.notlogged')
 
         bar_parts = []
 
@@ -828,6 +848,19 @@ def otr_statusbar_cb(data, item, window):
                             config_color('status.unauthenticated'),
                             unauthenticated_str,
                             config_color('status.default')]))
+
+            if context.is_logged():
+                if logged_str:
+                    bar_parts.append(''.join([
+                                config_color('status.logged'),
+                                logged_str,
+                                config_color('status.default')]))
+            elif notlogged_str:
+                bar_parts.append(''.join([
+                            config_color('status.notlogged'),
+                            notlogged_str,
+                            config_color('status.default')]))
+
         elif unencrypted_str:
             bar_parts.append(''.join([
                         config_color('status.unencrypted'),
@@ -866,6 +899,12 @@ def policy_create_option_cb(data, config_file, section, name, value):
 
     return weechat.WEECHAT_CONFIG_OPTION_SET_OK_CHANGED
 
+def logger_level_update_cb(data, option, value):
+    """Callback called when any logger level changes."""
+    weechat.bar_item_update(SCRIPT_NAME)
+
+    return weechat.WEECHAT_RC_OK
+
 def init_config():
     """Set up configuration options and load config file."""
     global CONFIG_FILE
@@ -898,6 +937,10 @@ def init_config():
          'green', 'bar_config_update_cb'),
         ('status.unauthenticated', 'status bar unauthenticated indicator color',
          'red', 'bar_config_update_cb'),
+        ('status.logged', 'status bar logged indicator color', 'lightred',
+         'bar_config_update_cb'),
+        ('status.notlogged', 'status bar not logged indicator color',
+         'green', 'bar_config_update_cb'),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['color'], option, 'color', desc, '', 0,
@@ -920,6 +963,14 @@ def init_config():
          'bar_config_update_cb'),
         ('bar.state.unauthenticated',
          'shown in status bar when peer is not authenticated', '!AUTH',
+         'bar_config_update_cb'),
+        ('bar.state.logged',
+         'shown in status bar when peer conversation is being logged to disk',
+         'LOG',
+         'bar_config_update_cb'),
+        ('bar.state.notlogged',
+         'shown in status bar when peer conversation is not being logged to disk',
+         '!LOG',
          'bar_config_update_cb'),
         ('bar.state.separator', 'separator for states in the status bar', ',',
          'bar_config_update_cb'),
@@ -998,6 +1049,8 @@ if weechat.register(
 
     weechat.hook_completion(
         'otr_policy', 'OTR policies', 'policy_completion_cb', '')
+
+    weechat.hook_config('logger.level.irc.*', 'logger_level_update_cb', '')
 
     OTR_STATUSBAR = weechat.bar_item_new(SCRIPT_NAME, 'otr_statusbar_cb', '')
     weechat.bar_item_update(SCRIPT_NAME)
