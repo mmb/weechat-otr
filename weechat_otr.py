@@ -122,6 +122,10 @@ def privmsg(server, nick, message):
     for line in message.split('\n'):
         command('', '/quote -server %s PRIVMSG %s :%s' % (server, nick, line))
 
+def build_privmsg_in(fromm, to, msg):
+    """Build an inbound IRC PRIVMSG command."""
+    return ':%s PRIVMSG %s :%s' % (fromm, to, msg)
+
 def prnt(buf, message):
     """Wrap weechat.prnt() with utf-8 encode."""
     weechat.prnt(buf, message.encode('utf-8'))
@@ -594,8 +598,8 @@ def message_in_cb(data, modifier, modifier_data, string):
             debug(('receive', msg, tlvs))
 
             if msg:
-                result = (':%s PRIVMSG %s :%s' % (
-                    parsed['from'], parsed['to'], msg.decode('utf-8'))).encode(
+                result = build_privmsg_in(
+                    parsed['from'], parsed['to'], msg.decode('utf-8')).encode(
                     'utf-8')
 
             context.handle_tlvs(tlvs)
@@ -607,9 +611,10 @@ def message_in_cb(data, modifier, modifier_data, string):
         except potr.context.NotOTRMessage:
             result = string
         except potr.context.UnencryptedMessage, err:
-            context.print_buffer(
-                'Unencrypted message received from %s: %s' % (
-                    context.peer, err.args[0]))
+            result = build_privmsg_in(
+                parsed['from'], parsed['to'],
+                'Unencrypted message received: %s' % (
+                    err.args[0])).encode('utf-8')
 
     weechat.bar_item_update(SCRIPT_NAME)
 
