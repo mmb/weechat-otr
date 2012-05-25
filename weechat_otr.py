@@ -36,14 +36,15 @@ import weechat
 import potr
 
 SCRIPT_NAME = 'otr'
-SCRIPT_DESC = """Off-the-Record messaging for IRC
+SCRIPT_DESC = 'Off-the-Record messaging for IRC'
+SCRIPT_HELP = """%s
 
 Quick start:
 
-Add OTR to the status bar by appending ',[otr]' to the end of the config
-setting weechat.bar.status.items. This will show you whether your current
-conversation is encrypted and/or authenticated. /set otr.* for OTR status
-bar customization options.
+Add an OTR item to the status bar by adding '[otr]' to the config setting
+weechat.bar.status.items. This will show you whether your current conversation
+is encrypted, authenticated and logged. /set otr.* for OTR status bar
+customization options.
 
 Start a private conversation with a friend who has OTR: /query yourpeer hi
 
@@ -55,7 +56,7 @@ authentication.
 View OTR policies for your peer: /otr policy
 
 To end your private conversation: /otr finish
-"""
+""" % SCRIPT_DESC
 
 SCRIPT_AUTHOR = 'Matthew M. Boedicker'
 SCRIPT_LICENCE = 'GPL3'
@@ -1022,8 +1023,8 @@ def create_dir():
         weechat.mkdir_home(OTR_DIR_NAME, 0700)
 
 if weechat.register(
-    SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, '', 'shutdown',
-    ''):
+    SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, SCRIPT_DESC,
+    'shutdown', ''):
     init_config()
 
     OTR_DIR = os.path.join(info_get('weechat_dir', ''), OTR_DIR_NAME)
@@ -1035,7 +1036,7 @@ if weechat.register(
     weechat.hook_modifier('irc_out_privmsg', 'message_out_cb', '')
 
     weechat.hook_command(
-        SCRIPT_NAME, SCRIPT_DESC,
+        SCRIPT_NAME, SCRIPT_HELP,
         'start [NICK SERVER] || '
         'finish [NICK SERVER] || '
         'smp ask NICK SERVER SECRET [QUESTION] || '
