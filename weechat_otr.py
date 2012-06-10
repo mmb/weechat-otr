@@ -713,7 +713,7 @@ def command_cb(data, buf, args):
 
     arg_parts = args.split(None, 5)
 
-    if arg_parts[0] == 'start':
+    if len(arg_parts) in (1, 3) and arg_parts[0] == 'start':
         nick, server = default_peer_args(arg_parts[1:3])
 
         if nick is not None and server is not None:
@@ -728,7 +728,7 @@ def command_cb(data, buf, args):
             privmsg(server, nick, '?OTR?')
 
             result = weechat.WEECHAT_RC_OK
-    elif arg_parts[0] == 'finish':
+    elif len(arg_parts) in (1, 3) and arg_parts[0] == 'finish':
         nick, server = default_peer_args(arg_parts[1:3])
 
         if nick is not None and server is not None:
@@ -763,7 +763,7 @@ def command_cb(data, buf, args):
             context.smpInit(secret, question)
 
             result = weechat.WEECHAT_RC_OK
-    elif arg_parts[0] == 'trust':
+    elif len(arg_parts) in (1, 3) and arg_parts[0] == 'trust':
         nick, server = default_peer_args(arg_parts[1:3])
 
         if nick is not None and server is not None:
@@ -781,7 +781,7 @@ def command_cb(data, buf, args):
                         % context.peer)
 
             result = weechat.WEECHAT_RC_OK
-    elif arg_parts[0] == 'policy':
+    elif len(arg_parts) in (1, 3) and arg_parts[0] == 'policy':
         if len(arg_parts) == 1:
             nick, server = default_peer_args([])
 
