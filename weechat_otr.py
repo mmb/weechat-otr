@@ -811,7 +811,12 @@ def command_cb(data, buf, args):
 
 def otr_statusbar_cb(data, item, window):
     """Update the statusbar."""
-    buf = weechat.window_get_pointer(window, 'buffer')
+    if window:
+        buf = weechat.window_get_pointer(window, 'buffer')
+    else:
+        # If the bar item is in a root bar that is not in a window, window
+        # will be empty.
+        buf = weechat.current_buffer()
 
     result = ''
 
@@ -906,6 +911,15 @@ def policy_create_option_cb(data, config_file, section, name, value):
 
 def logger_level_update_cb(data, option, value):
     """Callback called when any logger level changes."""
+    weechat.bar_item_update(SCRIPT_NAME)
+
+    return weechat.WEECHAT_RC_OK
+
+def buffer_switch_cb(data, signal, signal_data):
+    """Callback for buffer switched.
+
+    Used for updating the status bar item when it is in a root bar.
+    """
     weechat.bar_item_update(SCRIPT_NAME)
 
     return weechat.WEECHAT_RC_OK
@@ -1056,6 +1070,8 @@ if weechat.register(
         'otr_policy', 'OTR policies', 'policy_completion_cb', '')
 
     weechat.hook_config('logger.level.irc.*', 'logger_level_update_cb', '')
+
+    weechat.hook_signal('buffer_switch', 'buffer_switch_cb', '')
 
     OTR_STATUSBAR = weechat.bar_item_new(SCRIPT_NAME, 'otr_statusbar_cb', '')
     weechat.bar_item_update(SCRIPT_NAME)
