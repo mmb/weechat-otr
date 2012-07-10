@@ -471,7 +471,7 @@ Respond with: /otr smp respond %s %s <answer>""" % (
         buf = cStringIO.StringIO()
 
         buf.write('Current OTR policies for %s:\n' % self.peer)
-        
+
         for policy, desc in sorted(POLICIES.iteritems()):
             buf.write('  %s (%s) : %s\n' % (
                     policy, desc,
@@ -804,7 +804,7 @@ def command_cb(data, buf, args):
                 command('', '/set %s %s' % (policy_var, arg_parts[2]))
 
                 context.print_buffer(context.format_policies())
-                
+
                 result = weechat.WEECHAT_RC_OK
 
     return result
