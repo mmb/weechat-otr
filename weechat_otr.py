@@ -760,9 +760,14 @@ def command_cb(data, buf, args):
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
 
-            context.smpInit(secret, question)
-
-            result = weechat.WEECHAT_RC_OK
+            try:
+                context.smpInit(secret, question)
+            except potr.context.NotEncryptedError:
+                context.print_buffer(
+                    'There is currently no encrypted session with %s.' % \
+                        context.peer)
+            else:
+                result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) in (1, 3) and arg_parts[0] == 'trust':
         nick, server = default_peer_args(arg_parts[1:3])
 
