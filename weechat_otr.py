@@ -67,10 +67,13 @@ OTR_DIR_NAME = 'otr'
 OTR_QUERY_RE = re.compile('\?OTR(\?|\??v[a-z\d]*\?)$')
 
 POLICIES = {
-    'allow_v1' : 'allow OTR protocol version 1',
     'allow_v2' : 'allow OTR protocol version 2',
     'require_encryption' : 'refuse to send unencrypted messages',
     'send_tag' : 'advertise your OTR capability using the whitespace tag',
+    }
+
+READ_ONLY_POLICIES = {
+    'allow_v1' : False,
     }
 
 IRC_PRIVMSG_RE = re.compile(r"""
@@ -303,13 +306,18 @@ class IrcContext(potr.context.Context):
 
     def getPolicy(self, key):
         """Get the value of a policy option for this context."""
-        option = weechat.config_get(self.policy_config_option(key))
+        key_lower = key.lower()
 
-        if option == '':
-            option = weechat.config_get(
-                config_prefix('policy.default.%s' % key.lower()))
+        if key_lower in READ_ONLY_POLICIES:
+            result = READ_ONLY_POLICIES[key_lower]
+        else:
+            option = weechat.config_get(self.policy_config_option(key))
 
-        result = bool(weechat.config_boolean(option))
+            if option == '':
+                option = weechat.config_get(
+                    config_prefix('policy.default.%s' % key_lower))
+
+            result = bool(weechat.config_boolean(option))
 
         debug(('getPolicy', key, result))
 
@@ -1008,7 +1016,6 @@ def init_config():
         'policy_create_option_cb', '', '', '')
 
     for option, desc, default in [
-        ('default.allow_v1', 'default allow OTR v1 policy', 'off'),
         ('default.allow_v2', 'default allow OTR v2 policy', 'on'),
         ('default.require_encryption', 'default require encryption policy',
          'off'),
