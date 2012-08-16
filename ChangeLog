@@ -1,0 +1,14 @@
+1.1.0
+	2012-08-15
+
+	Remove references to OTR protocol version 1 because pure-python-otr
+	doesn't support it.
+
+	Stricter argument parsing to prevent tracebacks.
+
+	Fix status bar item when it occurs in a root bar.
+
+1.0.0
+	2012-05-26
+
+	Initial release.
