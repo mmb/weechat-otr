@@ -107,19 +107,19 @@ class WeechatTaggedPlaintext(potr.proto.TaggedPlaintextOrig):
 
     def __bytes__(self):
         # old style because parent class is old style
-        result = potr.proto.TaggedPlaintextOrig.__bytes__(self).decode('utf-8')
+        result = potr.proto.TaggedPlaintextOrig.__bytes__(self).decode('utf-8', "replace")
 
         if result.endswith(' '):
             result = '%s\t' % result
 
-        return result.encode('utf-8')
+        return result.encode('utf-8', "replace")
 
 potr.proto.TaggedPlaintext = WeechatTaggedPlaintext
 
 def command(buf, command_str):
     """Wrap weechat.command() with utf-8 encode."""
     debug(command_str)
-    weechat.command(buf, command_str.encode('utf-8'))
+    weechat.command(buf, command_str.encode('utf-8', "replace"))
 
 def privmsg(server, nick, message):
     """Send a private message to a nick."""
@@ -132,7 +132,7 @@ def build_privmsg_in(fromm, to, msg):
 
 def prnt(buf, message):
     """Wrap weechat.prnt() with utf-8 encode."""
-    weechat.prnt(buf, message.encode('utf-8'))
+    weechat.prnt(buf, message.encode('utf-8', "replace"))
 
 def debug(msg):
     """Send a debug message to the WeeChat core buffer."""
@@ -206,11 +206,11 @@ def config_color(option):
 def config_string(option):
     """Get the string value of a config option with utf-8 decode."""
     return weechat.config_string(
-        weechat.config_get(config_prefix(option))).decode('utf-8')
+        weechat.config_get(config_prefix(option))).decode('utf-8', "replace")
 
 def buffer_get_string(buf, prop):
     """Wrap weechat.buffer_get_string() with utf-8 encode/decode."""
-    return weechat.buffer_get_string(buf, prop.encode('utf-8')).decode('utf-8')
+    return weechat.buffer_get_string(buf, prop.encode('utf-8', "replace")).decode('utf-8', "replace")
 
 def buffer_is_private(buf):
     """Return True if a buffer is private."""
@@ -218,7 +218,7 @@ def buffer_is_private(buf):
 
 def info_get(info_name, arguments):
     """Wrap weechat.info_get() with utf-8 encode/decode."""
-    return weechat.info_get(info_name, arguments.encode('utf-8')).decode(
+    return weechat.info_get(info_name, arguments.encode('utf-8', "replace")).decode(
         'utf-8')
 
 def default_peer_args(args):
@@ -328,7 +328,7 @@ class IrcContext(potr.context.Context):
         if isinstance(msg, potr.proto.OTRMessage):
             msg = unicode(msg)
         else:
-            msg = msg.decode('utf-8')
+            msg = msg.decode('utf-8', "replace")
 
         debug(('inject', msg, 'len %d' % len(msg), appdata))
 
@@ -582,14 +582,14 @@ def message_in_cb(data, modifier, modifier_data, string):
     """Incoming message callback"""
     debug(('message_in_cb', data, modifier, modifier_data, string))
 
-    parsed = parse_irc_privmsg(string.decode('utf-8'))
+    parsed = parse_irc_privmsg(string.decode('utf-8', "replace"))
     debug(('parsed message', parsed))
 
     # skip processing messages to public channels
     if parsed['to_channel']:
         return string
 
-    server = modifier_data.decode('utf-8')
+    server = modifier_data.decode('utf-8', "replace")
 
     from_user = irc_user(parsed['from_nick'], server)
     local_user = current_user(server)
@@ -608,7 +608,7 @@ def message_in_cb(data, modifier, modifier_data, string):
 
             if msg:
                 result = build_privmsg_in(
-                    parsed['from'], parsed['to'], msg.decode('utf-8')).encode(
+                    parsed['from'], parsed['to'], msg.decode('utf-8', "replace")).encode(
                     'utf-8')
 
             context.handle_tlvs(tlvs)
@@ -623,7 +623,7 @@ def message_in_cb(data, modifier, modifier_data, string):
             result = build_privmsg_in(
                 parsed['from'], parsed['to'],
                 'Unencrypted message received: %s' % (
-                    err.args[0])).encode('utf-8')
+                    err.args[0])).encode('utf-8', "replace")
 
     weechat.bar_item_update(SCRIPT_NAME)
 
@@ -640,14 +640,14 @@ def message_out_cb(data, modifier, modifier_data, string):
     try:
         debug(('message_out_cb', data, modifier, modifier_data, string))
 
-        parsed = parse_irc_privmsg(string.decode('utf-8'))
+        parsed = parse_irc_privmsg(string.decode('utf-8', "replace"))
         debug(('parsed message', parsed))
 
         # skip processing messages to public channels
         if parsed['to_channel']:
             return string
 
-        server = modifier_data.decode('utf-8')
+        server = modifier_data.decode('utf-8', "replace")
 
         to_user = irc_user(parsed['to_nick'], server)
         local_user = current_user(server)
@@ -679,7 +679,7 @@ def message_out_cb(data, modifier, modifier_data, string):
                 if ret:
                     debug(('sendMessage returned', ret))
                     result = ('PRIVMSG %s :%s' % (
-                            parsed['to_nick'], ret.decode('utf-8'))).encode(
+                            parsed['to_nick'], ret.decode('utf-8', "replace"))).encode(
                         'utf-8')
             except potr.context.NotEncryptedError, err:
                 if err.args[0] == potr.context.EXC_FINISHED:
