@@ -1093,14 +1093,14 @@ if weechat.register(
         'smp ask NICK SERVER SECRET [QUESTION] || '
         'smp respond NICK SERVER SECRET || '
         'trust [NICK SERVER] || '
-	'distrust [NICK SERVER] || '
+        'distrust [NICK SERVER] || '
         'policy [POLICY on|off]',
         '',
         'start %(nick) %(irc_servers) %-||'
         'finish %(nick) %(irc_servers) %-||'
         'smp ask|respond %(nick) %(irc_servers) %-||'
         'trust %(nick) %(irc_servers) %-||'
-	'distrust %(nick) %(irc_servers) %-||'
+        'distrust %(nick) %(irc_servers) %-||'
         'policy %(otr_policy) on|off %-||',
         'command_cb',
         '')
