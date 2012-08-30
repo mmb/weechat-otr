@@ -801,6 +801,25 @@ def command_cb(data, buf, args):
                         % context.peer)
 
             result = weechat.WEECHAT_RC_OK
+    elif len(arg_parts) in (1, 3) and arg_parts[0] == 'distrust':
+        nick, server = default_peer_args(arg_parts[1:3])
+
+        if nick is not None and server is not None:
+            context = ACCOUNTS[current_user(server)].getContext(
+                irc_user(nick, server))
+
+            if context.crypto.theirPubkey is not None:
+                context.setCurrentTrust('')
+                context.print_buffer(
+                    '%s is now de-authenticated.' % context.peer)
+
+                weechat.bar_item_update(SCRIPT_NAME)
+            else:
+                context.print_buffer(
+                    'No fingerprint for %s. Start an OTR conversation first: /otr start' \
+                        % context.peer)
+
+            result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) in (1, 3) and arg_parts[0] == 'policy':
         if len(arg_parts) == 1:
             nick, server = default_peer_args([])
@@ -1075,12 +1094,14 @@ if weechat.register(
         'smp ask NICK SERVER SECRET [QUESTION] || '
         'smp respond NICK SERVER SECRET || '
         'trust [NICK SERVER] || '
+        'distrust [NICK SERVER] || '
         'policy [POLICY on|off]',
         '',
         'start %(nick) %(irc_servers) %-||'
         'finish %(nick) %(irc_servers) %-||'
         'smp ask|respond %(nick) %(irc_servers) %-||'
         'trust %(nick) %(irc_servers) %-||'
+        'distrust %(nick) %(irc_servers) %-||'
         'policy %(otr_policy) on|off %-||',
         'command_cb',
         '')
