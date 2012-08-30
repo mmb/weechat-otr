@@ -410,7 +410,11 @@ class IrcContext(potr.context.Context):
             smp3 = first_instance(tlvs, potr.proto.SMP3TLV)
             smp4 = first_instance(tlvs, potr.proto.SMP4TLV)
 
-            if self.in_smp and not self.smpIsValid():
+            if first_instance(tlvs, potr.proto.SMPABORTTLV):
+                debug('SMP aborted by peer')
+                self.smp_finish('SMP aborted by peer.')
+                self.print_buffer('SMP aborted by peer.')
+            elif self.in_smp and not self.smpIsValid():
                 debug('SMP aborted')
                 self.smp_finish('SMP aborted.')
             elif first_instance(tlvs, potr.proto.SMP1TLV):
@@ -752,7 +756,7 @@ def command_cb(data, buf, args):
             context.disconnect()
 
             result = weechat.WEECHAT_RC_OK
-    elif len(arg_parts) in (5, 6) and arg_parts[0] == 'smp':
+    elif len(arg_parts) in (4, 5, 6) and arg_parts[0] == 'smp':
         action = arg_parts[1]
 
         if action == 'respond':
@@ -783,6 +787,23 @@ def command_cb(data, buf, args):
                         context.peer)
             else:
                 result = weechat.WEECHAT_RC_OK
+        elif action == 'abort':
+            nick, server = arg_parts[2:4]
+            context = ACCOUNTS[current_user(server)].getContext(
+                irc_user(nick, server))
+
+            if context.in_smp:
+                try:
+                    context.smpAbort()
+                except potr.context.NotEncryptedError:
+                    context.print_buffer(
+                        'There is currently no encrypted session with %s.' % \
+                         context.peer)
+                else:
+                    debug('SMP aborted')
+                    context.smp_finish('SMP aborted.')
+                    result = weechat.WEECHAT_RC_OK
+
     elif len(arg_parts) in (1, 3) and arg_parts[0] == 'trust':
         nick, server = default_peer_args(arg_parts[1:3])
 
@@ -1093,6 +1114,7 @@ if weechat.register(
         'finish [NICK SERVER] || '
         'smp ask NICK SERVER SECRET [QUESTION] || '
         'smp respond NICK SERVER SECRET || '
+        'smp abort NICK SERVER || '
         'trust [NICK SERVER] || '
         'distrust [NICK SERVER] || '
         'policy [POLICY on|off]',
@@ -1100,6 +1122,7 @@ if weechat.register(
         'start %(nick) %(irc_servers) %-||'
         'finish %(nick) %(irc_servers) %-||'
         'smp ask|respond %(nick) %(irc_servers) %-||'
+        'smp abort %(nick) %(irc_servers) %-||'
         'trust %(nick) %(irc_servers) %-||'
         'distrust %(nick) %(irc_servers) %-||'
         'policy %(otr_policy) on|off %-||',
