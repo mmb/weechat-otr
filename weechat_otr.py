@@ -359,6 +359,12 @@ class IrcContext(potr.context.Context):
         elif newstate == potr.context.STATE_ENCRYPTED:
             # unencrypted => encrypted
             trust = self.getCurrentTrust()
+
+            # disable logging before any proof of OTR activity
+            # is generated. This is necessary when the session is started
+            # automatically, and not by /otr start
+            self.previous_logvalue = self.disable_logging()
+
             if trust is None:
                 fpr = str(self.getCurrentKey())
                 self.print_buffer('New fingerprint: %s' % fpr)
@@ -375,6 +381,11 @@ class IrcContext(potr.context.Context):
         if self.state != potr.context.STATE_PLAINTEXT and \
                 newstate == potr.context.STATE_PLAINTEXT:
             self.print_buffer('Private conversation ended.')
+
+            # If we altered the logging value, restore it.
+            if self.previous_logvalue is not -1:
+                    self.restore_logging(self.previous_logvalue)
+
 
         super(IrcContext, self).setState(newstate)
 
@@ -515,6 +526,55 @@ Respond with: /otr smp respond %s %s <answer>""" % (
         weechat.infolist_free(infolist)
 
         return result
+
+    def disable_logging(self):
+        """Return the previous logger level, set the buffer logger level to
+        0. If it was already 0, return -1."""
+        infolist = weechat.infolist_get('logger_buffer', '', '')
+
+        buf = self.buffer()
+        previous_loglevel = -1
+
+        while weechat.infolist_next(infolist):
+            if weechat.infolist_pointer(infolist, 'buffer') == buf:
+                previous_loglevel = weechat.infolist_integer(infolist, 'log_level')
+                if previous_loglevel is not 0:
+                    weechat.command(buf, '/mute logger set 0')
+                    self.print_buffer('Logs have been temporarily disabled for the session. They will be restored upon finishing the OTR session.')
+                    break
+                else:
+                    weechat.infolist_free(infolist)
+                    return -1
+
+        weechat.infolist_free(infolist)
+
+        try:
+            self.previous_logvalue
+
+        # if previous_logvalue has NOT been previously set, return the value we
+        # detected now.
+        except AttributeError:
+            return previous_loglevel
+        # if previous_logvalue WAS already set, it means we already altered it
+        # and that we just detected an already modified logging level,
+        # thus we return the pre-existing value so it doesn't get lost, and we can restore it later.
+        else:
+            return self.previous_logvalue
+
+
+    def restore_logging(self, previous_loglevel):
+        """Restore the log level of the buffer, return the set log level."""
+
+        buf = self.buffer()
+
+        if (previous_loglevel > 0) and (previous_loglevel < 10):
+            self.print_buffer('Restoring buffer logging value to: %s' %previous_loglevel)
+            weechat.command(buf, '/mute logger set %s' %previous_loglevel)
+            return True
+
+        return False
+
+
 
 class IrcOtrAccount(potr.context.Account):
     """Account class for OTR over IRC."""
@@ -734,6 +794,11 @@ def command_cb(data, buf, args):
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
+            # We need to wall disable_logging() here so that no OTR-related
+            # buffer messages get logged at any point. disable_logging() will
+            # be called again when effectively switching to encrypted, but
+            # the previous_logvalue we set here will be preserved for later restoring.
+            context.previous_logvalue = context.disable_logging()
 
             context.print_buffer('Sending OTR query...')
             context.print_buffer(
