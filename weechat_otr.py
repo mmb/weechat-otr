@@ -530,34 +530,33 @@ Respond with: /otr smp respond %s %s <answer>""" % (
     def disable_logging(self):
         """Return the previous logger level, set the buffer logger level to
         0. If it was already 0, return -1."""
-        infolist = weechat.infolist_get('logger_buffer', '', '')
-
-        buf = self.buffer()
-        previous_loglevel = -1
-
-        while weechat.infolist_next(infolist):
-            if weechat.infolist_pointer(infolist, 'buffer') == buf:
-                previous_loglevel = weechat.infolist_integer(infolist, 'log_level')
-                if previous_loglevel is not 0:
-                    weechat.command(buf, '/mute logger set 0')
-                    self.print_buffer('Logs have been temporarily disabled for the session. They will be restored upon finishing the OTR session.')
-                    break
-                else:
-                    weechat.infolist_free(infolist)
-                    return -1
-
-        weechat.infolist_free(infolist)
 
         try:
             self.previous_logvalue
-
         # if previous_logvalue has NOT been previously set, return the value we
-        # detected now.
+        # detect now.
         except AttributeError:
+
+            infolist = weechat.infolist_get('logger_buffer', '', '')
+
+            buf = self.buffer()
+            previous_loglevel = -1
+
+            while weechat.infolist_next(infolist):
+                if weechat.infolist_pointer(infolist, 'buffer') == buf:
+                    previous_loglevel = weechat.infolist_integer(infolist, 'log_level')
+                    if previous_loglevel is not 0:
+                        weechat.command(buf, '/mute logger set 0')
+                        self.print_buffer('Logs have been temporarily disabled for the session. They will be restored upon finishing the OTR session.')
+                        break
+
+            weechat.infolist_free(infolist)
             return previous_loglevel
+
         # if previous_logvalue WAS already set, it means we already altered it
         # and that we just detected an already modified logging level,
-        # thus we return the pre-existing value so it doesn't get lost, and we can restore it later.
+        # thus we return the pre-existing value so it doesn't get lost, and we
+        # can restore it later.
         else:
             return self.previous_logvalue
 
