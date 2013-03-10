@@ -569,8 +569,9 @@ Respond with: /otr smp respond %s %s <answer>""" % (
         if (previous_loglevel > 0) and (previous_loglevel < 10):
             self.print_buffer('Restoring buffer logging value to: %s' %previous_loglevel)
             weechat.command(buf, '/mute logger set %s' %previous_loglevel)
+            del self.previous_logvalue
             return True
-
+        del self.previous_logvalue
         return False
 
 
