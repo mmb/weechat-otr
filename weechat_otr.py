@@ -562,7 +562,7 @@ Respond with: /otr smp respond %s %s <answer>""" % (
 
 
     def restore_logging(self, previous_loglevel):
-        """Restore the log level of the buffer, return the set log level."""
+        """Restore the log level of the buffer."""
 
         buf = self.buffer()
 
