@@ -360,10 +360,10 @@ class IrcContext(potr.context.Context):
             # unencrypted => encrypted
             trust = self.getCurrentTrust()
 
-            # disable logging before any proof of OTR activity
-            # is generated. This is necessary when the session is started
-            # automatically, and not by /otr start
-            self.previous_logvalue = self.disable_logging()
+            # Disable logging before any proof of OTR activity is generated.
+            # This is necessary when the session is started automatically, and
+            # not by /otr start.
+            self.previous_log_level = self.disable_logging()
 
             if trust is None:
                 fpr = str(self.getCurrentKey())
@@ -383,9 +383,8 @@ class IrcContext(potr.context.Context):
             self.print_buffer('Private conversation ended.')
 
             # If we altered the logging value, restore it.
-            if self.previous_logvalue is not -1:
-                    self.restore_logging(self.previous_logvalue)
-
+            if self.previous_log_level is not None:
+                self.restore_logging(self.previous_log_level)
 
         super(IrcContext, self).setState(newstate)
 
@@ -421,7 +420,11 @@ class IrcContext(potr.context.Context):
             smp3 = first_instance(tlvs, potr.proto.SMP3TLV)
             smp4 = first_instance(tlvs, potr.proto.SMP4TLV)
 
-            if self.in_smp and not self.smpIsValid():
+            if first_instance(tlvs, potr.proto.SMPABORTTLV):
+                debug('SMP aborted by peer')
+                self.smp_finish('SMP aborted by peer.')
+                self.print_buffer('SMP aborted by peer.')
+            elif self.in_smp and not self.smpIsValid():
                 debug('SMP aborted')
                 self.smp_finish('SMP aborted.')
             elif first_instance(tlvs, potr.proto.SMP1TLV):
@@ -528,53 +531,47 @@ Respond with: /otr smp respond %s %s <answer>""" % (
         return result
 
     def disable_logging(self):
-        """Return the previous logger level, set the buffer logger level to
-        0. If it was already 0, return -1."""
-
-        try:
-            self.previous_logvalue
-        # if previous_logvalue has NOT been previously set, return the value we
-        # detect now.
-        except AttributeError:
-
+        """Return the previous logger level and set the buffer logger level
+        to 0. If it was already 0, return None."""
+        # If previous_log_level has not been previously set, return the level
+        # we detect now.
+        if not hasattr(self, 'previous_log_level'):
             infolist = weechat.infolist_get('logger_buffer', '', '')
 
             buf = self.buffer()
-            previous_loglevel = -1
+            previous_log_level = None
 
             while weechat.infolist_next(infolist):
                 if weechat.infolist_pointer(infolist, 'buffer') == buf:
-                    previous_loglevel = weechat.infolist_integer(infolist, 'log_level')
-                    if previous_loglevel is not 0:
-                        weechat.command(buf, '/mute logger set 0')
-                        self.print_buffer('Logs have been temporarily disabled for the session. They will be restored upon finishing the OTR session.')
+                    previous_log_level = weechat.infolist_integer(
+                        infolist, 'log_level')
+                    if self.is_logged():
+                        weechat.command(buf, '/mute logger disable')
+                        self.print_buffer(
+                            'Logs have been temporarily disabled for the session. They will be restored upon finishing the OTR session.')
                         break
 
             weechat.infolist_free(infolist)
-            return previous_loglevel
 
-        # if previous_logvalue WAS already set, it means we already altered it
-        # and that we just detected an already modified logging level,
-        # thus we return the pre-existing value so it doesn't get lost, and we
-        # can restore it later.
+            return previous_log_level
+
+        # If previous_log_level was already set, it means we already altered it
+        # and that we just detected an already modified logging level.
+        # Return the pre-existing value so it doesn't get lost, and we can
+        # restore it later.
         else:
-            return self.previous_logvalue
+            return self.previous_log_level
 
-
-    def restore_logging(self, previous_loglevel):
+    def restore_logging(self, previous_log_level):
         """Restore the log level of the buffer."""
-
         buf = self.buffer()
 
-        if (previous_loglevel > 0) and (previous_loglevel < 10):
-            self.print_buffer('Restoring buffer logging value to: %s' %previous_loglevel)
-            weechat.command(buf, '/mute logger set %s' %previous_loglevel)
-            del self.previous_logvalue
-            return True
-        del self.previous_logvalue
-        return False
+        if (previous_log_level > 0) and (previous_log_level < 10):
+            self.print_buffer(
+                'Restoring buffer logging value to: %s' % previous_log_level)
+            weechat.command(buf, '/mute logger set %s' % previous_log_level)
 
-
+        del self.previous_log_level
 
 class IrcOtrAccount(potr.context.Account):
     """Account class for OTR over IRC."""
@@ -797,8 +794,9 @@ def command_cb(data, buf, args):
             # We need to wall disable_logging() here so that no OTR-related
             # buffer messages get logged at any point. disable_logging() will
             # be called again when effectively switching to encrypted, but
-            # the previous_logvalue we set here will be preserved for later restoring.
-            context.previous_logvalue = context.disable_logging()
+            # the previous_log_level we set here will be preserved for later
+            # restoring.
+            context.previous_log_level = context.disable_logging()
 
             context.print_buffer('Sending OTR query...')
             context.print_buffer(
@@ -817,7 +815,7 @@ def command_cb(data, buf, args):
             context.disconnect()
 
             result = weechat.WEECHAT_RC_OK
-    elif len(arg_parts) in (5, 6) and arg_parts[0] == 'smp':
+    elif len(arg_parts) in (4, 5, 6) and arg_parts[0] == 'smp':
         action = arg_parts[1]
 
         if action == 'respond':
@@ -848,6 +846,23 @@ def command_cb(data, buf, args):
                         context.peer)
             else:
                 result = weechat.WEECHAT_RC_OK
+        elif action == 'abort':
+            nick, server = arg_parts[2:4]
+            context = ACCOUNTS[current_user(server)].getContext(
+                irc_user(nick, server))
+
+            if context.in_smp:
+                try:
+                    context.smpAbort()
+                except potr.context.NotEncryptedError:
+                    context.print_buffer(
+                        'There is currently no encrypted session with %s.' % \
+                         context.peer)
+                else:
+                    debug('SMP aborted')
+                    context.smp_finish('SMP aborted.')
+                    result = weechat.WEECHAT_RC_OK
+
     elif len(arg_parts) in (1, 3) and arg_parts[0] == 'trust':
         nick, server = default_peer_args(arg_parts[1:3])
 
@@ -1158,6 +1173,7 @@ if weechat.register(
         'finish [NICK SERVER] || '
         'smp ask NICK SERVER SECRET [QUESTION] || '
         'smp respond NICK SERVER SECRET || '
+        'smp abort NICK SERVER || '
         'trust [NICK SERVER] || '
         'distrust [NICK SERVER] || '
         'policy [POLICY on|off]',
@@ -1165,6 +1181,7 @@ if weechat.register(
         'start %(nick) %(irc_servers) %-||'
         'finish %(nick) %(irc_servers) %-||'
         'smp ask|respond %(nick) %(irc_servers) %-||'
+        'smp abort %(nick) %(irc_servers) %-||'
         'trust %(nick) %(irc_servers) %-||'
         'distrust %(nick) %(irc_servers) %-||'
         'policy %(otr_policy) on|off %-||',
