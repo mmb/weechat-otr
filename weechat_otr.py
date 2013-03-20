@@ -55,6 +55,8 @@ authentication.
 
 View OTR policies for your peer: /otr policy
 
+View default OTR policies: /otr policy default
+
 To end your private conversation: /otr finish
 """ % SCRIPT_DESC
 
@@ -251,6 +253,14 @@ def default_peer_args(args):
                 buffer_get_string(buf, 'localvar_server'))
 
     return result
+
+def print_default_policies():
+    """Print default policies values to the core buffer."""
+    weechat.prnt('', 'Current default OTR policies:')
+    for policy, desc in sorted(POLICIES.iteritems()):
+        weechat.prnt('','  %s (%s) is %s' % (policy, desc, config_string('policy.default.' + policy)))
+    weechat.prnt('', 'Change default policies with /otr policy default NAME on/off')
+    return True
 
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
@@ -509,6 +519,20 @@ Respond with: /otr smp respond %s %s <answer>""" % (
                     { True : 'on', False : 'off'}[self.getPolicy(policy)]))
 
         buf.write('Change policies with: /otr policy NAME on|off')
+
+        return buf.getvalue()
+
+    def format_default_policies(self):
+        """Return current default policies formatted as a string for the user."""
+        buf = cStringIO.StringIO()
+
+        buf.write('Current default OTR policies:\n')
+
+        for policy, desc in sorted(POLICIES.iteritems()):
+            buf.write('  %s (%s) : %s\n' % (
+                    policy, desc, config_string('policy.default.' + policy)))
+
+        buf.write('Change default policies with: /otr policy default NAME on|off')
 
         return buf.getvalue()
 
@@ -900,7 +924,7 @@ def command_cb(data, buf, args):
                         % context.peer)
 
             result = weechat.WEECHAT_RC_OK
-    elif len(arg_parts) in (1, 3) and arg_parts[0] == 'policy':
+    elif len(arg_parts) in (1, 2, 3, 4) and arg_parts[0] == 'policy':
         if len(arg_parts) == 1:
             nick, server = default_peer_args([])
 
@@ -911,6 +935,28 @@ def command_cb(data, buf, args):
                 context.print_buffer(context.format_policies())
 
                 result = weechat.WEECHAT_RC_OK
+
+            else:
+                print_default_policies()
+
+                result = weechat.WEECHAT_RC_OK
+
+        elif len(arg_parts) == 2 and arg_parts[1].lower() == 'default':
+                nick, server = default_peer_args([])
+
+                if nick is not None and server is not None:
+                    context = ACCOUNTS[current_user(server)].getContext(
+                        irc_user(nick, server))
+
+                    context.print_buffer(context.format_default_policies())
+
+                    result = weechat.WEECHAT_RC_OK
+
+                else:
+                    print_default_policies()
+
+                    result = weechat.WEECHAT_RC_OK
+
         elif len(arg_parts) == 3 and arg_parts[1].lower() in POLICIES:
             nick, server = default_peer_args([])
 
@@ -924,6 +970,25 @@ def command_cb(data, buf, args):
 
                 context.print_buffer(context.format_policies())
 
+                result = weechat.WEECHAT_RC_OK
+
+        elif len(arg_parts) == 4 and arg_parts[1].lower() == 'default' and arg_parts[2].lower() in POLICIES:
+            nick, server = default_peer_args([])
+
+            policy_var = "otr.policy.default." + arg_parts[2].lower()
+
+            command('', '/set %s %s' % (policy_var, arg_parts[3]))
+
+            if nick is not None and server is not None:
+                context = ACCOUNTS[current_user(server)].getContext(
+                    irc_user(nick,server))
+
+                context.print_buffer(context.format_default_policies())
+
+                result = weechat.WEECHAT_RC_OK
+
+            else:
+                print_default_policies()
                 result = weechat.WEECHAT_RC_OK
 
     return result
