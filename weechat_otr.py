@@ -57,6 +57,9 @@ View OTR policies for your peer: /otr policy
 
 View default OTR policies: /otr policy default
 
+Start/Stop log recording for the current OTR session: /otr log [start|stop]
+This will be reverted back to the previous log setting at the end of the session.
+
 To end your private conversation: /otr finish
 """ % SCRIPT_DESC
 
@@ -377,8 +380,9 @@ class IrcContext(potr.context.Context):
             if not self.getPolicy('log'):
                 self.previous_log_level = self.disable_logging()
             else:
-                self.previous_log_level = None
-                self.print_buffer('You have enabled the recording to disk of OTR conversations. By doing this you are potentially putting yourself and your correspondent in danger. Please consider disabling this policy with "/otr policy default log off"')
+                self.previous_log_level = self.get_log_level()
+                if self.is_logged():
+                    self.print_buffer('You have enabled the recording to disk of OTR conversations. By doing this you are potentially putting yourself and your correspondent in danger. Please consider disabling this policy with "/otr policy default log off". To disable logging for this OTR session, use "/otr log stop"')
 
             if trust is None:
                 fpr = str(self.getCurrentKey())
@@ -559,6 +563,24 @@ Respond with: /otr smp respond %s %s <answer>""" % (
 
         return result
 
+    def get_log_level(self):
+        """Return the current logging level for this context's peer."""
+        infolist = weechat.infolist_get('logger_buffer', '', '')
+
+        buf = self.buffer()
+
+        result = 0
+
+        while weechat.infolist_next(infolist):
+            if weechat.infolist_pointer(infolist, 'buffer') == buf:
+                result = weechat.infolist_integer(infolist, 'log_level')
+                break
+
+        weechat.infolist_free(infolist)
+
+        return result
+
+
     def disable_logging(self):
         """Return the previous logger level and set the buffer logger level
         to 0. If it was already 0, return None."""
@@ -568,7 +590,7 @@ Respond with: /otr smp respond %s %s <answer>""" % (
             infolist = weechat.infolist_get('logger_buffer', '', '')
 
             buf = self.buffer()
-            previous_log_level = None
+            previous_log_level = 0
 
             while weechat.infolist_next(infolist):
                 if weechat.infolist_pointer(infolist, 'buffer') == buf:
@@ -595,7 +617,7 @@ Respond with: /otr smp respond %s %s <answer>""" % (
         """Restore the log level of the buffer."""
         buf = self.buffer()
 
-        if (previous_log_level > 0) and (previous_log_level < 10):
+        if (previous_log_level >= 0) and (previous_log_level < 10):
             self.print_buffer(
                 'Restoring buffer logging value to: %s' % previous_log_level)
             weechat.command(buf, '/mute logger set %s' % previous_log_level)
@@ -828,8 +850,7 @@ def command_cb(data, buf, args):
             if not context.getPolicy('log'):
                 context.previous_log_level = context.disable_logging()
             else:
-                context.previous_log_level = None
-                context.print_buffer('You have enabled the recording to disk of OTR conversations. By doing this you are potentially putting yourself and your correspondent in danger. Please consider disabling this policy with "/otr policy default log off"')
+                context.previous_log_level = context.get_log_level()
 
             context.print_buffer('Sending OTR query... Please await confirmation of the OTR session being started before sending a message.')
             context.print_buffer(
@@ -933,6 +954,60 @@ def command_cb(data, buf, args):
                         % context.peer)
 
             result = weechat.WEECHAT_RC_OK
+
+    elif len(arg_parts) in (1, 2) and arg_parts[0] == 'log':
+        nick, server = default_peer_args([])
+        if len(arg_parts) == 1:
+            if nick is not None and server is not None:
+                context = ACCOUNTS[current_user(server)].getContext(
+                    irc_user(nick, server))
+
+                if context.is_encrypted():
+                    if context.is_logged():
+                        context.print_buffer('This conversation is currently being logged.')
+                        result = weechat.WEECHAT_RC_OK
+
+                    else:
+                        context.print_buffer('This conversation is corrently NOT being logged.')
+                        result = weechat.WEECHAT_RC_OK
+                else:
+                    weechat.prnt('', 'OTR LOG: Not in an OTR session')
+                    result = weechat.WEECHAT_RC_OK
+
+            else:
+                weechat.prnt('', 'OTR LOG: Not in an OTR session')
+                result = weechat.WEECHAT_RC_OK
+
+        if len(arg_parts) == 2:
+            if nick is not None and server is not None:
+                context = ACCOUNTS[current_user(server)].getContext(
+                    irc_user(nick, server))
+
+                if arg_parts[1] == 'start' and not context.is_logged() and context.is_encrypted():
+                    if context.previous_log_level is None:
+                        context.previous_log_level = context.get_log_level()
+                    context.print_buffer('From this point on, this conversation will be logged. Please keep in mind that by doing so you are potentially putting yourself and your interlocutor at risk. You can disable this by doing /otr log stop')
+                    weechat.command(buf, '/mute logger set 9')
+                    result = weechat.WEECHAT_RC_OK
+
+                elif arg_parts[1] == 'stop' and context.is_logged() and context.is_encrypted():
+                    if context.previous_log_level is None:
+                        context.previous_log_level = context.get_log_level()
+                    weechat.command(buf, '/mute logger set 0')
+                    context.print_buffer('From this point on, this conversation will NOT be logged ANYMORE.')
+                    result = weechat.WEECHAT_RC_OK
+
+                elif not context.is_encrypted():
+                    weechat.prnt('', 'OTR LOG: Not in an OTR session')
+                    result = weechat.WEECHAT_RC_OK
+
+                else:
+                    # Don't need to do anything.
+                    result = weechat.WEECHAT_RC_OK
+
+            else:
+                weechat.prnt('', 'OTR LOG: Not in an OTR session')
+
     elif len(arg_parts) in (1, 2, 3, 4) and arg_parts[0] == 'policy':
         if len(arg_parts) == 1:
             nick, server = default_peer_args([])
@@ -1251,6 +1326,7 @@ if weechat.register(
         'smp abort NICK SERVER || '
         'trust [NICK SERVER] || '
         'distrust [NICK SERVER] || '
+        'log [on|off] || '
         'policy [POLICY on|off]',
         '',
         'start %(nick) %(irc_servers) %-||'
@@ -1259,6 +1335,7 @@ if weechat.register(
         'smp abort %(nick) %(irc_servers) %-||'
         'trust %(nick) %(irc_servers) %-||'
         'distrust %(nick) %(irc_servers) %-||'
+        'log on|off %-||'
         'policy %(otr_policy) on|off %-||',
         'command_cb',
         '')
