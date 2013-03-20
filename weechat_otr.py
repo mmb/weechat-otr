@@ -256,10 +256,10 @@ def default_peer_args(args):
 
 def print_default_policies():
     """Print default policies values to the core buffer."""
-    weechat.prnt('', 'Current default OTR policies:')
+    prnt('', 'Current default OTR policies:')
     for policy, desc in sorted(POLICIES.iteritems()):
-        weechat.prnt('','  %s (%s) is %s' % (policy, desc, config_string('policy.default.' + policy)))
-    weechat.prnt('', 'Change default policies with /otr policy default NAME on/off')
+        prnt('','  %s (%s) is %s' % (policy, desc, config_string('policy.default.' + policy)))
+    prnt('', 'Change default policies with /otr policy default NAME on/off')
     return True
 
 class AccountDict(collections.defaultdict):
