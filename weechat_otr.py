@@ -71,6 +71,7 @@ OTR_QUERY_RE = re.compile('\?OTR(\?|\??v[a-z\d]*\?)$')
 POLICIES = {
     'allow_v2' : 'allow OTR protocol version 2',
     'require_encryption' : 'refuse to send unencrypted messages',
+    'log' : 'enable logging of OTR conversations',
     'send_tag' : 'advertise your OTR capability using the whitespace tag',
     }
 
@@ -373,7 +374,11 @@ class IrcContext(potr.context.Context):
             # Disable logging before any proof of OTR activity is generated.
             # This is necessary when the session is started automatically, and
             # not by /otr start.
-            self.previous_log_level = self.disable_logging()
+            if not self.getPolicy('log'):
+                self.previous_log_level = self.disable_logging()
+            else:
+                self.previous_log_level = None
+                self.print_buffer('You have enabled the recording to disk of OTR conversations. By doing this you are potentially putting yourself and your correspondent in danger. Please consider disabling this policy with "/otr policy default log off"')
 
             if trust is None:
                 fpr = str(self.getCurrentKey())
@@ -820,7 +825,11 @@ def command_cb(data, buf, args):
             # be called again when effectively switching to encrypted, but
             # the previous_log_level we set here will be preserved for later
             # restoring.
-            context.previous_log_level = context.disable_logging()
+            if not context.getPolicy('log'):
+                context.previous_log_level = context.disable_logging()
+            else:
+                context.previous_log_level = None
+                context.print_buffer('You have enabled the recording to disk of OTR conversations. By doing this you are potentially putting yourself and your correspondent in danger. Please consider disabling this policy with "/otr policy default log off"')
 
             context.print_buffer('Sending OTR query... Please await confirmation of the OTR session being started before sending a message.')
             context.print_buffer(
@@ -1190,6 +1199,7 @@ def init_config():
         ('default.allow_v2', 'default allow OTR v2 policy', 'on'),
         ('default.require_encryption', 'default require encryption policy',
          'off'),
+        ('default.log', 'default enable logging to disk', 'off'),
         ('default.send_tag', 'default send tag policy', 'off'),
         ]:
         weechat.config_new_option(
