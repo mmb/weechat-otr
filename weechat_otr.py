@@ -300,7 +300,7 @@ class Assembler:
 
     def get(self):
         """Return the current value of the buffer and empty it."""
-        result = self.value
+        result = bytes(utf8_encode(self.value))
         self.clear()
 
         return result
