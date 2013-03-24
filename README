@@ -18,7 +18,7 @@ To install script:
 
 Copy weechat_otr.py to ~/.weechat/python/
 
-Then either symlink it into ~/.weechat/python/autload
+Then either symlink it into ~/.weechat/python/autoload
 or '/python load python/weechat_otr.py' in WeeChat
 
 Questions, comments and patches welcome: matthewm@boedicker.org
