@@ -442,7 +442,6 @@ class IrcContext(potr.context.Context):
             if first_instance(tlvs, potr.proto.SMPABORTTLV):
                 debug('SMP aborted by peer')
                 self.smp_finish('SMP aborted by peer.')
-                self.print_buffer('SMP aborted by peer.')
             elif self.in_smp and not self.smpIsValid():
                 debug('SMP aborted')
                 self.smp_finish('SMP aborted.')
