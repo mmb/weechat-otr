@@ -95,7 +95,7 @@ IRC_PRIVMSG_RE = re.compile(r"""
 \ )?
 PRIVMSG
 \ (?P<to>.+?)
-\ :
+\ :?
 (?P<text>.+)
 """, re.VERBOSE)
 
