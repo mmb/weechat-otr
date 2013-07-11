@@ -473,13 +473,17 @@ Respond with: /otr smp respond %s %s <answer>""" % (
                     debug('SMP4')
 
                 if self.smpIsSuccess():
-                    self.smp_finish('SMP verification succeeded.')
 
                     if self.smp_question:
+                        self.smp_finish('SMP verification succeeded.')
                         self.print_buffer(
                             """You may want to authenticate your peer by asking your own question:
 /otr smp ask %s %s <secret> <question>
 """ % (self.peer_nick, self.peer_server))
+
+                    else:
+                       self.smp_finish('SMP verification succeeded.')
+
                 else:
                     self.smp_finish('SMP verification failed.')
 
