@@ -465,8 +465,12 @@ Respond with: /otr smp respond %s %s <secret>""" % (
 Respond with: /otr smp respond %s %s <answer>""" % (
                         smp1q.msg, self.peer_nick, self.peer_server))
             elif first_instance(tlvs, potr.proto.SMP2TLV):
-                debug('SMP2')
-                self.print_buffer('SMP progressing.')
+                if not self.in_smp:
+                    debug('Reveived unexpected SMP2')
+                    self.smp_finish()
+                else:
+                    debug('SMP2')
+                    self.print_buffer('SMP progressing.')
             elif smp3 or smp4:
                 if smp3:
                     debug('SMP3')
