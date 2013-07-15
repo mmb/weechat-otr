@@ -908,6 +908,8 @@ def command_cb(data, buf, args):
                     'There is currently no encrypted session with %s.' % \
                         context.peer)
             else:
+                context.print_buffer('SMP question sent...')
+                context.in_smp = True
                 result = weechat.WEECHAT_RC_OK
         elif action == 'abort':
             nick, server = arg_parts[2:4]
