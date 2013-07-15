@@ -425,13 +425,14 @@ class IrcContext(potr.context.Context):
         """Print a message to the buffer for this context."""
         prnt(self.buffer(), '%s\t%s' % (SCRIPT_NAME, msg))
 
-    def smp_finish(self, message):
+    def smp_finish(self, message = False):
         """Reset SMP state and send a message to the user."""
         self.in_smp = False
         self.smp_question = False
 
         self.user.saveTrusts()
-        self.print_buffer(message)
+        if message:
+            self.print_buffer(message)
 
     def handle_tlvs(self, tlvs):
         """Handle SMP states."""
