@@ -31,6 +31,7 @@ import cStringIO
 import os
 import re
 import traceback
+import shlex
 
 import weechat
 
@@ -369,8 +370,7 @@ class IrcContext(potr.context.Context):
             elif newstate == potr.context.STATE_FINISHED:
                 self.print_buffer(
                     """%s has ended the private conversation. You should do the same:
-/otr finish %s %s
-""" % (self.peer, self.peer_nick, self.peer_server))
+/otr finish""" % self.peer_nick)
         elif newstate == potr.context.STATE_ENCRYPTED:
             # unencrypted => encrypted
             trust = self.getCurrentTrust()
@@ -453,8 +453,7 @@ class IrcContext(potr.context.Context):
 
                 self.print_buffer(
                     """Peer has requested SMP verification.
-Respond with: /otr smp respond %s %s <secret>""" % (
-                        self.peer_nick, self.peer_server))
+Respond with: /otr smp respond <secret>""")
             elif smp1q:
                 debug(('SMP1Q', smp1q.msg))
                 self.in_smp = True
@@ -462,8 +461,7 @@ Respond with: /otr smp respond %s %s <secret>""" % (
 
                 self.print_buffer(
                     """Peer has requested SMP verification: %s
-Respond with: /otr smp respond %s %s <answer>""" % (
-                        smp1q.msg, self.peer_nick, self.peer_server))
+Respond with: /otr smp respond <answer>""" % (smp1q.msg))
             elif first_instance(tlvs, potr.proto.SMP2TLV):
                 if not self.in_smp:
                     debug('Reveived unexpected SMP2')
@@ -481,10 +479,10 @@ Respond with: /otr smp respond %s %s <answer>""" % (
 
                     if self.smp_question:
                         self.smp_finish('SMP verification succeeded.')
-                        self.print_buffer(
+                        if not self.is_verified:
+                            self.print_buffer(
                             """You may want to authenticate your peer by asking your own question:
-/otr smp ask %s %s <secret> <question>
-""" % (self.peer_nick, self.peer_server))
+/otr smp ask <question> <secret>""")
 
                     else:
                        self.smp_finish('SMP verification succeeded.')
@@ -505,7 +503,11 @@ Respond with: /otr smp respond %s %s <answer>""" % (
   /otr smp ask %(peer_nick)s %(peer_server)s <secret>
 
 3) SMP pre-shared secret that you both know with a question:
-  /otr smp ask %(peer_nick)s %(peer_server)s <secret> <question>
+  /otr smp ask %(peer_nick)s %(peer_server)s <question> <secret>
+
+Note: You can safely omit specifying the peer and server when
+      executing these commands from the appropriate conversation
+      buffer
 """ % dict(
             your_fingerprint=self.user.getPrivkey(),
             peer=self.peer,
@@ -808,8 +810,7 @@ def message_out_cb(data, modifier, modifier_data, string):
             except potr.context.NotEncryptedError, err:
                 if err.args[0] == potr.context.EXC_FINISHED:
                     context.print_buffer(
-                        """Your message was not sent. End your private conversation:\n/otr finish %s %s""" % (
-                            parsed['to_nick'], server))
+                        """Your message was not sent. End your private conversation:\n/otr finish""")
                 else:
                     raise
 
@@ -843,7 +844,11 @@ def command_cb(data, buf, args):
     """Parse and dispatch WeeChat OTR commands."""
     result = weechat.WEECHAT_RC_ERROR
 
-    arg_parts = args.split(None, 5)
+    try:
+        arg_parts = shlex.split(args)
+    except:
+        debug("Command parsing error.")
+        return result
 
     if len(arg_parts) in (1, 3) and arg_parts[0] == 'start':
         nick, server = default_peer_args(arg_parts[1:3])
@@ -878,28 +883,61 @@ def command_cb(data, buf, args):
             context.disconnect()
 
             result = weechat.WEECHAT_RC_OK
-    elif len(arg_parts) in (4, 5, 6) and arg_parts[0] == 'smp':
+    elif len(arg_parts) in range(2,7) and arg_parts[0] == 'smp':
         action = arg_parts[1]
 
         if action == 'respond':
-            nick, server = arg_parts[2:4]
-            secret = args.split(None, 4)[-1]
+            # Check if nickname and server are specified
+            if len(arg_parts) == 3:
+                nick, server = default_peer_args([])
+                secret = arg_parts[2]
+            elif len(arg_parts) == 5:
+                nick, server = default_peer_args(arg_parts[2:4])
+                secret = arg_parts[4]
+
+            # Sometimes potr chokes on funky UTF chars without this
+            if secret:
+                secret = secret.encode('raw_unicode_escape')
 
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
             context.smpGotSecret(secret)
 
             result = weechat.WEECHAT_RC_OK
-        elif action == 'ask':
-            nick, server, secret = arg_parts[2:5]
 
-            if len(arg_parts) > 5:
-                question = arg_parts[5]
-            else:
-                question = None
+        elif action == 'ask':
+            question = None
+            secret = None
+
+            # Nickname and server are not specified
+            # Check whether it's a simple challenge or a question/answer request
+            if len(arg_parts) == 3:
+                nick, server = default_peer_args([])
+                secret = arg_parts[2]
+            elif len(arg_parts) == 4:
+                nick, server = default_peer_args([])
+                secret = arg_parts[3]
+                question = arg_parts[2]
+
+            # Nickname and server are specified
+            # Check whether it's a simple challenge or a question/answer request
+            elif len(arg_parts) == 5:
+                nick, server = default_peer_args(arg_parts[2:4])
+                question = arg_parts[4]
+            elif len(arg_parts) == 6:
+                nick, server = default_peer_args(arg_parts[2:4])
+                secret = arg_parts[5]
+                question = arg_parts[4]
+
 
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
+
+            # Sometimes potr chokes on funky UTF chars without this
+            if secret:
+                secret = secret.encode('raw_unicode_escape')
+            if question:
+                question = question.encode('raw_unicode_escape')
 
             try:
                 context.smpInit(secret, question)
@@ -908,11 +946,20 @@ def command_cb(data, buf, args):
                     'There is currently no encrypted session with %s.' % \
                         context.peer)
             else:
-                context.print_buffer('SMP question sent...')
+                if question:
+                    context.print_buffer('SMP challenge sent...')
+                else:
+                    context.print_buffer('SMP question sent...')
                 context.in_smp = True
                 result = weechat.WEECHAT_RC_OK
+
         elif action == 'abort':
-            nick, server = arg_parts[2:4]
+            # Nickname and server are not specified
+            if len(arg_parts) == 2:
+                nick, server = default_peer_args([])
+            # Nickname and server are specified
+            elif len(arg_parts) == 4:
+                nick, server = default_peer_args(arg_parts[2:4])
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
 
@@ -1332,9 +1379,9 @@ if weechat.register(
         SCRIPT_NAME, SCRIPT_HELP,
         'start [NICK SERVER] || '
         'finish [NICK SERVER] || '
-        'smp ask NICK SERVER SECRET [QUESTION] || '
-        'smp respond NICK SERVER SECRET || '
-        'smp abort NICK SERVER || '
+        'smp ask [NICK SERVER] [QUESTION] SECRET || '
+        'smp respond [NICK SERVER] SECRET || '
+        'smp abort [NICK SERVER] || '
         'trust [NICK SERVER] || '
         'distrust [NICK SERVER] || '
         'log [on|off] || '
