@@ -55,6 +55,9 @@ In the private chat buffer: /otr start
 If you have not authenticated your peer yet, follow the instructions for
 authentication.
 
+You can, at any time, see the current OTR session status and fingerprints with:
+/otr status
+
 View OTR policies for your peer: /otr policy
 
 View default OTR policies: /otr policy default
@@ -1412,6 +1415,7 @@ if weechat.register(
         SCRIPT_NAME, SCRIPT_HELP,
         'start [NICK SERVER] || '
         'finish [NICK SERVER] || '
+        'status [NICK SERVER] || '
         'smp ask [NICK SERVER] [QUESTION] SECRET || '
         'smp respond [NICK SERVER] SECRET || '
         'smp abort [NICK SERVER] || '
@@ -1422,6 +1426,7 @@ if weechat.register(
         '',
         'start %(nick) %(irc_servers) %-||'
         'finish %(nick) %(irc_servers) %-||'
+        'status %(nick) %(irc_servers) %-||'
         'smp ask|respond %(nick) %(irc_servers) %-||'
         'smp abort %(nick) %(irc_servers) %-||'
         'trust %(nick) %(irc_servers) %-||'
