@@ -103,6 +103,9 @@ PRIVMSG
 
 potr.proto.TaggedPlaintextOrig = potr.proto.TaggedPlaintext
 
+global otr_debug_buffer
+otr_debug_buffer = None
+
 class WeechatTaggedPlaintext(potr.proto.TaggedPlaintextOrig):
     """Patch potr.proto.TaggedPlaintext to not end plaintext tags in a space.
 
@@ -155,9 +158,19 @@ def prnt(buf, message):
 def debug(msg):
     """Send a debug message to the WeeChat core buffer."""
     debug_option = weechat.config_get(config_prefix('general.debug'))
+    global otr_debug_buffer
 
     if weechat.config_boolean(debug_option):
-        prnt('', ('%s debug\t%s' % (SCRIPT_NAME, unicode(msg))))
+        if not otr_debug_buffer:
+            otr_debug_buffer = weechat.buffer_new("OTR Debug", "", "", "debug_buffer_close_cb", "")
+            weechat.buffer_set(otr_debug_buffer, 'title', 'OTR Debug')
+            weechat.buffer_set(otr_debug_buffer, 'localvar_set_no_log', '1')
+        prnt(otr_debug_buffer, ('%s debug\t%s' % (SCRIPT_NAME, unicode(msg))))
+
+def debug_buffer_close_cb(data, buffer):
+    global otr_debug_buffer
+    otr_debug_buffer = None
+    return weechat.WEECHAT_RC_OK
 
 def current_user(server_name):
     """Get the nick and server of the current user on a server."""
