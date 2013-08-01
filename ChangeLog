@@ -1,3 +1,29 @@
+1.2.0
+	2013-08-13
+
+	Fix UTF8 encoding errors
+
+	Add the possibility to revoke a contact's trust permanently
+
+	Add logging control and settings during an OTR session. Logs are disabled
+	by default during the OTR session and restored to their previous value
+	after the OTR session has ended
+
+	Add the possibility to abort a SMP process
+
+	Better policy management
+
+	Clearer messages and  warnings to avoid user mistakes and confusion
+
+	Send debug messages to a dedicated buffer for easier debugging
+
+	Add a command "/otr status" to see fingerprints and the OTR status
+	of a specific conversation
+
+	Lots of bugfixes and little improvements
+
+
+
 1.1.0
 	2012-08-15
 
