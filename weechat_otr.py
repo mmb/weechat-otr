@@ -896,6 +896,26 @@ def command_cb(data, buf, args):
             context.disconnect()
 
             result = weechat.WEECHAT_RC_OK
+
+    elif len(arg_parts) in (1, 3) and arg_parts[0] == 'status':
+        nick, server = default_peer_args(arg_parts[1:3])
+
+        if nick is not None and server is not None:
+            context = ACCOUNTS[current_user(server)].getContext(
+                irc_user(nick, server))
+            if context.is_encrypted():
+                context.print_buffer("This conversation is encrypted.")
+                context.print_buffer("Your fingerprint is : %s" % context.user.getPrivkey())
+                context.print_buffer("Your peer's fingerprint is : %s" % potr.human_hash(context.crypto.theirPubkey.cfingerprint()))
+                if context.is_verified():
+                    context.print_buffer("The peer's identity has been verified.")
+                else:
+                    context.print_buffer("You have not verified the peer's identity yet.")
+            else:
+                context.print_buffer("This current conversation is not encrypted.")
+
+            result = weechat.WEECHAT_RC_OK
+
     elif len(arg_parts) in range(2,7) and arg_parts[0] == 'smp':
         action = arg_parts[1]
 
