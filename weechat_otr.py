@@ -239,8 +239,8 @@ def config_color(option):
 
 def config_string(option):
     """Get the string value of a config option with utf-8 decode."""
-    return weechat.config_string(
-        utf8_decode(weechat.config_get(config_prefix(option))))
+    return utf8_decode(weechat.config_string(
+        weechat.config_get(config_prefix(option))))
 
 def buffer_get_string(buf, prop):
     """Wrap weechat.buffer_get_string() with utf-8 encode/decode."""
