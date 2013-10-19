@@ -104,31 +104,26 @@ PRIVMSG
 (?P<text>.+)
 """, re.VERBOSE)
 
-potr.proto.TaggedPlaintextOrig = potr.proto.TaggedPlaintext
-
 global otr_debug_buffer
 otr_debug_buffer = None
 
-class WeechatTaggedPlaintext(potr.proto.TaggedPlaintextOrig):
-    """Patch potr.proto.TaggedPlaintext to not end plaintext tags in a space.
+# Patch potr.proto.TaggedPlaintext to not end plaintext tags in a space.
+#
+# When POTR adds OTR tags to plaintext it puts them at the end of the message.
+# The tags end in a space which gets stripped off by WeeChat because it
+# strips trailing spaces from commands. This causes OTR initiation to fail so
+# the following code adds an extra tab at the end of the plaintext tags if
+# they end in a space.
 
-    When POTR adds OTR tags to plaintext it puts them at the end of the message.
-    The tags end in a space which gets stripped off by WeeChat because it
-    strips trailing spaces from commands. This causes OTR initiation to fail so
-    the following code adds an extra tab at the end of the plaintext tags if
-    they end in a space.
-    """
+def patched__bytes__(self):
+    data = self.msg + potr.proto.MESSAGE_TAG_BASE
+    for v in self.versions:
+        data += potr.proto.MESSAGE_TAGS[v]
+    if data.endswith(' '):
+      data = '%s\t' % data
+    return data
 
-    def __bytes__(self):
-        # old style because parent class is old style
-        result = utf8_decode(potr.proto.TaggedPlaintextOrig.__bytes__(self))
-
-        if result.endswith(' '):
-            result = '%s\t' % result
-
-        return utf8_encode(result)
-
-potr.proto.TaggedPlaintext = WeechatTaggedPlaintext
+potr.proto.TaggedPlaintext.__bytes__ = patched__bytes__
 
 def utf8_encode(s):
     """Encode a Unicode string into utf-8 bytes, replacing characters that
