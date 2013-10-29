@@ -328,7 +328,7 @@ class IrcContext(potr.context.Context):
     def __init__(self, account, peername):
         super(IrcContext, self).__init__(account, peername)
 
-        self.peer_nick, self.peer_server = peername.split('@')
+        self.peer_nick, self.peer_server = peername.split('@', 1)
         self.in_assembler = Assembler()
         self.in_otr_message = False
         self.in_smp = False
@@ -658,7 +658,7 @@ class IrcOtrAccount(potr.context.Account):
         super(IrcOtrAccount, self).__init__(
             name, IrcOtrAccount.PROTOCOL, IrcOtrAccount.MAX_MSG_SIZE)
 
-        self.nick, self.server = self.name.split('@')
+        self.nick, self.server = self.name.split('@', 1)
 
         # IRC messages cannot have newlines, OTR query and "no plugin" text
         # need to be one message
