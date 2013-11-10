@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mmb/weechat-otr.png)](https://travis-ci.org/mmb/weechat-otr)
+
 WeeChat script for Off-the-Record messaging
 
 DISCLAIMER: To the best of my knowledge this script securely provides OTR
