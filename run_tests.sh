@@ -1,6 +1,6 @@
 #!/bin/sh
 
-pylint weechat_otr.py test
-pylint test
+pylint --rcfile=pylint.rc weechat_otr.py
+pylint --rcfile=pylint.rc test
 
 python -m unittest discover
