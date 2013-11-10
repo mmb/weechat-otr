@@ -24,6 +24,7 @@ Then either symlink it into ~/.weechat/python/autoload
 or '/python load python/weechat_otr.py' in WeeChat
 
 Questions, comments and patches welcome: matthewm@boedicker.org
+
 Current maintainer: koolfy@koolfy.be
 
 Feel free to open issues on Github before sending an email.
