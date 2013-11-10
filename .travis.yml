@@ -4,4 +4,4 @@ python:
 install:
   - "pip install pylint"
   - "pip install python-potr"
-script: run_tests.sh
+script: ./run_tests.sh
