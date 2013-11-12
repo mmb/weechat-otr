@@ -119,8 +119,8 @@ def patched__bytes__(self):
     data = self.msg + potr.proto.MESSAGE_TAG_BASE
     for v in self.versions:
         data += potr.proto.MESSAGE_TAGS[v]
-    if data.endswith(' '):
-      data = '%s\t' % data
+    if data.endswith(utf8_encode(' ')):
+        data += utf8_encode('\t')
     return data
 
 potr.proto.TaggedPlaintext.__bytes__ = patched__bytes__
