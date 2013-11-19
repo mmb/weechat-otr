@@ -1,3 +1,4 @@
+import copy
 import types
 
 class MockWeechat(types.ModuleType):
@@ -5,6 +6,14 @@ class MockWeechat(types.ModuleType):
     def __init__(self):
         self.config_options = {}
         self.script_name = None
+
+    def save(self):
+        self.saved_state = copy.deepcopy(self.__dict__)
+
+    def restore(self):
+        prev_state = copy.deepcopy(self.saved_state)
+        self.__dict__.clear()
+        self.__dict__.update(prev_state)
 
     def bar_item_new(*args):
         pass

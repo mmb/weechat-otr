@@ -8,6 +8,12 @@ import weechat_otr
 
 class WeechatOtrTestCase(unittest.TestCase):
 
+    def setUp(self):
+        sys.modules['weechat'].save()
+
+    def tearDown(self):
+        sys.modules['weechat'].restore()
+
     def test_message_out_cb(self):
         result = weechat_otr.message_out_cb(None, None, 'freenode',
             ':nick!user@host PRIVMSG friend :hello')
