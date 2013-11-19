@@ -878,9 +878,10 @@ def command_cb(data, buf, args):
                 context.previous_log_level = context.get_log_level()
 
             context.print_buffer('Sending OTR query... Please await confirmation of the OTR session being started before sending a message.')
-            context.print_buffer(
-                'To try OTR on all conversations with %s: /otr policy send_tag on' %
-                context.peer)
+            if not context.getPolicy('send_tag'):
+                context.print_buffer(
+                    'To try OTR on all conversations with %s: /otr policy send_tag on' %
+                    context.peer)
 
             privmsg(server, nick, '?OTR?')
 
