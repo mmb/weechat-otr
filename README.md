@@ -8,13 +8,9 @@ holes you find.
 
 Testing and security auditing are appreciated.
 
-It requires the most recent master branch of the pure Python OTR
-implementation (potr):
+This script requires the Python OTR package to be installed:
 
-https://github.com/afflux/pure-python-otr
-
-Thanks to Kjell Braden for the Python OTR library and the Gajim Python plugin
-which I used as a reference.
+```pip install python-potr```
 
 To install script:
 
@@ -28,3 +24,6 @@ Questions, comments and patches welcome: matthewm@boedicker.org
 Current maintainer: koolfy@koolfy.be
 
 Feel free to open issues on Github before sending an email.
+
+Thanks to Kjell Braden for the Python OTR library and the Gajim Python plugin
+which I used as a reference.
