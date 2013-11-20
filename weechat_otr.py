@@ -914,7 +914,7 @@ def command_cb(data, buf, args):
 
             result = weechat.WEECHAT_RC_OK
 
-    elif len(arg_parts) in range(2,7) and arg_parts[0] == 'smp':
+    elif len(arg_parts) in range(2, 7) and arg_parts[0] == 'smp':
         action = arg_parts[1]
 
         if action == 'respond':
