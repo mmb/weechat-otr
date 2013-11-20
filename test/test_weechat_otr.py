@@ -27,3 +27,8 @@ class WeechatOtrTestCase(unittest.TestCase):
             ":nick!user@host PRIVMSG friend :\xc3")
         self.assertEquals(result,
             "PRIVMSG friend :\xef\xbf\xbd \t  \t\t\t\t \t \t \t    \t\t  \t \t")
+
+    def test_parse_irc_privmsg_channel_ampersand(self):
+        result = weechat_otr.parse_irc_privmsg(
+            ':nick!user@host PRIVMSG &channel :test')
+        self.assertEquals(result['to_channel'], '&channel')
