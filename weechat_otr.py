@@ -74,7 +74,7 @@ SCRIPT_VERSION = '1.2.0'
 
 OTR_DIR_NAME = 'otr'
 
-OTR_QUERY_RE = re.compile('\?OTR(\?|\??v[a-z\d]*\?)$')
+OTR_QUERY_RE = re.compile('\?OTR(\?|\??v[a-z\d]*\?)')
 
 POLICIES = {
     'allow_v2' : 'allow OTR protocol version 2',
@@ -323,7 +323,7 @@ class Assembler:
 
     def is_query(self):
         """Return true if the buffer is an OTR query."""
-        return OTR_QUERY_RE.match(self.value)
+        return OTR_QUERY_RE.search(self.value)
 
 class IrcContext(potr.context.Context):
     """Context class for OTR over IRC."""

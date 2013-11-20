@@ -45,6 +45,12 @@ class WeechatOtrTestCase(unittest.TestCase):
         result = weechat_otr.build_privmsg_in('f', 't', 'line1\nline2')
         self.assertEqual(result, ':f PRIVMSG t :line1\n:f PRIVMSG t :line2')
 
+    def test_is_query(self):
+        assembler = weechat_otr.Assembler()
+        assembler.add('ATT: ?OTRv2?someone requested encryption!')
+
+        self.assertTrue(assembler.is_query())
+
     def test_command_cb_start_send_tag_off(self):
         weechat_otr.command_cb(None, None, 'start')
 
@@ -87,4 +93,3 @@ class WeechatOtrTestCase(unittest.TestCase):
 
     def assertNotPrinted(self, buf, text):
         self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))
-
