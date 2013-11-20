@@ -204,7 +204,7 @@ def parse_irc_privmsg(message):
     if match:
         result = match.groupdict()
 
-        if result['to'].startswith('#'):
+        if result['to'].startswith(('#','&')):
             result['to_channel'] = result['to']
             result['to_nick'] = None
         else:
