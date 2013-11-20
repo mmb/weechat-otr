@@ -496,7 +496,7 @@ Respond with: /otr smp respond <answer>""" % (smp1q.msg))
 /otr smp ask <question> <secret>""")
 
                     else:
-                       self.smp_finish('SMP verification succeeded.')
+                        self.smp_finish('SMP verification succeeded.')
 
                 else:
                     self.smp_finish('SMP verification failed.')
