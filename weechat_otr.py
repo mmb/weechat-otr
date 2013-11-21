@@ -146,8 +146,11 @@ def privmsg(server, nick, message):
         command('', '/quote -server %s PRIVMSG %s :%s' % (server, nick, line))
 
 def build_privmsg_in(fromm, to, msg):
-    """Build an inbound IRC PRIVMSG command."""
-    return ':%s PRIVMSG %s :%s' % (fromm, to, msg)
+    """Build inbound IRC PRIVMSG command(s)."""
+    cmd = []
+    for line in msg.split('\n'):
+        cmd.append(':%s PRIVMSG %s :%s' % (fromm, to, line))
+    return '\n'.join(cmd)
 
 def prnt(buf, message):
     """Wrap weechat.prnt() with utf-8 encode."""
