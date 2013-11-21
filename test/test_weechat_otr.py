@@ -32,3 +32,11 @@ class WeechatOtrTestCase(unittest.TestCase):
         result = weechat_otr.parse_irc_privmsg(
             ':nick!user@host PRIVMSG &channel :test')
         self.assertEquals(result['to_channel'], '&channel')
+
+    def test_build_privmsg_in_without_newline(self):
+        result = weechat_otr.build_privmsg_in('f', 't', 'line1')
+        self.assertEquals(result, ':f PRIVMSG t :line1')
+
+    def test_build_privmsg_in_with_newline(self):
+        result = weechat_otr.build_privmsg_in('f', 't', 'line1\nline2')
+        self.assertEquals(result, ':f PRIVMSG t :line1\n:f PRIVMSG t :line2')
