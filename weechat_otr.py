@@ -142,20 +142,20 @@ def command(buf, command_str):
 
 def privmsg(server, nick, message):
     """Send a private message to a nick."""
-    for line in message.split('\n'):
+    for line in message.splitlines():
         command('', '/quote -server %s PRIVMSG %s :%s' % tuple(map(sanitize, (server, nick, line))))
 
 def build_privmsg_in(fromm, to, msg):
     """Build inbound IRC PRIVMSG command(s)."""
     cmd = []
-    for line in msg.split('\n'):
+    for line in msg.splitlines():
         cmd.append(':%s PRIVMSG %s :%s' % tuple(map(sanitize, (fromm, to, line))))
     return '\r\n'.join(cmd)
 
 def build_privmsg_out(to, msg):
     """Build outbound IRC PRIVMSG command(s)."""
     cmd = []
-    for line in msg.split('\n'):
+    for line in msg.splitlines():
         cmd.append('PRIVMSG %s :%s' % tuple(map(sanitize, (to, line))))
     return '\r\n'.join(cmd)
 
