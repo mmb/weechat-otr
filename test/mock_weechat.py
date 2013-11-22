@@ -3,9 +3,13 @@ import types
 
 class MockWeechat(types.ModuleType):
 
+    WEECHAT_RC_ERROR = None
+    WEECHAT_RC_OK = None
+
     def __init__(self):
         self.config_options = {}
         self.script_name = None
+        self.printed = {}
 
     def save(self):
         self.saved_state = copy.deepcopy(self.__dict__)
@@ -19,6 +23,18 @@ class MockWeechat(types.ModuleType):
         pass
 
     def bar_item_update(*args):
+        pass
+
+    def buffer_get_string(self, buf, string):
+        strings = {
+            'localvar_type' : 'private',
+            'localvar_channel' : 'nick',
+            'localvar_server' : 'server',
+            }
+
+        return strings.get(string)
+
+    def command(*args):
         pass
 
     def config_boolean(self, s):
@@ -49,6 +65,9 @@ class MockWeechat(types.ModuleType):
     def config_read(*args):
         pass
 
+    def current_buffer(*args):
+        pass
+
     def hook_command(*args):
         pass
 
@@ -66,17 +85,27 @@ class MockWeechat(types.ModuleType):
 
     def info_get(self, name, *args):
         infos = {
+            'irc_buffer' : 'buffer',
             'irc_nick': 'nick',
             'weechat_dir': '/tmp/weechat'
         }
 
         return infos.get(name)
 
+    def infolist_free(*args):
+        pass
+
+    def infolist_get(*args):
+        pass
+
+    def infolist_next(*args):
+        pass
+
     def mkdir_home(self, *args):
         pass
 
-    def prnt(*args):
-        pass
+    def prnt(self, buf, message):
+        self.printed.setdefault(buf, []).append(message)
 
     def register(self, script_name, *args):
         self.script_name = script_name

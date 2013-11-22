@@ -40,3 +40,26 @@ class WeechatOtrTestCase(unittest.TestCase):
     def test_build_privmsg_in_with_newline(self):
         result = weechat_otr.build_privmsg_in('f', 't', 'line1\nline2')
         self.assertEquals(result, ':f PRIVMSG t :line1\n:f PRIVMSG t :line2')
+
+    def test_command_cb_start_send_tag_off(self):
+        weechat_otr.command_cb(None, None, 'start')
+        printed = sys.modules['weechat'].printed['buffer']
+
+        self.assertEquals(printed, [
+          'otr\tSending OTR query... Please await confirmation of the OTR ' +
+          'session being started before sending a message.',
+
+          'otr\tTo try OTR on all conversations with nick@server: /otr ' +
+          'policy send_tag on'
+          ])
+
+    def test_command_cb_start_send_tag_on(self):
+        sys.modules['weechat'].config_options[
+            'otr.policy.server.nick.nick.send_tag'] = 'on'
+        weechat_otr.command_cb(None, None, 'start')
+        printed = sys.modules['weechat'].printed['buffer']
+
+        self.assertEquals(printed, [
+          'otr\tSending OTR query... Please await confirmation of the OTR ' +
+          'session being started before sending a message.',
+          ])
