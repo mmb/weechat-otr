@@ -451,7 +451,13 @@ class IrcContext(potr.context.Context):
 
     def print_buffer(self, msg):
         """Print a message to the buffer for this context."""
-        prnt(self.buffer(), '%s\t%s' % (SCRIPT_NAME, msg))
+        buf = self.buffer()
+
+        # add [nick] prefix if we have only a server buffer for the query
+        if self.peer_nick and not buffer_is_private(buf):
+            msg = '[%s] %s' % (self.peer_nick, msg)
+
+        prnt(buf, '%s\t%s' % (SCRIPT_NAME, msg))
 
     def hint(self, msg):
         """Print a message to the buffer but only when hints are enabled."""
