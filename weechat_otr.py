@@ -104,6 +104,10 @@ PRIVMSG
 (?P<text>.+)
 """, re.VERBOSE)
 
+ACTION_PREFIX = '/me '
+IRC_ACTION_RE   = re.compile('^\x01ACTION (?P<text>.*)\x01$')
+PLAIN_ACTION_RE = re.compile('^'+ACTION_PREFIX+'(?P<text>.*)$')
+
 IRC_SANITIZE_TABLE = dict((ord(char), None) for char in u'\n\r\x00')
 
 global otr_debug_buffer
@@ -269,6 +273,17 @@ def buffer_is_private(buf):
 def info_get(info_name, arguments):
     """Wrap weechat.info_get() with utf-8 encode/decode."""
     return utf8_decode(weechat.info_get(info_name, utf8_encode(arguments)))
+
+def msg_irc_from_plain(msg):
+    """Transform a plain-text message to irc format.
+    This will replace lines that start with /me with the respective
+    irc command."""
+    return PLAIN_ACTION_RE.sub('\x01ACTION \g<text>\x01', msg)
+
+def msg_plain_from_irc(msg):
+    """Transform an irc message to plain-text.
+    Any ACTION found will be rewritten as /me <text>."""
+    return IRC_ACTION_RE.sub(ACTION_PREFIX + '\g<text>', msg)
 
 def default_peer_args(args, buf):
     """Get the nick and server of a remote peer from command arguments or
@@ -778,6 +793,7 @@ def message_in_cb(data, modifier, modifier_data, string):
             debug(('receive', msg, tlvs))
 
             if msg:
+                msg = msg_irc_from_plain(msg)
                 result = utf8_encode(build_privmsg_in(
                     parsed['from'], parsed['to'], utf8_decode(msg)))
 
@@ -841,6 +857,7 @@ def message_out_cb(data, modifier, modifier_data, string):
             debug(('context send message', parsed['text'], parsed['to_nick'],
                    server))
 
+            parsed['text'] = msg_plain_from_irc(parsed['text'])
             try:
                 ret = context.sendMessage(
                     potr.context.FRAGMENT_SEND_ALL,

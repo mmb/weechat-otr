@@ -63,6 +63,42 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         result = weechat_otr.build_privmsg_out('t', 'line1\nline2')
         self.assertEqual(result, 'PRIVMSG t :line1\r\nPRIVMSG t :line2')
 
+    def test_msg_irc_from_plain_action(self):
+        result = weechat_otr.msg_irc_from_plain('/me does something')
+        self.assertEqual(result,
+                '\x01ACTION does something\x01')
+
+    def test_msg_irc_from_plain_no_action(self):
+        msg_no_action = 'just a message'
+        self.assertEqual(weechat_otr.msg_irc_from_plain(msg_no_action),
+                msg_no_action)
+
+    def test_msg_irc_from_plain_action_invariant(self):
+        msg_action = '\x01ACTION does something\x01'
+        self.assertEqual(msg_action,
+                weechat_otr.msg_irc_from_plain(
+                    weechat_otr.msg_plain_from_irc(msg_action)
+                    )
+                )
+
+    def test_msg_plain_from_irc_action(self):
+        result = weechat_otr.msg_plain_from_irc('\x01ACTION does something\x01')
+        self.assertEqual(result,
+                '/me does something')
+
+    def test_msg_plain_from_irc_no_action(self):
+        msg_no_action = 'just a message'
+        self.assertEqual(weechat_otr.msg_plain_from_irc(msg_no_action),
+                msg_no_action)
+
+    def test_msg_plain_from_irc_action_invariant(self):
+        msg_action = '/me does something'
+        self.assertEqual(msg_action,
+                weechat_otr.msg_plain_from_irc(
+                    weechat_otr.msg_irc_from_plain(msg_action)
+                    )
+                )
+
     def test_command_cb_start_send_tag_off(self):
         weechat_otr.command_cb(None, None, 'start')
 
