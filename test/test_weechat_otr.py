@@ -62,7 +62,19 @@ class WeechatOtrTestCase(unittest.TestCase):
             'otr.general.hints'] = 'off'
         weechat_otr.command_cb(None, None, 'start')
 
-        self.assertEquals(False, 'buffer' in sys.modules['weechat'].printed)
+        self.assertNotIn(
+            'otr\tTo try OTR on all conversations with nick@server: /otr ' +
+            'policy send_tag on',
+            sys.modules['weechat'].printed.get('buffer', []))
+
+    def test_command_cb_start_send_tag_off_with_hints(self):
+        sys.modules['weechat'].config_options['otr.general.hints'] = 'on'
+        weechat_otr.command_cb(None, None, 'start')
+
+        self.assertIn(
+            'otr\tTo try OTR on all conversations with nick@server: /otr ' +
+           'policy send_tag on',
+           sys.modules['weechat'].printed['buffer'])
 
     def test_command_cb_start_send_tag_on(self):
         sys.modules['weechat'].config_options[
@@ -74,12 +86,3 @@ class WeechatOtrTestCase(unittest.TestCase):
           'otr\tSending OTR query... Please await confirmation of the OTR ' +
           'session being started before sending a message.',
           ])
-
-    def test_command_cb_start_send_tag_on_no_hints(self):
-        sys.modules['weechat'].config_options[
-            'otr.policy.server.nick.nick.send_tag'] = 'on'
-        sys.modules['weechat'].config_options[
-            'otr.general.hints'] = 'off'
-        weechat_otr.command_cb(None, None, 'start')
-
-        self.assertEquals(False, 'buffer' in sys.modules['weechat'].printed)
