@@ -83,8 +83,8 @@ class WeechatOtrTestCase(unittest.TestCase):
           'session being started before sending a message.')
 
     def assertPrinted(self, buf, text):
-         self.assertIn(text, sys.modules['weechat'].printed[buf])
+        self.assertIn(text, sys.modules['weechat'].printed[buf])
 
     def assertNotPrinted(self, buf, text):
-         self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))
+        self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))
 
