@@ -47,42 +47,44 @@ class WeechatOtrTestCase(unittest.TestCase):
 
     def test_command_cb_start_send_tag_off(self):
         weechat_otr.command_cb(None, None, 'start')
-        printed = sys.modules['weechat'].printed['buffer']
 
-        self.assertEquals(printed, [
+        self.assertPrinted('buffer',
           'otr\tSending OTR query... Please await confirmation of the OTR ' +
-          'session being started before sending a message.',
+          'session being started before sending a message.')
 
+        self.assertPrinted('buffer',
           'otr\tTo try OTR on all conversations with nick@server: /otr ' +
-          'policy send_tag on'
-          ])
+          'policy send_tag on')
 
     def test_command_cb_start_send_tag_off_no_hints(self):
         sys.modules['weechat'].config_options[
             'otr.general.hints'] = 'off'
         weechat_otr.command_cb(None, None, 'start')
 
-        self.assertNotIn(
+        self.assertNotPrinted('buffer',
             'otr\tTo try OTR on all conversations with nick@server: /otr ' +
-            'policy send_tag on',
-            sys.modules['weechat'].printed.get('buffer', []))
+            'policy send_tag on')
 
     def test_command_cb_start_send_tag_off_with_hints(self):
         sys.modules['weechat'].config_options['otr.general.hints'] = 'on'
         weechat_otr.command_cb(None, None, 'start')
 
-        self.assertIn(
+        self.assertPrinted('buffer',
             'otr\tTo try OTR on all conversations with nick@server: /otr ' +
-           'policy send_tag on',
-           sys.modules['weechat'].printed['buffer'])
+           'policy send_tag on')
 
     def test_command_cb_start_send_tag_on(self):
         sys.modules['weechat'].config_options[
             'otr.policy.server.nick.nick.send_tag'] = 'on'
         weechat_otr.command_cb(None, None, 'start')
-        printed = sys.modules['weechat'].printed['buffer']
 
-        self.assertEquals(printed, [
+        self.assertPrinted('buffer',
           'otr\tSending OTR query... Please await confirmation of the OTR ' +
-          'session being started before sending a message.',
-          ])
+          'session being started before sending a message.')
+
+    def assertPrinted(self, buf, text):
+         self.assertIn(text, sys.modules['weechat'].printed[buf])
+
+    def assertNotPrinted(self, buf, text):
+         self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))
+
