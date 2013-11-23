@@ -397,7 +397,7 @@ class IrcContext(potr.context.Context):
             else:
                 self.previous_log_level = self.get_log_level()
                 if self.is_logged():
-                    self.print_buffer('You have enabled the recording to disk of OTR conversations. By doing this you are potentially putting yourself and your correspondent in danger. Please consider disabling this policy with "/otr policy default log off". To disable logging for this OTR session, use "/otr log stop"')
+                    self.hint('You have enabled the recording to disk of OTR conversations. By doing this you are potentially putting yourself and your correspondent in danger. Please consider disabling this policy with "/otr policy default log off". To disable logging for this OTR session, use "/otr log stop"')
 
             if trust is None:
                 fpr = str(self.getCurrentKey())
@@ -410,7 +410,7 @@ class IrcContext(potr.context.Context):
             else:
                 self.print_buffer(
                     'Unauthenticated secured OTR conversation started.')
-                self.print_buffer(self.verify_instructions())
+                self.hint(self.verify_instructions())
 
         if self.state != potr.context.STATE_PLAINTEXT and \
                 newstate == potr.context.STATE_PLAINTEXT:
@@ -438,6 +438,13 @@ class IrcContext(potr.context.Context):
     def print_buffer(self, msg):
         """Print a message to the buffer for this context."""
         prnt(self.buffer(), '%s\t%s' % (SCRIPT_NAME, msg))
+
+    def hint(self, msg):
+        """Print a message to the buffer but only when hints are enabled."""
+        hints_option = weechat.config_get(config_prefix('general.hints'))
+
+        if weechat.config_boolean(hints_option):
+            self.print_buffer(msg)
 
     def smp_finish(self, message = False):
         """Reset SMP state and send a message to the user."""
@@ -880,9 +887,9 @@ def command_cb(data, buf, args):
             else:
                 context.previous_log_level = context.get_log_level()
 
-            context.print_buffer('Sending OTR query... Please await confirmation of the OTR session being started before sending a message.')
+            context.hint('Sending OTR query... Please await confirmation of the OTR session being started before sending a message.')
             if not context.getPolicy('send_tag'):
-                context.print_buffer(
+                context.hint(
                     'To try OTR on all conversations with %s: /otr policy send_tag on' %
                     context.peer)
 
@@ -1298,6 +1305,7 @@ def init_config():
 
     for option, typ, desc, default in [
         ('debug', 'boolean', 'OTR script debugging', 'off'),
+        ('hints', 'boolean', 'Give helpful hints how to use this script and how to stay secure while using OTR (recommended)', 'on'),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['general'], option, typ, desc, '', 0,
