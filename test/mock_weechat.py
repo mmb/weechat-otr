@@ -1,3 +1,9 @@
+# pylint: disable=missing-docstring
+# pylint: disable=no-method-argument
+# pylint: disable=no-self-use
+# pylint: disable=too-many-public-methods
+# pylint: disable=unused-argument
+
 import copy
 import types
 
