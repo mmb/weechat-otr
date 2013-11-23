@@ -21,7 +21,7 @@ class WeechatOtrTestCase(unittest.TestCase):
     def test_message_out_cb(self):
         result = weechat_otr.message_out_cb(None, None, 'freenode',
             ':nick!user@host PRIVMSG friend :hello')
-        self.assertEquals(result, 'PRIVMSG friend :hello')
+        self.assertEqual(result, 'PRIVMSG friend :hello')
 
     def test_message_out_cb_send_tag_non_ascii(self):
         sys.modules['weechat'].config_options[
@@ -29,21 +29,21 @@ class WeechatOtrTestCase(unittest.TestCase):
 
         result = weechat_otr.message_out_cb(None, None, 'freenode',
             ":nick!user@host PRIVMSG friend :\xc3")
-        self.assertEquals(result,
+        self.assertEqual(result,
             "PRIVMSG friend :\xef\xbf\xbd \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
     def test_parse_irc_privmsg_channel_ampersand(self):
         result = weechat_otr.parse_irc_privmsg(
             ':nick!user@host PRIVMSG &channel :test')
-        self.assertEquals(result['to_channel'], '&channel')
+        self.assertEqual(result['to_channel'], '&channel')
 
     def test_build_privmsg_in_without_newline(self):
         result = weechat_otr.build_privmsg_in('f', 't', 'line1')
-        self.assertEquals(result, ':f PRIVMSG t :line1')
+        self.assertEqual(result, ':f PRIVMSG t :line1')
 
     def test_build_privmsg_in_with_newline(self):
         result = weechat_otr.build_privmsg_in('f', 't', 'line1\nline2')
-        self.assertEquals(result, ':f PRIVMSG t :line1\n:f PRIVMSG t :line2')
+        self.assertEqual(result, ':f PRIVMSG t :line1\n:f PRIVMSG t :line2')
 
     def test_command_cb_start_send_tag_off(self):
         weechat_otr.command_cb(None, None, 'start')
