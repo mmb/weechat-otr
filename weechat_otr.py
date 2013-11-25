@@ -823,9 +823,10 @@ def message_out_cb(data, modifier, modifier_data, string):
         local_user = current_user(server)
 
         context = ACCOUNTS[local_user].getContext(to_user)
+        is_query = OTR_QUERY_RE.search(parsed['text']);
 
         if parsed['text'].startswith(potr.proto.OTRTAG) and \
-                not OTR_QUERY_RE.match(parsed['text']):
+                not is_query:
             if not has_otr_end(parsed['text']):
                 debug('in OTR message')
                 context.in_otr_message = True
@@ -840,6 +841,14 @@ def message_out_cb(data, modifier, modifier_data, string):
         else:
             debug(('context send message', parsed['text'], parsed['to_nick'],
                    server))
+
+            if not context.is_encrypted() and not is_query and \
+                    context.getPolicy('require_encryption'):
+                context.print_buffer(
+                   'Your message will not be sent, because policy requires an encrypted connection.')
+                context.hint(
+                   'Wait for the OTR connection or change the policy to allow clear-text messages:\n'
+                   '/policy set require_encryption off')
 
             try:
                 ret = context.sendMessage(
