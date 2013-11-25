@@ -150,14 +150,14 @@ def build_privmsg_in(fromm, to, msg):
     cmd = []
     for line in msg.split('\n'):
         cmd.append(':%s PRIVMSG %s :%s' % tuple(map(sanitize, (fromm, to, line))))
-    return '\n'.join(cmd)
+    return '\r\n'.join(cmd)
 
 def build_privmsg_out(to, msg):
     """Build outbound IRC PRIVMSG command(s)."""
     cmd = []
     for line in msg.split('\n'):
         cmd.append('PRIVMSG %s :%s' % tuple(map(sanitize, (to, line))))
-    return '\n'.join(cmd)
+    return '\r\n'.join(cmd)
 
 def sanitize(msg):
     """Remove NUL, CR and LF characters from msg.

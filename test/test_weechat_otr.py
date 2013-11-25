@@ -53,7 +53,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
     def test_build_privmsg_in_with_newline(self):
         result = weechat_otr.build_privmsg_in('f', 't', 'line1\nline2')
-        self.assertEqual(result, ':f PRIVMSG t :line1\n:f PRIVMSG t :line2')
+        self.assertEqual(result, ':f PRIVMSG t :line1\r\n:f PRIVMSG t :line2')
 
     def test_build_privmsg_out_without_newline(self):
         result = weechat_otr.build_privmsg_out('t', 'line1')
@@ -61,7 +61,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
     def test_build_privmsg_out_with_newline(self):
         result = weechat_otr.build_privmsg_out('t', 'line1\nline2')
-        self.assertEqual(result, 'PRIVMSG t :line1\nPRIVMSG t :line2')
+        self.assertEqual(result, 'PRIVMSG t :line1\r\nPRIVMSG t :line2')
 
     def test_command_cb_start_send_tag_off(self):
         weechat_otr.command_cb(None, None, 'start')
