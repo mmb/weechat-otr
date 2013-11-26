@@ -279,7 +279,8 @@ def print_default_policies():
     """Print default policies values to the core buffer."""
     prnt('', 'Current default OTR policies:')
     for policy, desc in sorted(POLICIES.iteritems()):
-        prnt('','  %s (%s) is %s' % (policy, desc, config_string('policy.default.' + policy)))
+        prnt('', '  %s (%s) is %s' % (
+            policy, desc, config_string('policy.default.%s' % policy)))
     prnt('', 'Change default policies with /otr policy default NAME on/off')
     return True
 
