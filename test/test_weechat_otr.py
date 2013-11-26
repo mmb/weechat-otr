@@ -18,6 +18,8 @@ class WeechatOtrTestCase(unittest.TestCase):
     def tearDown(self):
         sys.modules['weechat'].restore()
 
+class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
+
     def test_message_out_cb(self):
         result = weechat_otr.message_out_cb(None, None, 'freenode',
             ':nick!user@host PRIVMSG friend :hello')
