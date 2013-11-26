@@ -163,7 +163,8 @@ def debug(msg):
 
     if weechat.config_boolean(debug_option):
         if not otr_debug_buffer:
-            otr_debug_buffer = weechat.buffer_new("OTR Debug", "", "", "debug_buffer_close_cb", "")
+            otr_debug_buffer = weechat.buffer_new("OTR Debug", "", "",
+                "debug_buffer_close_cb", "")
             weechat.buffer_set(otr_debug_buffer, 'title', 'OTR Debug')
             weechat.buffer_set(otr_debug_buffer, 'localvar_set_no_log', '1')
         prnt(otr_debug_buffer, ('%s debug\t%s' % (SCRIPT_NAME, unicode(msg))))
