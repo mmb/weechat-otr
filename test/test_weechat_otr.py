@@ -14,9 +14,17 @@ class WeechatOtrTestCase(unittest.TestCase):
 
     def setUp(self):
         sys.modules['weechat'].save()
+        self.afterSetUp()
 
     def tearDown(self):
         sys.modules['weechat'].restore()
+        self.afterTearDown()
+
+    def afterSetUp(self):
+        pass
+
+    def afterTearDown(self):
+        pass
 
 class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
@@ -46,24 +54,6 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
     def test_build_privmsg_in_with_newline(self):
         result = weechat_otr.build_privmsg_in('f', 't', 'line1\nline2')
         self.assertEqual(result, ':f PRIVMSG t :line1\n:f PRIVMSG t :line2')
-
-    def test_is_query_start(self):
-        assembler = weechat_otr.Assembler()
-        assembler.add('?OTRv2? encryption?')
-
-        self.assertTrue(assembler.is_query())
-
-    def test_is_query_middle(self):
-        assembler = weechat_otr.Assembler()
-        assembler.add('ATT: ?OTRv2?someone requested encryption!')
-
-        self.assertTrue(assembler.is_query())
-
-    def test_is_query_end(self):
-        assembler = weechat_otr.Assembler()
-        assembler.add('encryption? ?OTRv2?')
-
-        self.assertTrue(assembler.is_query())
 
     def test_command_cb_start_send_tag_off(self):
         weechat_otr.command_cb(None, None, 'start')
@@ -107,3 +97,23 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
     def assertNotPrinted(self, buf, text):
         self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))
+
+class AssemblerTestCase(WeechatOtrTestCase):
+
+    def afterSetUp(self):
+        self.assembler = weechat_otr.Assembler()
+
+    def test_is_query_start(self):
+        self.assembler.add('?OTRv2? encryption?')
+
+        self.assertTrue(self.assembler.is_query())
+
+    def test_is_query_middle(self):
+        self.assembler.add('ATT: ?OTRv2?someone requested encryption!')
+
+        self.assertTrue(self.assembler.is_query())
+
+    def test_is_query_end(self):
+        self.assembler.add('encryption? ?OTRv2?')
+
+        self.assertTrue(self.assembler.is_query())
