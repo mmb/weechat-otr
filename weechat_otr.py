@@ -268,21 +268,18 @@ def info_get(info_name, arguments):
     """Wrap weechat.info_get() with utf-8 encode/decode."""
     return utf8_decode(weechat.info_get(info_name, utf8_encode(arguments)))
 
-def default_peer_args(args):
+def default_peer_args(args, buf):
     """Get the nick and server of a remote peer from command arguments or
-    the current buffer.
+    a buffer.
 
-    Passed in args are the [nick, server] slice of arguments from a command.
-    If these are present, return them. If args is empty and the current buffer
-    is private, return the remote nick and server of the current buffer.
-    """
+    args is the [nick, server] slice of arguments from a command.
+    If these are present, return them. If args is empty and the buffer buf
+    is private, return the remote nick and server of buf."""
     result = None, None
 
     if len(args) == 2:
         result = tuple(args)
     else:
-        buf = weechat.current_buffer()
-
         if buffer_is_private(buf):
             result = (
                 buffer_get_string(buf, 'localvar_channel'),
@@ -892,7 +889,7 @@ def command_cb(data, buf, args):
         return result
 
     if len(arg_parts) in (1, 3) and arg_parts[0] == 'start':
-        nick, server = default_peer_args(arg_parts[1:3])
+        nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
@@ -917,7 +914,7 @@ def command_cb(data, buf, args):
 
             result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) in (1, 3) and arg_parts[0] == 'finish':
-        nick, server = default_peer_args(arg_parts[1:3])
+        nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
@@ -927,7 +924,7 @@ def command_cb(data, buf, args):
             result = weechat.WEECHAT_RC_OK
 
     elif len(arg_parts) in (1, 3) and arg_parts[0] == 'status':
-        nick, server = default_peer_args(arg_parts[1:3])
+        nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
@@ -951,10 +948,10 @@ def command_cb(data, buf, args):
         if action == 'respond':
             # Check if nickname and server are specified
             if len(arg_parts) == 3:
-                nick, server = default_peer_args([])
+                nick, server = default_peer_args([], buf)
                 secret = arg_parts[2]
             elif len(arg_parts) == 5:
-                nick, server = default_peer_args(arg_parts[2:4])
+                nick, server = default_peer_args(arg_parts[2:4], buf)
                 secret = arg_parts[4]
 
             # Sometimes potr chokes on funky UTF chars without this
@@ -974,20 +971,20 @@ def command_cb(data, buf, args):
             # Nickname and server are not specified
             # Check whether it's a simple challenge or a question/answer request
             if len(arg_parts) == 3:
-                nick, server = default_peer_args([])
+                nick, server = default_peer_args([], buf)
                 secret = arg_parts[2]
             elif len(arg_parts) == 4:
-                nick, server = default_peer_args([])
+                nick, server = default_peer_args([], buf)
                 secret = arg_parts[3]
                 question = arg_parts[2]
 
             # Nickname and server are specified
             # Check whether it's a simple challenge or a question/answer request
             elif len(arg_parts) == 5:
-                nick, server = default_peer_args(arg_parts[2:4])
+                nick, server = default_peer_args(arg_parts[2:4], buf)
                 question = arg_parts[4]
             elif len(arg_parts) == 6:
-                nick, server = default_peer_args(arg_parts[2:4])
+                nick, server = default_peer_args(arg_parts[2:4], buf)
                 secret = arg_parts[5]
                 question = arg_parts[4]
 
@@ -1018,10 +1015,10 @@ def command_cb(data, buf, args):
         elif action == 'abort':
             # Nickname and server are not specified
             if len(arg_parts) == 2:
-                nick, server = default_peer_args([])
+                nick, server = default_peer_args([], buf)
             # Nickname and server are specified
             elif len(arg_parts) == 4:
-                nick, server = default_peer_args(arg_parts[2:4])
+                nick, server = default_peer_args(arg_parts[2:4], buf)
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
 
@@ -1038,7 +1035,7 @@ def command_cb(data, buf, args):
                     result = weechat.WEECHAT_RC_OK
 
     elif len(arg_parts) in (1, 3) and arg_parts[0] == 'trust':
-        nick, server = default_peer_args(arg_parts[1:3])
+        nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
@@ -1056,7 +1053,7 @@ def command_cb(data, buf, args):
 
             result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) in (1, 3) and arg_parts[0] == 'distrust':
-        nick, server = default_peer_args(arg_parts[1:3])
+        nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
             context = ACCOUNTS[current_user(server)].getContext(
@@ -1076,7 +1073,7 @@ def command_cb(data, buf, args):
             result = weechat.WEECHAT_RC_OK
 
     elif len(arg_parts) in (1, 2) and arg_parts[0] == 'log':
-        nick, server = default_peer_args([])
+        nick, server = default_peer_args([], buf)
         if len(arg_parts) == 1:
             if nick is not None and server is not None:
                 context = ACCOUNTS[current_user(server)].getContext(
@@ -1130,7 +1127,7 @@ def command_cb(data, buf, args):
 
     elif len(arg_parts) in (1, 2, 3, 4) and arg_parts[0] == 'policy':
         if len(arg_parts) == 1:
-            nick, server = default_peer_args([])
+            nick, server = default_peer_args([], buf)
 
             if nick is not None and server is not None:
                 context = ACCOUNTS[current_user(server)].getContext(
@@ -1146,7 +1143,7 @@ def command_cb(data, buf, args):
                 result = weechat.WEECHAT_RC_OK
 
         elif len(arg_parts) == 2 and arg_parts[1].lower() == 'default':
-            nick, server = default_peer_args([])
+            nick, server = default_peer_args([], buf)
 
             if nick is not None and server is not None:
                 context = ACCOUNTS[current_user(server)].getContext(
@@ -1162,7 +1159,7 @@ def command_cb(data, buf, args):
                 result = weechat.WEECHAT_RC_OK
 
         elif len(arg_parts) == 3 and arg_parts[1].lower() in POLICIES:
-            nick, server = default_peer_args([])
+            nick, server = default_peer_args([], buf)
 
             if nick is not None and server is not None:
                 context = ACCOUNTS[current_user(server)].getContext(
@@ -1177,7 +1174,7 @@ def command_cb(data, buf, args):
                 result = weechat.WEECHAT_RC_OK
 
         elif len(arg_parts) == 4 and arg_parts[1].lower() == 'default' and arg_parts[2].lower() in POLICIES:
-            nick, server = default_peer_args([])
+            nick, server = default_peer_args([], buf)
 
             policy_var = "otr.policy.default." + arg_parts[2].lower()
 
