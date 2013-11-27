@@ -53,7 +53,15 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
     def test_build_privmsg_in_with_newline(self):
         result = weechat_otr.build_privmsg_in('f', 't', 'line1\nline2')
-        self.assertEqual(result, ':f PRIVMSG t :line1\n:f PRIVMSG t :line2')
+        self.assertEqual(result, ':f PRIVMSG t :line1\r\n:f PRIVMSG t :line2')
+
+    def test_build_privmsg_out_without_newline(self):
+        result = weechat_otr.build_privmsg_out('t', 'line1')
+        self.assertEqual(result, 'PRIVMSG t :line1')
+
+    def test_build_privmsg_out_with_newline(self):
+        result = weechat_otr.build_privmsg_out('t', 'line1\nline2')
+        self.assertEqual(result, 'PRIVMSG t :line1\r\nPRIVMSG t :line2')
 
     def test_command_cb_start_send_tag_off(self):
         weechat_otr.command_cb(None, None, 'start')
@@ -91,6 +99,10 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         self.assertPrinted('buffer',
           'otr\tSending OTR query... Please await confirmation of the OTR ' +
           'session being started before sending a message.')
+
+    def test_sanitize(self):
+        result = weechat_otr.sanitize('this\r\x00 is \r\n\rnot an i\n\x00rc command')
+        self.assertEqual(result, 'this is not an irc command')
 
     def assertPrinted(self, buf, text):
         self.assertIn(text, sys.modules['weechat'].printed[buf])

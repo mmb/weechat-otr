@@ -142,15 +142,29 @@ def command(buf, command_str):
 
 def privmsg(server, nick, message):
     """Send a private message to a nick."""
-    for line in message.split('\n'):
-        command('', '/quote -server %s PRIVMSG %s :%s' % (server, nick, line))
+    for line in message.splitlines():
+        command('', '/quote -server %s PRIVMSG %s :%s' % tuple(map(sanitize, (server, nick, line))))
 
 def build_privmsg_in(fromm, to, msg):
     """Build inbound IRC PRIVMSG command(s)."""
     cmd = []
-    for line in msg.split('\n'):
-        cmd.append(':%s PRIVMSG %s :%s' % (fromm, to, line))
-    return '\n'.join(cmd)
+    for line in msg.splitlines():
+        cmd.append(':%s PRIVMSG %s :%s' % tuple(map(sanitize, (fromm, to, line))))
+    return '\r\n'.join(cmd)
+
+def build_privmsg_out(to, msg):
+    """Build outbound IRC PRIVMSG command(s)."""
+    cmd = []
+    for line in msg.splitlines():
+        cmd.append('PRIVMSG %s :%s' % tuple(map(sanitize, (to, line))))
+    return '\r\n'.join(cmd)
+
+def sanitize(msg):
+    """Remove NUL, CR and LF characters from msg.
+    The (utf-8 encoded version of a) string returned from this function
+    should be safe to use as an argument in an irc command."""
+    deletedict = dict((ord(char), None) for char in u'\n\r\x00')
+    return unicode(msg).translate(deletedict)
 
 def prnt(buf, message):
     """Wrap weechat.prnt() with utf-8 encode."""
@@ -828,8 +842,11 @@ def message_out_cb(data, modifier, modifier_data, string):
 
                 if ret:
                     debug(('sendMessage returned', ret))
-                    result = utf8_encode('PRIVMSG %s :%s' % (
-                            parsed['to_nick'], utf8_decode(ret)))
+                    result = utf8_encode(
+                        build_privmsg_out(
+                            parsed['to_nick'], utf8_decode(ret)
+                            ))
+
             except potr.context.NotEncryptedError, err:
                 if err.args[0] == potr.context.EXC_FINISHED:
                     context.print_buffer(
