@@ -100,8 +100,9 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
           'otr\tSending OTR query... Please await confirmation of the OTR ' +
           'session being started before sending a message.')
 
-    def test_sanitize(self):
-        result = weechat_otr.sanitize('this\r\x00 is \r\n\rnot an i\n\x00rc command')
+    def test_irc_sanitize(self):
+        result = weechat_otr.irc_sanitize(
+            'this\r\x00 is \r\n\rnot an i\n\x00rc command')
         self.assertEqual(result, 'this is not an irc command')
 
     def assertPrinted(self, buf, text):

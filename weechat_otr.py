@@ -143,23 +143,23 @@ def command(buf, command_str):
 def privmsg(server, nick, message):
     """Send a private message to a nick."""
     for line in message.splitlines():
-        command('', '/quote -server %s PRIVMSG %s :%s' % tuple(map(sanitize, (server, nick, line))))
+        command('', '/quote -server %s PRIVMSG %s :%s' % tuple(map(irc_sanitize, (server, nick, line))))
 
 def build_privmsg_in(fromm, to, msg):
     """Build inbound IRC PRIVMSG command(s)."""
     cmd = []
     for line in msg.splitlines():
-        cmd.append(':%s PRIVMSG %s :%s' % tuple(map(sanitize, (fromm, to, line))))
+        cmd.append(':%s PRIVMSG %s :%s' % tuple(map(irc_sanitize, (fromm, to, line))))
     return '\r\n'.join(cmd)
 
 def build_privmsg_out(to, msg):
     """Build outbound IRC PRIVMSG command(s)."""
     cmd = []
     for line in msg.splitlines():
-        cmd.append('PRIVMSG %s :%s' % tuple(map(sanitize, (to, line))))
+        cmd.append('PRIVMSG %s :%s' % tuple(map(irc_sanitize, (to, line))))
     return '\r\n'.join(cmd)
 
-def sanitize(msg):
+def irc_sanitize(msg):
     """Remove NUL, CR and LF characters from msg.
     The (utf-8 encoded version of a) string returned from this function
     should be safe to use as an argument in an irc command."""
