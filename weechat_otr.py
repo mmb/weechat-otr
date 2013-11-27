@@ -104,6 +104,8 @@ PRIVMSG
 (?P<text>.+)
 """, re.VERBOSE)
 
+IRC_SANITIZE_TABLE = dict((ord(char), None) for char in u'\n\r\x00')
+
 global otr_debug_buffer
 otr_debug_buffer = None
 
@@ -163,8 +165,7 @@ def irc_sanitize(msg):
     """Remove NUL, CR and LF characters from msg.
     The (utf-8 encoded version of a) string returned from this function
     should be safe to use as an argument in an irc command."""
-    deletedict = dict((ord(char), None) for char in u'\n\r\x00')
-    return unicode(msg).translate(deletedict)
+    return unicode(msg).translate(IRC_SANITIZE_TABLE)
 
 def prnt(buf, message):
     """Wrap weechat.prnt() with utf-8 encode."""
