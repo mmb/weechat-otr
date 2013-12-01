@@ -32,13 +32,20 @@ class MockWeechat(types.ModuleType):
         pass
 
     def buffer_get_string(self, buf, string):
-        strings = {
-            'localvar_type' : 'private',
-            'localvar_channel' : 'nick',
-            'localvar_server' : 'server',
+        buffers = {
+            None : {
+                'localvar_type' : 'private',
+                'localvar_channel' : 'nick',
+                'localvar_server' : 'server',
+                },
+            'server_nick_buffer' : {
+                'localvar_type' : 'private',
+                'localvar_channel' : 'nick',
+                'localvar_server' : 'server',
+                },
             }
 
-        return strings.get(string)
+        return buffers[buf].get(string)
 
     def command(*args):
         pass
@@ -91,12 +98,18 @@ class MockWeechat(types.ModuleType):
 
     def info_get(self, name, *args):
         infos = {
-            'irc_buffer' : 'buffer',
-            'irc_nick': 'nick',
-            'weechat_dir': '/tmp/weechat'
+            ('',) : {
+                'weechat_dir': '/tmp/weechat',
+                },
+            ('server',) : {
+                'irc_nick': 'nick',
+                },
+            ('server,nick',) : {
+                'irc_buffer' : 'server_nick_buffer',
+                },
         }
 
-        return infos.get(name)
+        return infos[args].get(name)
 
     def infolist_free(*args):
         pass
