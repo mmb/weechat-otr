@@ -190,7 +190,7 @@ def debug(msg):
             weechat.buffer_set(otr_debug_buffer, 'localvar_set_no_log', '1')
         prnt(otr_debug_buffer, ('%s debug\t%s' % (SCRIPT_NAME, unicode(msg))))
 
-def debug_buffer_close_cb(data, buffer):
+def debug_buffer_close_cb(data, buf):
     global otr_debug_buffer
     otr_debug_buffer = None
     return weechat.WEECHAT_RC_OK
