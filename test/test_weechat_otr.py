@@ -89,7 +89,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
         self.assertPrinted('server_nick_buffer',
             'otr\tTo try OTR on all conversations with nick@server: /otr ' +
-           'policy send_tag on')
+            'policy send_tag on')
 
     def test_command_cb_start_send_tag_on(self):
         sys.modules['weechat'].config_options[
