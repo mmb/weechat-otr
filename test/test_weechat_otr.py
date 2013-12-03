@@ -105,6 +105,13 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             'this\r\x00 is \r\n\rnot an i\n\x00rc command')
         self.assertEqual(result, 'this is not an irc command')
 
+    def test_print_buffer_not_private(self):
+        weechat_otr.command_cb(None, None, 'start no_window_nick server')
+        self.assertPrinted('non_private_buffer',
+            'otr\t[no_window_nick] Sending OTR query... Please await ' +
+            'confirmation of the OTR session being started before sending a ' +
+            'message.')
+
     def assertPrinted(self, buf, text):
         self.assertIn(text, sys.modules['weechat'].printed[buf])
 

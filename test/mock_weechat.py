@@ -43,6 +43,9 @@ class MockWeechat(types.ModuleType):
                 'localvar_channel' : 'nick',
                 'localvar_server' : 'server',
                 },
+            'non_private_buffer' : {
+                'localvar_type' : 'non_private',
+                }
             }
 
         return buffers[buf].get(string)
@@ -106,6 +109,9 @@ class MockWeechat(types.ModuleType):
                 },
             ('server,nick',) : {
                 'irc_buffer' : 'server_nick_buffer',
+                },
+            ('server,no_window_nick',) : {
+                'irc_buffer' : 'non_private_buffer',
                 },
         }
 
