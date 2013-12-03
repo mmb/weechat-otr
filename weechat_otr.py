@@ -283,7 +283,7 @@ def msg_irc_from_plain(msg):
 def msg_plain_from_irc(msg):
     """Transform an irc message to plain-text.
     Any ACTION found will be rewritten as /me <text>."""
-    return IRC_ACTION_RE.sub(ACTION_PREFIX + '\g<text>', msg)
+    return IRC_ACTION_RE.sub(ACTION_PREFIX + r'\g<text>', msg)
 
 def default_peer_args(args, buf):
     """Get the nick and server of a remote peer from command arguments or
