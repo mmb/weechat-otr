@@ -783,7 +783,8 @@ def message_in_cb(data, modifier, modifier_data, string):
 
             context.handle_tlvs(tlvs)
         except potr.context.ErrorReceived, e:
-            context.print_buffer('Received OTR error: %s' % e.args[0].error)
+            context.print_buffer('Received OTR error: %s' % (
+                utf8_decode(e.args[0].error)))
         except potr.context.NotEncryptedError:
             context.print_buffer(
                 'Received encrypted data but no private session established.')
@@ -793,7 +794,7 @@ def message_in_cb(data, modifier, modifier_data, string):
             result = utf8_encode(build_privmsg_in(
                 parsed['from'], parsed['to'],
                 'Unencrypted message received: %s' % (
-                    err.args[0])))
+                    utf8_decode(err.args[0]))))
 
     weechat.bar_item_update(SCRIPT_NAME)
 
