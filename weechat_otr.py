@@ -519,7 +519,7 @@ Respond with: /otr smp respond <secret>""")
 
                 self.print_buffer(
                     """Peer has requested SMP verification: %s
-Respond with: /otr smp respond <answer>""" % (smp1q.msg))
+Respond with: /otr smp respond <answer>""" % (utf8_decode(smp1q.msg)))
             elif first_instance(tlvs, potr.proto.SMP2TLV):
                 if not self.in_smp:
                     debug('Reveived unexpected SMP2')
@@ -799,7 +799,8 @@ def message_in_cb(data, modifier, modifier_data, string):
 
             context.handle_tlvs(tlvs)
         except potr.context.ErrorReceived, e:
-            context.print_buffer('Received OTR error: %s' % e.args[0].error)
+            context.print_buffer('Received OTR error: %s' % (
+                utf8_decode(e.args[0].error)))
         except potr.context.NotEncryptedError:
             context.print_buffer(
                 'Received encrypted data but no private session established.')
@@ -809,7 +810,7 @@ def message_in_cb(data, modifier, modifier_data, string):
             result = utf8_encode(build_privmsg_in(
                 parsed['from'], parsed['to'],
                 'Unencrypted message received: %s' % (
-                    err.args[0])))
+                    utf8_decode(err.args[0]))))
 
     weechat.bar_item_update(SCRIPT_NAME)
 
@@ -908,7 +909,7 @@ def command_cb(data, buf, args):
     result = weechat.WEECHAT_RC_ERROR
 
     try:
-        arg_parts = shlex.split(args)
+        arg_parts = map(utf8_decode, shlex.split(args))
     except:
         debug("Command parsing error.")
         return result
@@ -979,9 +980,8 @@ def command_cb(data, buf, args):
                 nick, server = default_peer_args(arg_parts[2:4], buf)
                 secret = arg_parts[4]
 
-            # Sometimes potr chokes on funky UTF chars without this
             if secret:
-                secret = secret.encode('raw_unicode_escape')
+                secret = utf8_encode(secret)
 
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
@@ -1017,11 +1017,10 @@ def command_cb(data, buf, args):
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
 
-            # Sometimes potr chokes on funky UTF chars without this
             if secret:
-                secret = secret.encode('raw_unicode_escape')
+                secret = utf8_encode(secret)
             if question:
-                question = question.encode('raw_unicode_escape')
+                question = utf8_encode(question)
 
             try:
                 context.smpInit(secret, question)
