@@ -1111,7 +1111,7 @@ def command_cb(data, buf, args):
 
                     else:
                         context.print_buffer(
-                            'This conversation is corrently NOT being logged.')
+                            'This conversation is currently NOT being logged.')
                         result = weechat.WEECHAT_RC_OK
                 else:
                     weechat.prnt('', 'OTR LOG: Not in an OTR session')
