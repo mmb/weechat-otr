@@ -1105,11 +1105,13 @@ def command_cb(data, buf, args):
 
                 if context.is_encrypted():
                     if context.is_logged():
-                        context.print_buffer('This conversation is currently being logged.')
+                        context.print_buffer(
+                            'This conversation is currently being logged.')
                         result = weechat.WEECHAT_RC_OK
 
                     else:
-                        context.print_buffer('This conversation is corrently NOT being logged.')
+                        context.print_buffer(
+                            'This conversation is corrently NOT being logged.')
                         result = weechat.WEECHAT_RC_OK
                 else:
                     weechat.prnt('', 'OTR LOG: Not in an OTR session')
@@ -1124,14 +1126,18 @@ def command_cb(data, buf, args):
                 context = ACCOUNTS[current_user(server)].getContext(
                     irc_user(nick, server))
 
-                if arg_parts[1] == 'start' and not context.is_logged() and context.is_encrypted():
+                if arg_parts[1] == 'start' and \
+                    not context.is_logged() and \
+                    context.is_encrypted():
                     if context.previous_log_level is None:
                         context.previous_log_level = context.get_log_level()
                     context.print_buffer('From this point on, this conversation will be logged. Please keep in mind that by doing so you are potentially putting yourself and your interlocutor at risk. You can disable this by doing /otr log stop')
                     weechat.command(buf, '/mute logger set 9')
                     result = weechat.WEECHAT_RC_OK
 
-                elif arg_parts[1] == 'stop' and context.is_logged() and context.is_encrypted():
+                elif arg_parts[1] == 'stop' and \
+                    context.is_logged() and \
+                    context.is_encrypted():
                     if context.previous_log_level is None:
                         context.previous_log_level = context.get_log_level()
                     weechat.command(buf, '/mute logger set 0')
@@ -1197,7 +1203,9 @@ def command_cb(data, buf, args):
 
                 result = weechat.WEECHAT_RC_OK
 
-        elif len(arg_parts) == 4 and arg_parts[1].lower() == 'default' and arg_parts[2].lower() in POLICIES:
+        elif len(arg_parts) == 4 and \
+            arg_parts[1].lower() == 'default' and \
+            arg_parts[2].lower() in POLICIES:
             nick, server = default_peer_args([], buf)
 
             policy_var = "otr.policy.default." + arg_parts[2].lower()
