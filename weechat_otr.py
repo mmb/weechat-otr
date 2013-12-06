@@ -149,22 +149,22 @@ def command(buf, command_str):
 def privmsg(server, nick, message):
     """Send a private message to a nick."""
     for line in message.splitlines():
-        command('', '/quote -server %s PRIVMSG %s :%s' %
-            tuple(map(irc_sanitize, (server, nick, line))))
+        command('', '/quote -server %s PRIVMSG %s :%s' % (
+            irc_sanitize(server), irc_sanitize(nick), irc_sanitize(line)))
 
 def build_privmsg_in(fromm, to, msg):
     """Build inbound IRC PRIVMSG command(s)."""
     cmd = []
     for line in msg.splitlines():
-        cmd.append(':%s PRIVMSG %s :%s' %
-            tuple(map(irc_sanitize, (fromm, to, line))))
+        cmd.append(':%s PRIVMSG %s :%s' % (
+          irc_sanitize(fromm), irc_sanitize(to), irc_sanitize(line)))
     return '\r\n'.join(cmd)
 
 def build_privmsg_out(to, msg):
     """Build outbound IRC PRIVMSG command(s)."""
     cmd = []
     for line in msg.splitlines():
-        cmd.append('PRIVMSG %s :%s' % tuple(map(irc_sanitize, (to, line))))
+        cmd.append('PRIVMSG %s :%s' % (irc_sanitize(to), irc_sanitize(line)))
     return '\r\n'.join(cmd)
 
 def irc_sanitize(msg):
@@ -909,7 +909,7 @@ def command_cb(data, buf, args):
     result = weechat.WEECHAT_RC_ERROR
 
     try:
-        arg_parts = map(utf8_decode, shlex.split(args))
+        arg_parts = [ utf8_decode(arg) for arg in shlex.split(args) ]
     except:
         debug("Command parsing error.")
         return result
