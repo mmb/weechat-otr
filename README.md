@@ -21,6 +21,8 @@ or '/python load python/weechat_otr.py' in WeeChat
 
 Questions, comments and patches welcome: matthewm@boedicker.org
 
+IRC channel: #weechat-otr on Freenode.
+
 Current maintainer: koolfy@koolfy.be
 
 Feel free to open issues on Github before sending an email.
