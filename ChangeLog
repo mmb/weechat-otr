@@ -1,3 +1,30 @@
+1.3.0
+	2013-12-13
+
+	Character encoding big fixes
+
+	Update to latest version of python-potr
+
+	Add tests
+
+	Fix for channels that start with &
+
+	Fix for incoming messages with newlines in them
+
+	Preference for turning off hints
+
+	Match OTR query string anywhere in the message
+
+	Better sanitization when building PRIVMSG commands
+
+	Prefix messages printed to server buffer with nick
+
+	Warn when a message is not sent due to require_encryption policy
+
+	Support ACTIONs (/me) in OTR messages
+
+	SMP questions can now contain non-ASCII characters
+
 1.2.0
 	2013-08-13
 
