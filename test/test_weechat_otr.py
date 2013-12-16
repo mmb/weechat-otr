@@ -10,6 +10,9 @@ sys.modules['weechat'] = mock_weechat.MockWeechat()
 
 import weechat_otr
 
+import mock_account
+import mock_context
+
 class WeechatOtrTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -147,6 +150,45 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             'otr\t[no_window_nick] Sending OTR query... Please await ' +
             'confirmation of the OTR session being started before sending a ' +
             'message.')
+
+    def test_smp_ask_nick_server_question_secret(self):
+        context = self.setup_smp_context('nick@server', 'nick2@server')
+
+        weechat_otr.command_cb(
+            None, None, 'smp ask nick2 server question secret')
+
+        self.assertEqual(('secret', 'question'), context.smp_init)
+
+    def test_smp_ask_nick_server_secret(self):
+        context = self.setup_smp_context('nick@server', 'nick2@server')
+
+        weechat_otr.command_cb(
+            None, None, 'smp ask nick2 server secret')
+
+        self.assertEqual(('secret', None), context.smp_init)
+
+    def test_smp_ask_question_secret(self):
+        context = self.setup_smp_context('nick@server', 'nick2@server')
+
+        weechat_otr.command_cb(
+            None, 'server_nick2_buffer', 'smp ask question secret')
+
+        self.assertEqual(('secret', 'question'), context.smp_init)
+
+    def test_smp_ask_secret(self):
+        context = self.setup_smp_context('nick@server', 'nick2@server')
+
+        weechat_otr.command_cb(None, 'server_nick2_buffer', 'smp ask secret')
+
+        self.assertEqual(('secret', None), context.smp_init)
+
+    def setup_smp_context(self, account_name, context_name):
+        context = mock_context.MockContext()
+        account = mock_account.MockAccount()
+        account.add_context('nick2@server', context)
+        weechat_otr.ACCOUNTS['nick@server'] = account
+
+        return context
 
     def assertPrinted(self, buf, text):
         self.assertIn(text, sys.modules['weechat'].printed[buf])

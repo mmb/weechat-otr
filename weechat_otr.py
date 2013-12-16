@@ -1051,7 +1051,7 @@ def command_cb(data, buf, args):
             # Check whether it's a simple challenge or a question/answer request
             elif len(arg_parts) == 5:
                 nick, server = default_peer_args(arg_parts[2:4], buf)
-                question = arg_parts[4]
+                secret = arg_parts[4]
             elif len(arg_parts) == 6:
                 nick, server = default_peer_args(arg_parts[2:4], buf)
                 secret = arg_parts[5]

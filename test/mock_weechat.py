@@ -43,6 +43,11 @@ class MockWeechat(types.ModuleType):
                 'localvar_channel' : 'nick',
                 'localvar_server' : 'server',
                 },
+            'server_nick2_buffer': {
+                'localvar_type' : 'private',
+                'localvar_channel' : 'nick2',
+                'localvar_server' : 'server',
+                },
             'non_private_buffer' : {
                 'localvar_type' : 'non_private',
                 }
