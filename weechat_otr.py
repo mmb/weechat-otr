@@ -338,7 +338,7 @@ class AccountDict(collections.defaultdict):
 
         return self[key]
 
-class Assembler:
+class Assembler(object):
     """Reassemble fragmented OTR messages.
 
     This does not deal with OTR fragmentation, which is handled by potr, but
