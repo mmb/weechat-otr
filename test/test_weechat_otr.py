@@ -196,8 +196,8 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
     def setup_smp_context(self, account_name, context_name):
         context = mock_context.MockContext()
         account = mock_account.MockAccount()
-        account.add_context('nick2@server', context)
-        weechat_otr.ACCOUNTS['nick@server'] = account
+        account.add_context(context_name, context)
+        weechat_otr.ACCOUNTS[account_name] = account
 
         return context
 
