@@ -182,6 +182,17 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
         self.assertEqual(('secret', None), context.smp_init)
 
+    def test_smp_ask_nick_server_question_secret_multiple_words(self):
+        context = self.setup_smp_context('nick@server', 'nick2@server')
+
+        weechat_otr.command_cb(
+            None, None, "smp ask nick2 server 'what is the secret?' "
+            "'eastmost penninsula is the secret'")
+
+        self.assertEqual(
+            ('eastmost penninsula is the secret', 'what is the secret?'),
+            context.smp_init)
+
     def setup_smp_context(self, account_name, context_name):
         context = mock_context.MockContext()
         account = mock_account.MockAccount()

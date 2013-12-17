@@ -564,7 +564,7 @@ Respond with: /otr smp respond <answer>""".format(
                         if not self.is_verified:
                             self.print_buffer(
                             """You may want to authenticate your peer by asking your own question:
-/otr smp ask <question> <secret>""")
+/otr smp ask <'question'> 'secret'""")
 
                     else:
                         self.smp_finish('SMP verification succeeded.')
@@ -582,10 +582,10 @@ Respond with: /otr smp respond <answer>""".format(
   then use the command: /otr trust {peer_nick} {peer_server}
 
 2) SMP pre-shared secret that you both know:
-  /otr smp ask {peer_nick} {peer_server} <secret>
+  /otr smp ask {peer_nick} {peer_server} 'secret'
 
 3) SMP pre-shared secret that you both know with a question:
-  /otr smp ask {peer_nick} {peer_server} <question> <secret>
+  /otr smp ask {peer_nick} {peer_server} <'question'> 'secret'
 
 Note: You can safely omit specifying the peer and server when
       executing these commands from the appropriate conversation
