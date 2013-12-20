@@ -632,7 +632,8 @@ Note: You can safely omit specifying the peer and server when
         return buf.getvalue()
 
     def format_default_policies(self):
-        """Return current default policies formatted as a string for the user."""
+        """Return current default policies formatted as a string for the
+        user."""
         buf = cStringIO.StringIO()
 
         buf.write('Current default OTR policies:\n')
@@ -1008,11 +1009,14 @@ def command_cb(data, buf, args):
                 context.print_buffer("Your peer's fingerprint is: {}".format(
                     potr.human_hash(context.crypto.theirPubkey.cfingerprint())))
                 if context.is_verified():
-                    context.print_buffer("The peer's identity has been verified.")
+                    context.print_buffer(
+                        "The peer's identity has been verified.")
                 else:
-                    context.print_buffer("You have not verified the peer's identity yet.")
+                    context.print_buffer(
+                        "You have not verified the peer's identity yet.")
             else:
-                context.print_buffer("This current conversation is not encrypted.")
+                context.print_buffer(
+                    "This current conversation is not encrypted.")
 
             result = weechat.WEECHAT_RC_OK
 
