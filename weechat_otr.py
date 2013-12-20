@@ -155,13 +155,18 @@ def privmsg(server, nick, message):
             line   = irc_sanitize(line)))
 
 def build_privmsg_in(fromm, to, msg):
-    """Build inbound IRC PRIVMSG command(s)."""
+    """Build inbound IRC PRIVMSG command."""
+    return ':{user} PRIVMSG {to} :{msg}'.format(
+        user = irc_sanitize(fromm),
+        to   = irc_sanitize(to),
+        msg  = irc_sanitize(msg))
+
+def build_privmsgs_in(fromm, to, msg, prefix=''):
+    """Build an inbound IRC PRIVMSG command for each line in msg.
+    If prefix is supplied, prefix each line of msg with it."""
     cmd = []
     for line in msg.splitlines():
-        cmd.append(':{user} PRIVMSG {to} :{line}'.format(
-            user = irc_sanitize(fromm),
-            to   = irc_sanitize(to),
-            line = irc_sanitize(line)))
+        cmd.append(build_privmsg_in(fromm, to, prefix+line))
     return '\r\n'.join(cmd)
 
 def build_privmsg_out(to, msg):
@@ -824,7 +829,7 @@ def message_in_cb(data, modifier, modifier_data, string):
 
             if msg:
                 msg = msg_irc_from_plain(msg)
-                result = utf8_encode(build_privmsg_in(
+                result = utf8_encode(build_privmsgs_in(
                     parsed['from'], parsed['to'], utf8_decode(msg)))
 
             context.handle_tlvs(tlvs)
@@ -837,10 +842,9 @@ def message_in_cb(data, modifier, modifier_data, string):
         except potr.context.NotOTRMessage:
             result = string
         except potr.context.UnencryptedMessage, err:
-            result = utf8_encode(build_privmsg_in(
-                parsed['from'], parsed['to'],
-                'Unencrypted message received: {}'.format(
-                    utf8_decode(err.args[0]))))
+            result = utf8_encode(build_privmsgs_in(
+                parsed['from'], parsed['to'], utf8_decode(err.args[0]),
+                'Unencrypted message received: '))
 
     weechat.bar_item_update(SCRIPT_NAME)
 
