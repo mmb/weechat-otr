@@ -33,6 +33,7 @@ import os
 import re
 import traceback
 import shlex
+import subprocess
 
 import weechat
 
@@ -72,6 +73,15 @@ To end your private conversation: /otr finish
 SCRIPT_AUTHOR = 'Matthew M. Boedicker'
 SCRIPT_LICENCE = 'GPL3'
 SCRIPT_VERSION = '1.3.0'
+
+SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
+if os.path.isdir('{}/.git'.format(SCRIPT_PATH)):
+    try:
+        os.chdir(SCRIPT_PATH)
+        SCRIPT_VERSION = subprocess.check_output(
+                ['git', 'describe','--dirty']).lstrip('v').rstrip()
+    except subprocess.CalledProcessError:
+        pass
 
 OTR_DIR_NAME = 'otr'
 
