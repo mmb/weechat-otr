@@ -5,13 +5,13 @@
 import sys
 import unittest
 
-import mock_weechat
-sys.modules['weechat'] = mock_weechat.MockWeechat()
+import weechat_otr_test.mock_weechat
+sys.modules['weechat'] = weechat_otr_test.mock_weechat.MockWeechat()
 
 import weechat_otr
 
-import mock_account
-import mock_context
+import weechat_otr_test.mock_account
+import weechat_otr_test.mock_context
 
 class WeechatOtrTestCase(unittest.TestCase):
 
@@ -231,8 +231,8 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             context.smp_init)
 
     def setup_smp_context(self, account_name, context_name):
-        context = mock_context.MockContext()
-        account = mock_account.MockAccount()
+        context = weechat_otr_test.mock_context.MockContext()
+        account = weechat_otr_test.mock_account.MockAccount()
         account.add_context(context_name, context)
         weechat_otr.ACCOUNTS[account_name] = account
 
