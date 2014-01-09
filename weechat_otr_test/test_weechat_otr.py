@@ -263,3 +263,18 @@ class AssemblerTestCase(WeechatOtrTestCase):
         self.assembler.add('encryption? ?OTRv2?')
 
         self.assertTrue(self.assembler.is_query())
+
+class HtmlEscapePolicyTestCase(WeechatOtrTestCase):
+
+    def test_default_html_escape_policy(self):
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            ":nick!user@host PRIVMSG friend :< > &")
+        self.assertEqual(result, 'PRIVMSG friend :< > &')
+
+    def test_html_escape_policy(self):
+        sys.modules['weechat'].config_options[
+            'otr.policy.server.nick.friend.html_escape'] = 'on'
+
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG friend :< > &')
+        self.assertEqual(result, 'PRIVMSG friend :&lt; &gt; &amp;')

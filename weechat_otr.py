@@ -26,6 +26,7 @@
 
 from __future__ import unicode_literals
 
+import cgi
 import collections
 import cStringIO
 import os
@@ -81,6 +82,7 @@ POLICIES = {
     'require_encryption' : 'refuse to send unencrypted messages',
     'log' : 'enable logging of OTR conversations',
     'send_tag' : 'advertise your OTR capability using the whitespace tag',
+    'html_escape' : 'escape HTML special characters in outbound messages',
     }
 
 READ_ONLY_POLICIES = {
@@ -896,6 +898,9 @@ def message_out_cb(data, modifier, modifier_data, string):
 
             parsed['text'] = msg_plain_from_irc(parsed['text'])
 
+            if context.getPolicy('html_escape'):
+                parsed['text'] = cgi.escape(parsed['text'])
+
             if not context.is_encrypted() and not is_query and \
                     context.getPolicy('require_encryption'):
                 context.print_buffer(
@@ -1485,6 +1490,7 @@ def init_config():
          'off'),
         ('default.log', 'default enable logging to disk', 'off'),
         ('default.send_tag', 'default send tag policy', 'off'),
+        ('default.html_escape', 'default HTML escape policy', 'off'),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['policy'], option, 'boolean', desc, '',
