@@ -731,6 +731,25 @@ Note: You can safely omit specifying the peer and server when
 
         del self.previous_log_level
 
+    def msg_convert_in(self, msg):
+        """Transform incoming OTR message to IRC format.
+        This includes stripping html, converting plain-text ACTIONs
+        and character encoding conversion."""
+        msg = utf8_decode(msg)
+
+        return msg_irc_from_plain(msg)
+
+    def msg_convert_out(self, msg):
+        """Convert an outgoing IRC message to be sent over OTR.
+        This includes escaping html, converting ACTIONs to plain-text
+        and character encoding conversion."""
+        msg = msg_plain_from_irc(msg)
+
+        if self.getPolicy('html_escape'):
+            msg = cgi.escape(msg)
+
+        return utf8_encode(msg)
+
 class IrcOtrAccount(potr.context.Account):
     """Account class for OTR over IRC."""
 
@@ -831,9 +850,9 @@ def message_in_cb(data, modifier, modifier_data, string):
             debug(('receive', msg, tlvs))
 
             if msg:
-                msg = msg_irc_from_plain(msg)
                 result = utf8_encode(build_privmsgs_in(
-                    parsed['from'], parsed['to'], utf8_decode(msg)))
+                    parsed['from'], parsed['to'],
+                    context.msg_convert_in(msg)))
 
             context.handle_tlvs(tlvs)
         except potr.context.ErrorReceived, e:
@@ -896,11 +915,6 @@ def message_out_cb(data, modifier, modifier_data, string):
             debug(('context send message', parsed['text'], parsed['to_nick'],
                    server))
 
-            parsed['text'] = msg_plain_from_irc(parsed['text'])
-
-            if context.getPolicy('html_escape'):
-                parsed['text'] = cgi.escape(parsed['text'])
-
             if not context.is_encrypted() and not is_query and \
                     context.getPolicy('require_encryption'):
                 context.print_buffer(
@@ -914,7 +928,7 @@ def message_out_cb(data, modifier, modifier_data, string):
             try:
                 ret = context.sendMessage(
                     potr.context.FRAGMENT_SEND_ALL,
-                    utf8_encode(parsed['text']))
+                    context.msg_convert_out(parsed['text']))
 
                 if ret:
                     debug(('sendMessage returned', ret))
