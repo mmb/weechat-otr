@@ -85,6 +85,7 @@ POLICIES = {
     'log' : 'enable logging of OTR conversations',
     'send_tag' : 'advertise your OTR capability using the whitespace tag',
     'html_escape' : 'escape HTML special characters in outbound messages',
+    'html_filter' : 'filter HTML in incoming messages',
     }
 
 READ_ONLY_POLICIES = {
@@ -739,10 +740,11 @@ Note: You can safely omit specifying the peer and server when
         and character encoding conversion."""
         msg = utf8_decode(msg)
 
-        try:
-            msg = IrcHTMLParser.parse(msg)
-        except HTMLParser.HTMLParseError:
-            pass
+        if self.getPolicy('html_filter'):
+            try:
+                msg = IrcHTMLParser.parse(msg)
+            except HTMLParser.HTMLParseError:
+                pass
 
         return msg_irc_from_plain(msg)
 
@@ -1572,6 +1574,7 @@ def init_config():
         ('default.log', 'default enable logging to disk', 'off'),
         ('default.send_tag', 'default send tag policy', 'off'),
         ('default.html_escape', 'default HTML escape policy', 'off'),
+        ('default.html_filter', 'default HTML filter policy', 'on'),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['policy'], option, 'boolean', desc, '',
