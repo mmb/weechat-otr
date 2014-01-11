@@ -33,6 +33,8 @@ import os
 import re
 import traceback
 import shlex
+import HTMLParser
+from htmlentitydefs import name2codepoint
 
 import weechat
 
@@ -737,6 +739,11 @@ Note: You can safely omit specifying the peer and server when
         and character encoding conversion."""
         msg = utf8_decode(msg)
 
+        try:
+            msg = IrcHTMLParser.parse(msg)
+        except HTMLParser.HTMLParseError:
+            pass
+
         return msg_irc_from_plain(msg)
 
     def msg_convert_out(self, msg):
@@ -820,6 +827,66 @@ class IrcOtrAccount(potr.context.Account):
         for context in self.ctxs.itervalues():
             if context.is_encrypted():
                 context.disconnect()
+
+class IrcHTMLParser(HTMLParser.HTMLParser):
+    """A simple HTML parser that throws away anything but newlines and links"""
+
+    @staticmethod
+    def parse(data):
+        """Create a temporary IrcHTMLParser and parse a single string"""
+        parser = IrcHTMLParser()
+        parser.feed(data)
+        parser.close()
+        return parser.result
+
+    def reset(self):
+        """Forget all state, called from __init__"""
+        HTMLParser.HTMLParser.reset(self)
+        self.result     = ''
+        self.linktarget = ''
+        self.linkstart  = 0
+
+    def handle_starttag(self, tag, attrs):
+        """Called when a start tag is encountered"""
+        if tag == 'br':
+            self.result += '\n'
+        elif tag == 'a':
+            attrs = dict(attrs)
+            if 'href' in attrs:
+                self.result += '['
+                self.linktarget = attrs['href']
+                self.linkstart  = len(self.result)
+
+    def handle_endtag(self, tag):
+        """Called when an end tag is encountered"""
+        if tag == 'a':
+            if self.linktarget:
+                if self.result[self.linkstart:] == self.linktarget:
+                    self.result += ']'
+                else:
+                    self.result += ']({})'.format(self.linktarget)
+                self.linktarget = ''
+
+    def handle_data(self, data):
+        """Called for character data (i.e. text)"""
+        self.result += data
+
+    def handle_entityref(self, name):
+        """Called for entity references, such as &amp;"""
+        try:
+            self.result += unichr(name2codepoint[name])
+        except KeyError:
+            self.result += '&{};'.format(name)
+
+    def handle_charref(self, name):
+        """Called for character references, such as &#39;"""
+        try:
+            if name.startswith('x'):
+                self.result += unichr(int(name[1:], 16))
+            else:
+                self.result += unichr(int(name))
+        except ValueError:
+            self.result += '&#{};'.format(name)
 
 def message_in_cb(data, modifier, modifier_data, string):
     """Incoming message callback"""
