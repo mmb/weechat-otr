@@ -28,7 +28,7 @@ from __future__ import unicode_literals
 
 import cgi
 import collections
-import cStringIO
+import io
 import os
 import re
 import traceback
@@ -639,7 +639,7 @@ Note: You can safely omit specifying the peer and server when
     def format_policies(self):
         """Return current policies for this context formatted as a string for
         the user."""
-        buf = cStringIO.StringIO()
+        buf = io.StringIO()
 
         buf.write('Current OTR policies for {peer}:\n'.format(
             peer = self.peer))
@@ -657,7 +657,7 @@ Note: You can safely omit specifying the peer and server when
     def format_default_policies(self):
         """Return current default policies formatted as a string for the
         user."""
-        buf = cStringIO.StringIO()
+        buf = io.StringIO()
 
         buf.write('Current default OTR policies:\n')
 
