@@ -33,8 +33,16 @@ import os
 import re
 import traceback
 import shlex
-import HTMLParser
-from htmlentitydefs import name2codepoint
+
+try:
+    import html.parser as htmlparser # python 3
+except ImportError:
+    import HTMLParser as htmlparser # python 2
+
+try:
+    from html.entities import name2codepoint # python 3
+except ImportError:
+    from htmlentitydefs import name2codepoint # python 2
 
 import weechat
 
@@ -761,7 +769,7 @@ Note: You can safely omit specifying the peer and server when
         if self.getPolicy('html_filter'):
             try:
                 msg = IrcHTMLParser.parse(msg)
-            except HTMLParser.HTMLParseError:
+            except htmlparser.HTMLParseError:
                 pass
 
         return msg_irc_from_plain(msg)
@@ -848,7 +856,7 @@ class IrcOtrAccount(potr.context.Account):
             if context.is_encrypted():
                 context.disconnect()
 
-class IrcHTMLParser(HTMLParser.HTMLParser):
+class IrcHTMLParser(htmlparser.HTMLParser):
     """A simple HTML parser that throws away anything but newlines and links"""
 
     @staticmethod
@@ -861,7 +869,7 @@ class IrcHTMLParser(HTMLParser.HTMLParser):
 
     def reset(self):
         """Forget all state, called from __init__"""
-        HTMLParser.HTMLParser.reset(self)
+        htmlparser.HTMLParser.reset(self)
         self.result     = ''
         self.linktarget = ''
         self.linkstart  = 0
