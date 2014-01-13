@@ -1053,7 +1053,7 @@ def command_cb(data, buf, args):
     result = weechat.WEECHAT_RC_ERROR
 
     try:
-        arg_parts = [ utf8_decode(arg) for arg in shlex.split(args) ]
+        arg_parts = shlex.split(utf8_decode(args))
     except:
         debug("Command parsing error.")
         return result

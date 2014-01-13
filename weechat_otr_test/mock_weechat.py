@@ -36,22 +36,22 @@ class MockWeechat(types.ModuleType):
     def buffer_get_string(self, buf, string):
         buffers = {
             None : {
-                'localvar_type' : 'private',
-                'localvar_channel' : 'nick',
-                'localvar_server' : 'server',
+                b'localvar_type' : b'private',
+                b'localvar_channel' : b'nick',
+                b'localvar_server' : b'server',
                 },
-            'server_nick_buffer' : {
-                'localvar_type' : 'private',
-                'localvar_channel' : 'nick',
-                'localvar_server' : 'server',
+            b'server_nick_buffer' : {
+                b'localvar_type' : b'private',
+                b'localvar_channel' : b'nick',
+                b'localvar_server' : b'server',
                 },
-            'server_nick2_buffer': {
-                'localvar_type' : 'private',
-                'localvar_channel' : 'nick2',
-                'localvar_server' : 'server',
+            b'server_nick2_buffer': {
+                b'localvar_type' : b'private',
+                b'localvar_channel' : b'nick2',
+                b'localvar_server' : b'server',
                 },
-            'non_private_buffer' : {
-                'localvar_type' : 'non_private',
+            b'non_private_buffer' : {
+                b'localvar_type' : b'non_private',
                 }
             }
 
@@ -61,13 +61,13 @@ class MockWeechat(types.ModuleType):
         pass
 
     def config_boolean(self, s):
-        if s == 'on':
+        if s == b'on':
             return 1
         else:
             return 0
 
     def config_get(self, key):
-        return self.config_options.get(key, '')
+        return self.config_options.get(key, b'')
 
     def config_new(*args):
         pass
@@ -108,17 +108,17 @@ class MockWeechat(types.ModuleType):
 
     def info_get(self, name, *args):
         infos = {
-            ('',) : {
-                'weechat_dir': '/tmp/weechat',
+            (b'',) : {
+                b'weechat_dir': b'/tmp/weechat',
                 },
-            ('server',) : {
-                'irc_nick': 'nick',
+            (b'server',) : {
+                b'irc_nick': b'nick',
                 },
-            ('server,nick',) : {
-                'irc_buffer' : 'server_nick_buffer',
+            (b'server,nick',) : {
+                b'irc_buffer' : b'server_nick_buffer',
                 },
-            ('server,no_window_nick',) : {
-                'irc_buffer' : 'non_private_buffer',
+            (b'server,no_window_nick',) : {
+                b'irc_buffer' : b'non_private_buffer',
                 },
         }
 

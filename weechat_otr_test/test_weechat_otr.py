@@ -194,42 +194,42 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
         weechat_otr.command_cb(
-            None, None, 'smp ask nick2 server question secret')
+            None, None, b'smp ask nick2 server question secret')
 
-        self.assertEqual(('secret', 'question'), context.smp_init)
+        self.assertEqual((b'secret', b'question'), context.smp_init)
 
     def test_smp_ask_nick_server_secret(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
         weechat_otr.command_cb(
-            None, None, 'smp ask nick2 server secret')
+            None, None, b'smp ask nick2 server secret')
 
-        self.assertEqual(('secret', None), context.smp_init)
+        self.assertEqual((b'secret', None), context.smp_init)
 
     def test_smp_ask_question_secret(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
         weechat_otr.command_cb(
-            None, 'server_nick2_buffer', 'smp ask question secret')
+            None, b'server_nick2_buffer', b'smp ask question secret')
 
-        self.assertEqual(('secret', 'question'), context.smp_init)
+        self.assertEqual((b'secret', b'question'), context.smp_init)
 
     def test_smp_ask_secret(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
-        weechat_otr.command_cb(None, 'server_nick2_buffer', 'smp ask secret')
+        weechat_otr.command_cb(None, b'server_nick2_buffer', b'smp ask secret')
 
-        self.assertEqual(('secret', None), context.smp_init)
+        self.assertEqual((b'secret', None), context.smp_init)
 
     def test_smp_ask_nick_server_question_secret_multiple_words(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
         weechat_otr.command_cb(
-            None, None, "smp ask nick2 server 'what is the secret?' "
-            "'eastmost penninsula is the secret'")
+            None, None, b"smp ask nick2 server 'what is the secret?' "
+            b"'eastmost penninsula is the secret'")
 
         self.assertEqual(
-            ('eastmost penninsula is the secret', 'what is the secret?'),
+            (b'eastmost penninsula is the secret', b'what is the secret?'),
             context.smp_init)
 
     def setup_smp_context(self, account_name, context_name):
