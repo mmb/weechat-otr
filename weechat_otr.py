@@ -942,15 +942,15 @@ def message_in_cb(data, modifier, modifier_data, string):
                     context.msg_convert_in(msg)))
 
             context.handle_tlvs(tlvs)
-        except potr.context.ErrorReceived, e:
+        except potr.context.ErrorReceived as err:
             context.print_buffer('Received OTR error: {}'.format(
-                utf8_decode(e.args[0].error)))
+                utf8_decode(err.args[0].error)))
         except potr.context.NotEncryptedError:
             context.print_buffer(
                 'Received encrypted data but no private session established.')
         except potr.context.NotOTRMessage:
             result = string
-        except potr.context.UnencryptedMessage, err:
+        except potr.context.UnencryptedMessage as err:
             result = utf8_encode(build_privmsgs_in(
                 parsed['from'], parsed['to'], utf8_decode(err.args[0]),
                 'Unencrypted message received: '))
@@ -1024,7 +1024,7 @@ def message_out_cb(data, modifier, modifier_data, string):
                             parsed['to_nick'], utf8_decode(ret)
                             ))
 
-            except potr.context.NotEncryptedError, err:
+            except potr.context.NotEncryptedError as err:
                 if err.args[0] == potr.context.EXC_FINISHED:
                     context.print_buffer(
                         """Your message was not sent. End your private conversation:\n/otr finish""")
