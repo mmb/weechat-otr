@@ -4,6 +4,8 @@
 # pylint: disable=too-many-public-methods
 # pylint: disable=unused-argument
 
+from __future__ import unicode_literals
+
 import copy
 import types
 

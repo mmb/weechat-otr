@@ -2,6 +2,8 @@
 # pylint: disable=missing-docstring
 # pylint: disable=too-many-public-methods
 
+from __future__ import unicode_literals
+
 import sys
 import unittest
 
@@ -41,9 +43,9 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             'otr.policy.server.nick.friend.send_tag'] = 'on'
 
         result = weechat_otr.message_out_cb(None, None, 'server',
-            ":nick!user@host PRIVMSG friend :\xc3")
+            b":nick!user@host PRIVMSG friend :\xc3")
         self.assertEqual(result,
-            "PRIVMSG friend :\xef\xbf\xbd \t  \t\t\t\t \t \t \t    \t\t  \t \t")
+            b"PRIVMSG friend :\xef\xbf\xbd \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
     def test_parse_irc_privmsg_channel_ampersand(self):
         result = weechat_otr.parse_irc_privmsg(
