@@ -303,7 +303,8 @@ def buffer_is_private(buf):
 
 def info_get(info_name, arguments):
     """Wrap weechat.info_get() with utf-8 encode/decode."""
-    return utf8_decode(weechat.info_get(info_name, utf8_encode(arguments)))
+    return utf8_decode(weechat.info_get(
+        utf8_encode(info_name), utf8_encode(arguments)))
 
 def msg_irc_from_plain(msg):
     """Transform a plain-text message to irc format.
