@@ -33,7 +33,6 @@ import os
 import re
 import traceback
 import shlex
-import subprocess
 
 import weechat
 
@@ -74,14 +73,23 @@ SCRIPT_AUTHOR = 'Matthew M. Boedicker'
 SCRIPT_LICENCE = 'GPL3'
 SCRIPT_VERSION = '1.3.0'
 
-SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
-if os.path.isdir('{}/.git'.format(SCRIPT_PATH)):
-    try:
-        os.chdir(SCRIPT_PATH)
-        SCRIPT_VERSION = subprocess.check_output(
-                ['git', 'describe','--dirty']).lstrip('v').rstrip()
-    except subprocess.CalledProcessError:
-        pass
+def git_info():
+    """If this script is part of a git repository return the repo state."""
+    result = None
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    git_dir = os.path.join(script_dir, '.git')
+    if os.path.isdir(git_dir):
+        import subprocess
+        try:
+            result = subprocess.check_output(
+                ['git', '--git-dir', git_dir, 'describe', '--dirty']
+                ).lstrip('v').rstrip()
+        except (OSError, subprocess.CalledProcessError):
+            pass
+
+    return result
+
+SCRIPT_VERSION = git_info() or SCRIPT_VERSION
 
 OTR_DIR_NAME = 'otr'
 
