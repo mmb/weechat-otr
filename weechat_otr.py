@@ -1619,7 +1619,7 @@ def create_dir():
     """Create the OTR subdirectory in the WeeChat config directory if it does
     not exist."""
     if not os.path.exists(OTR_DIR):
-        weechat.mkdir_home(OTR_DIR_NAME, 0700)
+        weechat.mkdir_home(OTR_DIR_NAME, 0o700)
 
 if weechat.register(
     SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, SCRIPT_DESC,
