@@ -278,3 +278,53 @@ class HtmlEscapePolicyTestCase(WeechatOtrTestCase):
         result = weechat_otr.message_out_cb(None, None, 'server',
             ':nick!user@host PRIVMSG friend :< > &')
         self.assertEqual(result, 'PRIVMSG friend :&lt; &gt; &amp;')
+
+class IrcHTMLParserTestCase(WeechatOtrTestCase):
+
+    def afterSetUp(self):
+        self.parser = weechat_otr.IrcHTMLParser()
+
+    def test_tag_a(self):
+        self.check_parse_result(
+            'this is a <a href="http://weechat.org">link</a>',
+            'this is a [link](http://weechat.org)'
+            )
+
+    def test_tag_a_same(self):
+        self.check_parse_result(
+            '<a href="http://weechat.org">http://weechat.org</a>',
+            '[http://weechat.org]'
+            )
+
+    def test_tag_br(self):
+        self.check_parse_result(
+            'foo<br>bar<br/>baz',
+            'foo\nbar\nbaz'
+            )
+
+    def test_tag_unknown(self):
+        self.check_parse_result(
+            '<font style="awesome"><blink>none of ' \
+            '<marquee behavior="alternate">this</marquee></blink> ' \
+            'matters</font>',
+            'none of this matters'
+            )
+
+    def test_entity_named(self):
+        self.check_parse_result(
+            'tom &amp; jerry',
+            'tom & jerry'
+            )
+
+    def test_entity_numeric(self):
+        self.check_parse_result(
+            '&#60;html&#x003E;',
+            '<html>'
+            )
+
+    def check_parse_result(self, html, result):
+        self.parser.feed(html)
+        self.parser.close()
+
+        self.assertEqual(self.parser.result, result)
+        self.assertEqual(self.parser.result, weechat_otr.IrcHTMLParser.parse(html))
