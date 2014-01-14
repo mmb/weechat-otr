@@ -295,7 +295,13 @@ def config_string(option):
 
 def buffer_get_string(buf, prop):
     """Wrap weechat.buffer_get_string() with utf-8 encode/decode."""
-    return utf8_decode(weechat.buffer_get_string(buf, utf8_encode(prop)))
+    if buf is not None:
+        encoded_buf = utf8_encode(buf)
+    else:
+        encoded_buf = None
+
+    return utf8_decode(weechat.buffer_get_string(
+        encoded_buf, utf8_encode(prop)))
 
 def buffer_is_private(buf):
     """Return True if a buffer is private."""
@@ -976,8 +982,11 @@ def message_out_cb(data, modifier, modifier_data, string):
         context = ACCOUNTS[local_user].getContext(to_user)
         is_query = OTR_QUERY_RE.search(parsed['text'])
 
-        if parsed['text'].startswith(potr.proto.OTRTAG) and \
-                not is_query:
+        is_otr_message = \
+            utf8_encode(parsed['text'])[:len(potr.proto.OTRTAG)] == \
+            potr.proto.OTRTAG
+
+        if is_otr_message and not is_query:
             if not has_otr_end(parsed['text']):
                 debug('in OTR message')
                 context.in_otr_message = True

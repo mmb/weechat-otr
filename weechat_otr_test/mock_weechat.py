@@ -61,13 +61,13 @@ class MockWeechat(types.ModuleType):
         pass
 
     def config_boolean(self, s):
-        if s == b'on':
+        if s == 'on':
             return 1
         else:
             return 0
 
     def config_get(self, key):
-        return self.config_options.get(key, b'')
+        return self.config_options.get(key, '')
 
     def config_new(*args):
         pass
