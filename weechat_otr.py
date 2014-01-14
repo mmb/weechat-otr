@@ -26,7 +26,6 @@
 
 from __future__ import unicode_literals
 
-import cgi
 import collections
 import io
 import os
@@ -40,9 +39,13 @@ if sys.version_info.major >= 3:
     from html.entities import name2codepoint
     unicode = str
     unichr = chr
+    import html
+    html_escape = html.escape
 else:
     import HTMLParser as htmlparser
     from htmlentitydefs import name2codepoint
+    import cgi
+    html_escape = cgi.escape
 
 import weechat
 
@@ -770,7 +773,7 @@ Note: You can safely omit specifying the peer and server when
         msg = msg_plain_from_irc(msg)
 
         if self.getPolicy('html_escape'):
-            msg = cgi.escape(msg)
+            msg = html_escape(msg)
 
         return utf8_encode(msg)
 
