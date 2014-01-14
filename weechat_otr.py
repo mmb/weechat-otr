@@ -33,16 +33,14 @@ import os
 import re
 import traceback
 import shlex
+import sys
 
-try:
-    import html.parser as htmlparser # python 3
-except ImportError:
-    import HTMLParser as htmlparser # python 2
-
-try:
-    from html.entities import name2codepoint # python 3
-except ImportError:
-    from htmlentitydefs import name2codepoint # python 2
+if sys.version_info.major >= 3:
+    import html.parser as htmlparser
+    from html.entities import name2codepoint
+else:
+    import HTMLParser as htmlparser
+    from htmlentitydefs import name2codepoint
 
 import weechat
 
