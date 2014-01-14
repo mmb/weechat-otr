@@ -40,7 +40,7 @@ if sys.version_info.major >= 3:
     unicode = str
     unichr = chr
     import html
-    html_escape = html.escape
+    html_escape = lambda x: html.escape(x, False)
 else:
     import HTMLParser as htmlparser
     from htmlentitydefs import name2codepoint
