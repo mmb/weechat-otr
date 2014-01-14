@@ -38,6 +38,8 @@ import sys
 if sys.version_info.major >= 3:
     import html.parser as htmlparser
     from html.entities import name2codepoint
+    unicode = str
+    unichr = chr
 else:
     import HTMLParser as htmlparser
     from htmlentitydefs import name2codepoint
