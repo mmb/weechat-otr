@@ -1,3 +1,6 @@
+# pylint: disable=missing-docstring
+# pylint: disable=too-many-public-methods
+
 from __future__ import unicode_literals
 
 import sys

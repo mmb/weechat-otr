@@ -1,3 +1,6 @@
+# pylint: disable=missing-docstring
+# pylint: disable=too-many-public-methods
+
 from __future__ import unicode_literals
 
 from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
@@ -7,6 +10,7 @@ import weechat_otr
 class IrcHTMLParserTestCase(WeechatOtrTestCase):
 
     def after_setup(self):
+        # pylint: disable=attribute-defined-outside-init
         self.parser = weechat_otr.IrcHTMLParser()
 
     def test_tag_a(self):
@@ -52,4 +56,5 @@ class IrcHTMLParserTestCase(WeechatOtrTestCase):
         self.parser.close()
 
         self.assertEqual(self.parser.result, result)
-        self.assertEqual(self.parser.result, weechat_otr.IrcHTMLParser.parse(html))
+        self.assertEqual(
+            self.parser.result, weechat_otr.IrcHTMLParser.parse(html))
