@@ -5,31 +5,13 @@
 from __future__ import unicode_literals
 
 import sys
-import unittest
 
-import weechat_otr_test.mock_weechat
-sys.modules['weechat'] = weechat_otr_test.mock_weechat.MockWeechat()
+from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
 
 import weechat_otr
 
 import weechat_otr_test.mock_account
 import weechat_otr_test.mock_context
-
-class WeechatOtrTestCase(unittest.TestCase):
-
-    def setUp(self):
-        sys.modules['weechat'].save()
-        self.afterSetUp()
-
-    def tearDown(self):
-        sys.modules['weechat'].restore()
-        self.afterTearDown()
-
-    def afterSetUp(self):
-        pass
-
-    def afterTearDown(self):
-        pass
 
 class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
