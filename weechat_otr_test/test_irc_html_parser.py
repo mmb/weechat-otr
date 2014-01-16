@@ -6,7 +6,7 @@ import weechat_otr
 
 class IrcHTMLParserTestCase(WeechatOtrTestCase):
 
-    def afterSetUp(self):
+    def after_setup(self):
         self.parser = weechat_otr.IrcHTMLParser()
 
     def test_tag_a(self):

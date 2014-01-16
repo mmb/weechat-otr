@@ -10,14 +10,14 @@ class WeechatOtrTestCase(unittest.TestCase):
 
     def setUp(self):
         sys.modules['weechat'].save()
-        self.afterSetUp()
+        self.after_setup()
 
     def tearDown(self):
         sys.modules['weechat'].restore()
-        self.afterTearDown()
+        self.after_teardown()
 
-    def afterSetUp(self):
+    def after_setup(self):
         pass
 
-    def afterTearDown(self):
+    def after_teardown(self):
         pass

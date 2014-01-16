@@ -6,7 +6,7 @@ import weechat_otr
 
 class AssemblerTestCase(WeechatOtrTestCase):
 
-    def afterSetUp(self):
+    def after_setup(self):
         self.assembler = weechat_otr.Assembler()
 
     def test_is_query_start(self):
