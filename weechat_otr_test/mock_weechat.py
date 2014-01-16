@@ -18,7 +18,6 @@ class MockWeechat(types.ModuleType):
         self.config_options = {}
         self.script_name = None
         self.printed = {}
-        self.saved_state = None
 
     def save(self):
         self.saved_state = copy.deepcopy(self.__dict__)
