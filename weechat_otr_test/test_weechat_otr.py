@@ -227,23 +227,3 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
     def assertNotPrinted(self, buf, text):
         self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))
-
-class AssemblerTestCase(WeechatOtrTestCase):
-
-    def afterSetUp(self):
-        self.assembler = weechat_otr.Assembler()
-
-    def test_is_query_start(self):
-        self.assembler.add('?OTRv2? encryption?')
-
-        self.assertTrue(self.assembler.is_query())
-
-    def test_is_query_middle(self):
-        self.assembler.add('ATT: ?OTRv2?someone requested encryption!')
-
-        self.assertTrue(self.assembler.is_query())
-
-    def test_is_query_end(self):
-        self.assembler.add('encryption? ?OTRv2?')
-
-        self.assertTrue(self.assembler.is_query())
