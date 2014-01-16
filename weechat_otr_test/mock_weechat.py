@@ -18,6 +18,7 @@ class MockWeechat(types.ModuleType):
         self.config_options = {}
         self.script_name = None
         self.printed = {}
+        self.saved_state = None
 
     def save(self):
         self.saved_state = copy.deepcopy(self.__dict__)
@@ -60,8 +61,8 @@ class MockWeechat(types.ModuleType):
     def command(*args):
         pass
 
-    def config_boolean(self, s):
-        if s == 'on':
+    def config_boolean(self, val):
+        if val == 'on':
             return 1
         else:
             return 0

@@ -1,3 +1,6 @@
+# pylint: disable=invalid-name
+# pylint: disable=missing-docstring
+
 class MockContext(object):
 
     def __init__(self):

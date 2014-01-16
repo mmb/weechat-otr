@@ -27,7 +27,8 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         result = weechat_otr.message_out_cb(None, None, b'server',
             b":nick!user@host PRIVMSG friend :\xc3")
         self.assertEqual(result,
-            b"PRIVMSG friend :\xef\xbf\xbd \t  \t\t\t\t \t \t \t    \t\t  \t \t")
+            b"PRIVMSG friend :\xef\xbf\xbd" +
+            b" \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
     def test_parse_irc_privmsg_channel_ampersand(self):
         result = weechat_otr.parse_irc_privmsg(
@@ -43,40 +44,40 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         self.assertEqual(result, ':f PRIVMSG t :line1line2')
 
     def test_build_privmsgs_in_without_newline(self):
-        fromm  = 'f'
-        to     = 't'
-        line   = 'line1'
+        fromm = 'f'
+        to = 't'
+        line = 'line1'
         result = weechat_otr.build_privmsgs_in(fromm, to, line)
         self.assertEqual(result,
                 weechat_otr.build_privmsg_in(fromm, to, line))
 
     def test_build_privmsgs_in_without_newline_prefix(self):
-        fromm  = 'f'
-        to     = 't'
-        line   = 'line1'
+        fromm = 'f'
+        to = 't'
+        line = 'line1'
         prefix = 'Some prefix: '
         result = weechat_otr.build_privmsgs_in(fromm, to, line, prefix)
         self.assertEqual(result,
                 weechat_otr.build_privmsg_in(fromm, to, prefix+line))
 
     def test_build_privmsgs_in_with_newline(self):
-        fromm  = 'f'
-        to     = 't'
+        fromm = 'f'
+        to = 't'
         result = weechat_otr.build_privmsgs_in(fromm, to, 'line1\nline2')
         self.assertEqual(result, '{msg1}\r\n{msg2}'.format(
-            msg1 = weechat_otr.build_privmsg_in(fromm, to, 'line1'),
-            msg2 = weechat_otr.build_privmsg_in(fromm, to, 'line2')))
+            msg1=weechat_otr.build_privmsg_in(fromm, to, 'line1'),
+            msg2=weechat_otr.build_privmsg_in(fromm, to, 'line2')))
 
     def test_build_privmsgs_in_with_newline_prefix(self):
-        fromm  = 'f'
-        to     = 't'
+        fromm = 'f'
+        to = 't'
         prefix = 'Some prefix: '
         result = weechat_otr.build_privmsgs_in(fromm, to, 'line1\nline2',
                 prefix)
         self.assertEqual(result, '{msg1}\r\n{msg2}'.format(
-            msg1 = weechat_otr.build_privmsg_in(fromm, to,
+            msg1=weechat_otr.build_privmsg_in(fromm, to,
                 '{}line1'.format(prefix)),
-            msg2 = weechat_otr.build_privmsg_in(fromm, to,
+            msg2=weechat_otr.build_privmsg_in(fromm, to,
                 '{}line2'.format(prefix))))
 
     def test_build_privmsg_out_without_newline(self):
@@ -215,6 +216,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             context.smp_init)
 
     def setup_smp_context(self, account_name, context_name):
+        # pylint: disable=no-self-use
         context = weechat_otr_test.mock_context.MockContext()
         account = weechat_otr_test.mock_account.MockAccount()
         account.add_context(context_name, context)
