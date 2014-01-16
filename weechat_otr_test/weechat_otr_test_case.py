@@ -9,10 +9,13 @@ import unittest
 import weechat_otr_test.mock_weechat
 sys.modules['weechat'] = weechat_otr_test.mock_weechat.MockWeechat()
 
+import weechat_otr
+
 class WeechatOtrTestCase(unittest.TestCase):
 
     def setUp(self):
         sys.modules['weechat'].save()
+        weechat_otr.ACCOUNTS.clear()
         self.after_setup()
 
     def tearDown(self):
