@@ -27,3 +27,9 @@ class AssemblerTestCase(WeechatOtrTestCase):
         self.assembler.add('encryption? ?OTRv2?')
 
         self.assertTrue(self.assembler.is_query())
+
+    def test_add_get(self):
+        self.assembler.add('part 1')
+        self.assembler.add('part 2')
+        self.assertEqual(self.assembler.get(), 'part 1part 2')
+        self.assertEqual(self.assembler.get(), '')
