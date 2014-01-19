@@ -176,7 +176,7 @@ ACTION_PREFIX = '/me '
 IRC_ACTION_RE   = re.compile('^\x01ACTION (?P<text>.*)\x01$')
 PLAIN_ACTION_RE = re.compile('^'+ACTION_PREFIX+'(?P<text>.*)$')
 
-IRC_SANITIZE_TABLE = dict((ord(char), None) for char in u'\n\r\x00')
+IRC_SANITIZE_TABLE = dict((ord(char), None) for char in '\n\r\x00')
 
 global otr_debug_buffer
 otr_debug_buffer = None
