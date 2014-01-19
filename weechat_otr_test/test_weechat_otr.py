@@ -16,19 +16,19 @@ import weechat_otr_test.mock_context
 class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
     def test_message_out_cb(self):
-        result = weechat_otr.message_out_cb(None, None, b'server',
-            b':nick!user@host PRIVMSG friend :hello')
-        self.assertEqual(result, b'PRIVMSG friend :hello')
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG friend :hello')
+        self.assertEqual(result, 'PRIVMSG friend :hello')
 
     def test_message_out_cb_send_tag_non_ascii(self):
         sys.modules['weechat'].config_options[
             'otr.policy.server.nick.friend.send_tag'] = 'on'
 
-        result = weechat_otr.message_out_cb(None, None, b'server',
-            b":nick!user@host PRIVMSG friend :\xc3")
-        self.assertEqual(result,
-            b"PRIVMSG friend :\xef\xbf\xbd" +
-            b" \t  \t\t\t\t \t \t \t    \t\t  \t \t")
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            ":nick!user@host PRIVMSG friend :\xc3")
+        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+            "PRIVMSG friend :\xc3" +
+            " \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
     def test_parse_irc_privmsg_channel_ampersand(self):
         result = weechat_otr.parse_irc_privmsg(
@@ -125,41 +125,41 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
                 )
 
     def test_command_cb_start_send_tag_off(self):
-        weechat_otr.command_cb(None, None, b'start')
+        weechat_otr.command_cb(None, None, 'start')
 
         self.assertPrinted('server_nick_buffer',
-          b'otr\tSending OTR query... Please await confirmation of the OTR ' +
-          b'session being started before sending a message.')
+          'otr\tSending OTR query... Please await confirmation of the OTR ' +
+          'session being started before sending a message.')
 
         self.assertPrinted('server_nick_buffer',
-          b'otr\tTo try OTR on all conversations with nick@server: /otr ' +
-          b'policy send_tag on')
+          'otr\tTo try OTR on all conversations with nick@server: /otr ' +
+          'policy send_tag on')
 
     def test_command_cb_start_send_tag_off_no_hints(self):
         sys.modules['weechat'].config_options[
             'otr.general.hints'] = 'off'
-        weechat_otr.command_cb(None, None, b'start')
+        weechat_otr.command_cb(None, None, 'start')
 
         self.assertNotPrinted('server_nick_buffer',
-            b'otr\tTo try OTR on all conversations with nick@server: /otr ' +
-            b'policy send_tag on')
+            'otr\tTo try OTR on all conversations with nick@server: /otr ' +
+            'policy send_tag on')
 
     def test_command_cb_start_send_tag_off_with_hints(self):
         sys.modules['weechat'].config_options['otr.general.hints'] = 'on'
-        weechat_otr.command_cb(None, None, b'start')
+        weechat_otr.command_cb(None, None, 'start')
 
         self.assertPrinted('server_nick_buffer',
-            b'otr\tTo try OTR on all conversations with nick@server: /otr ' +
-            b'policy send_tag on')
+            'otr\tTo try OTR on all conversations with nick@server: /otr ' +
+            'policy send_tag on')
 
     def test_command_cb_start_send_tag_on(self):
         sys.modules['weechat'].config_options[
             'otr.policy.server.nick.nick.send_tag'] = 'on'
-        weechat_otr.command_cb(None, None, b'start')
+        weechat_otr.command_cb(None, None, 'start')
 
         self.assertPrinted('server_nick_buffer',
-          b'otr\tSending OTR query... Please await confirmation of the OTR ' +
-          b'session being started before sending a message.')
+          'otr\tSending OTR query... Please await confirmation of the OTR ' +
+          'session being started before sending a message.')
 
     def test_irc_sanitize(self):
         result = weechat_otr.irc_sanitize(
@@ -167,52 +167,52 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         self.assertEqual(result, 'this is not an irc command')
 
     def test_print_buffer_not_private(self):
-        weechat_otr.command_cb(None, None, b'start no_window_nick server')
+        weechat_otr.command_cb(None, None, 'start no_window_nick server')
         self.assertPrinted('non_private_buffer',
-            b'otr\t[no_window_nick] Sending OTR query... Please await ' +
-            b'confirmation of the OTR session being started before sending a ' +
-            b'message.')
+            'otr\t[no_window_nick] Sending OTR query... Please await ' +
+            'confirmation of the OTR session being started before sending a ' +
+            'message.')
 
     def test_smp_ask_nick_server_question_secret(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
         weechat_otr.command_cb(
-            None, None, b'smp ask nick2 server question secret')
+            None, None, 'smp ask nick2 server question secret')
 
-        self.assertEqual((b'secret', b'question'), context.smp_init)
+        self.assertEqual(('secret', 'question'), context.smp_init)
 
     def test_smp_ask_nick_server_secret(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
         weechat_otr.command_cb(
-            None, None, b'smp ask nick2 server secret')
+            None, None, 'smp ask nick2 server secret')
 
-        self.assertEqual((b'secret', None), context.smp_init)
+        self.assertEqual(('secret', None), context.smp_init)
 
     def test_smp_ask_question_secret(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
         weechat_otr.command_cb(
-            None, 'server_nick2_buffer', b'smp ask question secret')
+            None, 'server_nick2_buffer', 'smp ask question secret')
 
-        self.assertEqual((b'secret', b'question'), context.smp_init)
+        self.assertEqual(('secret', 'question'), context.smp_init)
 
     def test_smp_ask_secret(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
-        weechat_otr.command_cb(None, 'server_nick2_buffer', b'smp ask secret')
+        weechat_otr.command_cb(None, 'server_nick2_buffer', 'smp ask secret')
 
-        self.assertEqual((b'secret', None), context.smp_init)
+        self.assertEqual(('secret', None), context.smp_init)
 
     def test_smp_ask_nick_server_question_secret_multiple_words(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
         weechat_otr.command_cb(
-            None, None, b"smp ask nick2 server 'what is the secret?' "
-            b"'eastmost penninsula is the secret'")
+            None, None, "smp ask nick2 server 'what is the secret?' "
+            "'eastmost penninsula is the secret'")
 
         self.assertEqual(
-            (b'eastmost penninsula is the secret', b'what is the secret?'),
+            ('eastmost penninsula is the secret', 'what is the secret?'),
             context.smp_init)
 
     def setup_smp_context(self, account_name, context_name):

@@ -36,22 +36,22 @@ class MockWeechat(types.ModuleType):
     def buffer_get_string(self, buf, string):
         buffers = {
             None : {
-                b'localvar_type' : b'private',
-                b'localvar_channel' : b'nick',
-                b'localvar_server' : b'server',
+                'localvar_type' : 'private',
+                'localvar_channel' : 'nick',
+                'localvar_server' : 'server',
                 },
-            b'server_nick_buffer' : {
-                b'localvar_type' : b'private',
-                b'localvar_channel' : b'nick',
-                b'localvar_server' : b'server',
+            'server_nick_buffer' : {
+                'localvar_type' : 'private',
+                'localvar_channel' : 'nick',
+                'localvar_server' : 'server',
                 },
-            b'server_nick2_buffer': {
-                b'localvar_type' : b'private',
-                b'localvar_channel' : b'nick2',
-                b'localvar_server' : b'server',
+            'server_nick2_buffer': {
+                'localvar_type' : 'private',
+                'localvar_channel' : 'nick2',
+                'localvar_server' : 'server',
                 },
-            b'non_private_buffer' : {
-                b'localvar_type' : b'non_private',
+            'non_private_buffer' : {
+                'localvar_type' : 'non_private',
                 }
             }
 
@@ -108,17 +108,17 @@ class MockWeechat(types.ModuleType):
 
     def info_get(self, name, *args):
         infos = {
-            (b'',) : {
-                b'weechat_dir': b'/tmp/weechat',
+            ('',) : {
+                'weechat_dir': '/tmp/weechat',
                 },
-            (b'server',) : {
-                b'irc_nick': b'nick',
+            ('server',) : {
+                'irc_nick': 'nick',
                 },
-            (b'server,nick',) : {
-                b'irc_buffer' : b'server_nick_buffer',
+            ('server,nick',) : {
+                'irc_buffer' : 'server_nick_buffer',
                 },
-            (b'server,no_window_nick',) : {
-                b'irc_buffer' : b'non_private_buffer',
+            ('server,no_window_nick',) : {
+                'irc_buffer' : 'non_private_buffer',
                 },
         }
 
