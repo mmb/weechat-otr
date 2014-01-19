@@ -303,7 +303,7 @@ def parse_irc_privmsg(message):
     if match:
         result = match.groupdict()
 
-        if result['to'].startswith(('#','&')):
+        if result['to'].startswith(('#', '&')):
             result['to_channel'] = result['to']
             result['to_nick'] = None
         else:
@@ -1425,7 +1425,7 @@ def command_cb(data, buf, args):
 
             if nick is not None and server is not None:
                 context = ACCOUNTS[current_user(server)].getContext(
-                    irc_user(nick,server))
+                    irc_user(nick, server))
 
                 context.print_buffer(context.format_default_policies())
 
