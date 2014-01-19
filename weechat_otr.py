@@ -34,18 +34,52 @@ import traceback
 import shlex
 import sys
 
+class PythonVersion2(object):
+
+    def __init__(self):
+        import cgi
+        self.cgi = cgi
+
+        import HTMLParser
+        self.html_parser = HTMLParser
+
+        import htmlentitydefs
+        self.html_entities = htmlentitydefs
+
+    def html_escape(self, strng):
+        return self.cgi.escape(strng)
+
+    def unicode(self, *args, **kwargs):
+        return unicode(*args, **kwargs)
+
+    def unichr(self, *args, **kwargs):
+        return unichr(*args, **kwargs)
+
+class PythonVersion3(object):
+
+    def __init__(self):
+        import html
+        self.html = html
+
+        import html.parser
+        self.html_parser = html.parser
+
+        import html.entities
+        self.html_entities = html.entities
+
+    def html_escape(self, strng):
+        return self.html.escape(strng, quote=False)
+
+    def unicode(self, *args, **kwargs):
+        return str(*args, **kwargs)
+
+    def unichr(self, *args, **kwargs):
+        return chr(*args, **kwargs)
+
 if sys.version_info.major >= 3:
-    import html.parser as htmlparser
-    from html.entities import name2codepoint
-    unicode = str
-    unichr = chr
-    import html
-    html_escape = lambda x: html.escape(x, False)
+    PYVER = PythonVersion3()
 else:
-    import HTMLParser as htmlparser
-    from htmlentitydefs import name2codepoint
-    import cgi
-    html_escape = cgi.escape
+    PYVER = PythonVersion2()
 
 import weechat
 
@@ -198,7 +232,7 @@ def irc_sanitize(msg):
     """Remove NUL, CR and LF characters from msg.
     The (utf-8 encoded version of a) string returned from this function
     should be safe to use as an argument in an irc command."""
-    return unicode(msg).translate(IRC_SANITIZE_TABLE)
+    return PYVER.unicode(msg).translate(IRC_SANITIZE_TABLE)
 
 def prnt(buf, message):
     """Wrap weechat.prnt() with utf-8 encode."""
@@ -217,7 +251,7 @@ def debug(msg):
             weechat.buffer_set(otr_debug_buffer, 'localvar_set_no_log', '1')
         prnt(otr_debug_buffer, ('{script} debug\t{text}'.format(
             script = SCRIPT_NAME,
-            text   = unicode(msg)
+            text   = PYVER.unicode(msg)
             )))
 
 def debug_buffer_close_cb(data, buf):
@@ -440,7 +474,7 @@ class IrcContext(potr.context.Context):
     def inject(self, msg, appdata=None):
         """Send a message to the remote peer."""
         if isinstance(msg, potr.proto.OTRMessage):
-            msg = unicode(msg)
+            msg = PYVER.unicode(msg)
         else:
             msg = utf8_decode(msg)
 
@@ -761,7 +795,7 @@ Note: You can safely omit specifying the peer and server when
         if self.getPolicy('html_filter'):
             try:
                 msg = IrcHTMLParser.parse(msg)
-            except htmlparser.HTMLParseError:
+            except PYVER.html_parser.HTMLParseError:
                 pass
 
         return msg_irc_from_plain(msg)
@@ -773,7 +807,7 @@ Note: You can safely omit specifying the peer and server when
         msg = msg_plain_from_irc(msg)
 
         if self.getPolicy('html_escape'):
-            msg = html_escape(msg)
+            msg = PYVER.html_escape(msg)
 
         return utf8_encode(msg)
 
@@ -848,7 +882,7 @@ class IrcOtrAccount(potr.context.Account):
             if context.is_encrypted():
                 context.disconnect()
 
-class IrcHTMLParser(htmlparser.HTMLParser):
+class IrcHTMLParser(PYVER.html_parser.HTMLParser):
     """A simple HTML parser that throws away anything but newlines and links"""
 
     @staticmethod
@@ -861,7 +895,7 @@ class IrcHTMLParser(htmlparser.HTMLParser):
 
     def reset(self):
         """Forget all state, called from __init__"""
-        htmlparser.HTMLParser.reset(self)
+        PYVER.html_parser.HTMLParser.reset(self)
         self.result     = ''
         self.linktarget = ''
         self.linkstart  = 0
@@ -894,7 +928,7 @@ class IrcHTMLParser(htmlparser.HTMLParser):
     def handle_entityref(self, name):
         """Called for entity references, such as &amp;"""
         try:
-            self.result += unichr(name2codepoint[name])
+            self.result += PYVER.unichr(PYVER.html_entities.name2codepoint[name])
         except KeyError:
             self.result += '&{};'.format(name)
 
@@ -902,9 +936,9 @@ class IrcHTMLParser(htmlparser.HTMLParser):
         """Called for character references, such as &#39;"""
         try:
             if name.startswith('x'):
-                self.result += unichr(int(name[1:], 16))
+                self.result += PYVER.unichr(int(name[1:], 16))
             else:
-                self.result += unichr(int(name))
+                self.result += PYVER.unichr(int(name))
         except ValueError:
             self.result += '&#{};'.format(name)
 
