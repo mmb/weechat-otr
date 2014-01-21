@@ -7,6 +7,10 @@
 from __future__ import unicode_literals
 
 import copy
+import io
+import os
+import shutil
+import tarfile
 import types
 
 class MockWeechat(types.ModuleType):
@@ -14,19 +18,37 @@ class MockWeechat(types.ModuleType):
     WEECHAT_RC_ERROR = None
     WEECHAT_RC_OK = None
 
-    def __init__(self):
+    def __init__(self, weechat_dir):
+        self.weechat_dir = weechat_dir
+
         self.config_options = {}
         self.script_name = None
         self.printed = {}
         self.saved_state = None
+        self.weechat_dir_tar = None
 
     def save(self):
+        self.snapshot_weechat_dir()
         self.saved_state = copy.deepcopy(self.__dict__)
 
     def restore(self):
         prev_state = copy.deepcopy(self.saved_state)
         self.__dict__.clear()
         self.__dict__.update(prev_state)
+
+        self.restore_weechat_dir()
+
+    def snapshot_weechat_dir(self):
+        tar_io = io.BytesIO()
+        with tarfile.open(fileobj=tar_io, mode='w') as tar:
+            tar.add(self.weechat_dir, '.')
+        self.weechat_dir_tar = tar_io.getvalue()
+
+    def restore_weechat_dir(self):
+        shutil.rmtree(self.weechat_dir)
+        tar_io = io.BytesIO(self.weechat_dir_tar)
+        with tarfile.open(fileobj=tar_io) as tar:
+            tar.extractall(self.weechat_dir)
 
     def bar_item_new(*args):
         pass
@@ -110,7 +132,7 @@ class MockWeechat(types.ModuleType):
     def info_get(self, name, *args):
         infos = {
             ('',) : {
-                'weechat_dir': '/tmp/weechat',
+                'weechat_dir': self.weechat_dir,
                 },
             ('server',) : {
                 'irc_nick': 'nick',
@@ -134,8 +156,8 @@ class MockWeechat(types.ModuleType):
     def infolist_next(*args):
         pass
 
-    def mkdir_home(self, *args):
-        pass
+    def mkdir_home(self, name, mode):
+        os.mkdir(os.path.join(self.weechat_dir, name), mode)
 
     def prnt(self, buf, message):
         self.printed.setdefault(buf, []).append(message)

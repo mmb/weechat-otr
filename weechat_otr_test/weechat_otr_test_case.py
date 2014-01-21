@@ -4,10 +4,12 @@
 from __future__ import unicode_literals
 
 import sys
+import tempfile
 import unittest
 
 import weechat_otr_test.mock_weechat
-sys.modules['weechat'] = weechat_otr_test.mock_weechat.MockWeechat()
+sys.modules['weechat'] = weechat_otr_test.mock_weechat.MockWeechat(
+    tempfile.mkdtemp())
 
 import weechat_otr
 
