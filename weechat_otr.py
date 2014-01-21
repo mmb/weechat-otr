@@ -975,7 +975,9 @@ def message_in_cb(data, modifier, modifier_data, string):
 
     if context.in_assembler.is_done():
         try:
-            msg, tlvs = context.receiveMessage(context.in_assembler.get())
+            msg, tlvs = context.receiveMessage(
+                # potr expects bytes
+                context.in_assembler.get().encode('utf-8', 'replace'))
 
             debug(('receive', msg, tlvs))
 
