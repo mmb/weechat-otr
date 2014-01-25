@@ -33,3 +33,7 @@ class AssemblerTestCase(WeechatOtrTestCase):
         self.assembler.add('part 2')
         self.assertEqual(self.assembler.get(), 'part 1part 2')
         self.assertEqual(self.assembler.get(), '')
+
+    def test_is_done_non_otr(self):
+        self.assembler.add('part 1')
+        self.assertTrue(self.assembler.is_done())

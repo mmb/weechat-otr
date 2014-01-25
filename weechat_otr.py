@@ -428,7 +428,7 @@ class Assembler(object):
     def is_done(self):
         """Return True if the buffer is a complete message."""
         return self.is_query() or \
-            not self.value.startswith(potr.proto.OTRTAG) or \
+            not self.value_bytes().startswith(potr.proto.OTRTAG) or \
             has_otr_end(self.value)
 
     def get(self):
@@ -441,6 +441,9 @@ class Assembler(object):
     def is_query(self):
         """Return true if the buffer is an OTR query."""
         return OTR_QUERY_RE.search(self.value)
+
+    def value_bytes(self):
+        return self.value.encode('utf-8', 'replace')
 
 class IrcContext(potr.context.Context):
     """Context class for OTR over IRC."""
