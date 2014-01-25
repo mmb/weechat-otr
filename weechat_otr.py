@@ -390,7 +390,7 @@ def default_peer_args(args, buf):
 def print_default_policies():
     """Print default policies values to the core buffer."""
     prnt('', 'Current default OTR policies:')
-    for policy, desc in sorted(POLICIES.iteritems()):
+    for policy, desc in sorted(POLICIES.items()):
         prnt('', '  {policy} ({desc}) is {value}'.format(
             policy = policy,
             desc   = desc,
@@ -686,7 +686,7 @@ Note: You can safely omit specifying the peer and server when
         buf.write('Current OTR policies for {peer}:\n'.format(
             peer = self.peer))
 
-        for policy, desc in sorted(POLICIES.iteritems()):
+        for policy, desc in sorted(POLICIES.items()):
             buf.write('  {policy} ({desc}) : {value}\n'.format(
                     policy = policy,
                     desc   = desc,
@@ -703,7 +703,7 @@ Note: You can safely omit specifying the peer and server when
 
         buf.write('Current default OTR policies:\n')
 
-        for policy, desc in sorted(POLICIES.iteritems()):
+        for policy, desc in sorted(POLICIES.items()):
             buf.write('  {policy} ({desc}) : {value}\n'.format(
                     policy = policy,
                     desc   = desc,
@@ -881,8 +881,8 @@ class IrcOtrAccount(potr.context.Account):
     def saveTrusts(self):
         """Save trusts."""
         with open(self.fpr_file_path, 'w') as fpr_file:
-            for uid, trusts in self.trusts.iteritems():
-                for fpr, trust in trusts.iteritems():
+            for uid, trusts in self.trusts.items():
+                for fpr, trust in trusts.items():
                     debug(('trust write', uid, self.name,
                            IrcOtrAccount.PROTOCOL, fpr, trust))
                     fpr_file.write('\t'.join(
