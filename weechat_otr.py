@@ -1683,9 +1683,12 @@ def git_info():
     if os.path.isdir(git_dir):
         import subprocess
         try:
-            result = PYVER.to_unicode(subprocess.check_output(
-                ['git', '--git-dir', git_dir, 'describe', '--dirty']
-                )).lstrip('v').rstrip()
+            result = PYVER.to_unicode(subprocess.check_output([
+                'git',
+                '--git-dir', git_dir,
+                '--work-tree', script_dir,
+                'describe', '--dirty'
+                ])).lstrip('v').rstrip()
         except (OSError, subprocess.CalledProcessError):
             pass
 
