@@ -26,6 +26,23 @@ class MockWeechat(types.ModuleType):
         self.printed = {}
         self.saved_state = None
         self.weechat_dir_tar = None
+        self.infos = {
+            ('',) : {
+                'weechat_dir': self.weechat_dir,
+                },
+            ('server',) : {
+                'irc_nick': 'nick',
+                },
+            ('server,nick',) : {
+                'irc_buffer' : 'server_nick_buffer',
+                },
+            ('server,nick2',) : {
+                'irc_buffer' : 'server_nick2_buffer',
+                },
+            ('server,no_window_nick',) : {
+                'irc_buffer' : 'non_private_buffer',
+                },
+        }
 
     def save(self):
         self.snapshot_weechat_dir()
@@ -130,22 +147,7 @@ class MockWeechat(types.ModuleType):
         pass
 
     def info_get(self, name, *args):
-        infos = {
-            ('',) : {
-                'weechat_dir': self.weechat_dir,
-                },
-            ('server',) : {
-                'irc_nick': 'nick',
-                },
-            ('server,nick',) : {
-                'irc_buffer' : 'server_nick_buffer',
-                },
-            ('server,no_window_nick',) : {
-                'irc_buffer' : 'non_private_buffer',
-                },
-        }
-
-        return infos[args].get(name)
+        return self.infos[args].get(name)
 
     def infolist_free(*args):
         pass
