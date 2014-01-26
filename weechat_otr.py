@@ -1120,7 +1120,7 @@ def command_cb(data, buf, args):
     result = weechat.WEECHAT_RC_ERROR
 
     try:
-        arg_parts = shlex.split(PYVER.to_unicode(args))
+        arg_parts = [ PYVER.to_unicode(arg) for arg in shlex.split(args) ]
     except:
         debug("Command parsing error.")
         return result
