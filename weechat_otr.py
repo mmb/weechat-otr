@@ -399,6 +399,10 @@ def print_default_policies():
     prnt('', 'Change default policies with /otr policy default NAME on/off')
     return True
 
+def to_bytes(strng):
+    """Convert a python str or unicode to bytes."""
+    return strng.encode('utf-8', 'replace')
+
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
 
@@ -428,7 +432,7 @@ class Assembler(object):
     def is_done(self):
         """Return True if the buffer is a complete message."""
         return self.is_query() or \
-            not self.value_bytes().startswith(potr.proto.OTRTAG) or \
+            not to_bytes(self.value).startswith(potr.proto.OTRTAG) or \
             has_otr_end(self.value)
 
     def get(self):
@@ -441,9 +445,6 @@ class Assembler(object):
     def is_query(self):
         """Return true if the buffer is an OTR query."""
         return OTR_QUERY_RE.search(self.value)
-
-    def value_bytes(self):
-        return self.value.encode('utf-8', 'replace')
 
 class IrcContext(potr.context.Context):
     """Context class for OTR over IRC."""
@@ -821,7 +822,7 @@ Note: You can safely omit specifying the peer and server when
             msg = PYVER.html_escape(msg)
 
         # potr expects bytes to be returned
-        return msg.encode('utf-8', 'replace')
+        return to_bytes(msg)
 
     def __repr__(self):
         return ('<{} {:x} peer_nick={c.peer_nick} '
@@ -985,7 +986,7 @@ def message_in_cb(data, modifier, modifier_data, string):
         try:
             msg, tlvs = context.receiveMessage(
                 # potr expects bytes
-                context.in_assembler.get().encode('utf-8', 'replace'))
+                to_bytes(context.in_assembler.get()))
 
             debug(('receive', msg, tlvs))
 
@@ -1038,7 +1039,7 @@ def message_out_cb(data, modifier, modifier_data, string):
         context = ACCOUNTS[local_user].getContext(to_user)
         is_query = OTR_QUERY_RE.search(parsed['text'])
 
-        parsed_text_bytes = parsed['text'].encode('utf-8', 'replace')
+        parsed_text_bytes = to_bytes(parsed['text'])
 
         is_otr_message = \
             parsed_text_bytes[:len(potr.proto.OTRTAG)] == potr.proto.OTRTAG
