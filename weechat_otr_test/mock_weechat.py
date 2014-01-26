@@ -169,3 +169,5 @@ class MockWeechat(types.ModuleType):
 
         return True
 
+    def set_server_current_nick(self, server, nick):
+        self.infos[(server, )]['irc_nick'] = nick

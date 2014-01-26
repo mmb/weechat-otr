@@ -10,6 +10,6 @@ class RecordingContext(weechat_otr.IrcContext):
         self.injected = []
 
     def inject(self, msg, appdata=None):
-        self.injected.append(msg)
+        self.injected.insert(0, msg)
 
         super(RecordingContext, self).inject(msg, appdata)
