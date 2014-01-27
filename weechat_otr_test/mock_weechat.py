@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # pylint: disable=missing-docstring
 # pylint: disable=no-method-argument
 # pylint: disable=no-self-use
