@@ -30,6 +30,15 @@ class SmpTestCase(WeechatOtrTestCase):
 
         self.assertEqual(('secret', None), context.smp_init)
 
+    def test_smp_ask_nick_server_secret_non_ascii(self):
+        context = self.setup_smp_context('nick@server', 'nick2@server')
+
+        weechat_otr.command_cb(None, None,
+            weechat_otr.PYVER.to_str('smp ask nick2 server motörhead'))
+
+        self.assertEqual((weechat_otr.PYVER.to_str('motörhead'), None),
+            context.smp_init)
+
     def test_smp_ask_question_secret(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
@@ -55,6 +64,23 @@ class SmpTestCase(WeechatOtrTestCase):
         self.assertEqual(
             ('eastmost penninsula is the secret', 'what is the secret?'),
             context.smp_init)
+
+    def test_smp_respond_secret(self):
+        context = self.setup_smp_context('nick@server', 'nick2@server')
+
+        weechat_otr.command_cb(
+            None, 'server_nick2_buffer', 'smp respond secret')
+
+        self.assertEqual(('secret', ), context.smp_got_secret)
+
+    def test_smp_respond_secret_non_ascii(self):
+        context = self.setup_smp_context('nick@server', 'nick2@server')
+
+        weechat_otr.command_cb(None, 'server_nick2_buffer',
+            weechat_otr.PYVER.to_str('smp respond deathtöngue'))
+
+        self.assertEqual((weechat_otr.PYVER.to_str('deathtöngue'), ),
+            context.smp_got_secret)
 
     def setup_smp_context(self, account_name, context_name):
         # pylint: disable=no-self-use
