@@ -1691,7 +1691,7 @@ def git_info():
                 'git',
                 '--git-dir', git_dir,
                 '--work-tree', script_dir,
-                'describe', '--dirty'
+                'describe', '--dirty', '--always',
                 ])).lstrip('v').rstrip()
         except (OSError, subprocess.CalledProcessError):
             pass
