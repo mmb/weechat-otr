@@ -889,9 +889,9 @@ class IrcOtrAccount(potr.context.Account):
                 for fpr, trust in trusts.items():
                     debug(('trust write', uid, self.name,
                            IrcOtrAccount.PROTOCOL, fpr, trust))
-                    fpr_file.write('\t'.join(
+                    fpr_file.write(PYVER.to_str('\t'.join(
                             (uid, self.name, IrcOtrAccount.PROTOCOL, fpr,
-                             trust)))
+                             trust))))
                     fpr_file.write('\n')
 
     def end_all_private(self):
