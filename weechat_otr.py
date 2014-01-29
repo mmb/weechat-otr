@@ -825,9 +825,9 @@ Note: You can safely omit specifying the peer and server when
         return to_bytes(msg)
 
     def __repr__(self):
-        return ('<{} {:x} peer_nick={c.peer_nick} '
+        return PYVER.to_str(('<{} {:x} peer_nick={c.peer_nick} '
             'peer_server={c.peer_server}>').format(
-            self.__class__.__name__, id(self), c=self)
+            self.__class__.__name__, id(self), c=self))
 
 class IrcOtrAccount(potr.context.Account):
     """Account class for OTR over IRC."""

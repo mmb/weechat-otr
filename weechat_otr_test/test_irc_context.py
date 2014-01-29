@@ -18,4 +18,6 @@ class IrcContextTestCase(WeechatOtrTestCase):
     def test_repr_non_ascii(self):
         self.assertRegexpMatches(
             weechat_otr.IrcContext(None, 'gefährte@gefährteserver').__repr__(),
-            r'<IrcContext [\da-f]+ peer_nick=gefährte peer_server=gefährteserver>')
+            weechat_otr.PYVER.to_str(
+                r'<IrcContext [\da-f]+ '
+                r'peer_nick=gefährte peer_server=gefährteserver>'))
