@@ -132,7 +132,7 @@ Start/Stop log recording for the current OTR session: /otr log [start|stop]
 This will be reverted back to the previous log setting at the end of the session.
 
 To end your private conversation: /otr finish
-""".format(description = SCRIPT_DESC)
+""".format(description=SCRIPT_DESC)
 
 SCRIPT_AUTHOR = 'Matthew M. Boedicker'
 SCRIPT_LICENCE = 'GPL3'
@@ -173,7 +173,7 @@ PRIVMSG
 """, re.VERBOSE)
 
 ACTION_PREFIX = '/me '
-IRC_ACTION_RE   = re.compile('^\x01ACTION (?P<text>.*)\x01$')
+IRC_ACTION_RE = re.compile('^\x01ACTION (?P<text>.*)\x01$')
 PLAIN_ACTION_RE = re.compile('^'+ACTION_PREFIX+'(?P<text>.*)$')
 
 IRC_SANITIZE_TABLE = dict((ord(char), None) for char in '\n\r\x00')
@@ -208,16 +208,16 @@ def privmsg(server, nick, message):
     """Send a private message to a nick."""
     for line in message.splitlines():
         command('', '/quote -server {server} PRIVMSG {nick} :{line}'.format(
-            server = irc_sanitize(server),
-            nick   = irc_sanitize(nick),
-            line   = irc_sanitize(line)))
+            server=irc_sanitize(server),
+            nick=irc_sanitize(nick),
+            line=irc_sanitize(line)))
 
 def build_privmsg_in(fromm, to, msg):
     """Build inbound IRC PRIVMSG command."""
     return ':{user} PRIVMSG {to} :{msg}'.format(
-        user = irc_sanitize(fromm),
-        to   = irc_sanitize(to),
-        msg  = irc_sanitize(msg))
+        user=irc_sanitize(fromm),
+        to=irc_sanitize(to),
+        msg=irc_sanitize(msg))
 
 def build_privmsgs_in(fromm, to, msg, prefix=''):
     """Build an inbound IRC PRIVMSG command for each line in msg.
@@ -232,8 +232,8 @@ def build_privmsg_out(to, msg):
     cmd = []
     for line in msg.splitlines():
         cmd.append('PRIVMSG {to} :{line}'.format(
-            to   = irc_sanitize(to),
-            line = irc_sanitize(line)))
+            to=irc_sanitize(to),
+            line=irc_sanitize(line)))
     return '\r\n'.join(cmd)
 
 def irc_sanitize(msg):
@@ -258,8 +258,8 @@ def debug(msg):
             weechat.buffer_set(otr_debug_buffer, 'title', 'OTR Debug')
             weechat.buffer_set(otr_debug_buffer, 'localvar_set_no_log', '1')
         prnt(otr_debug_buffer, ('{script} debug\t{text}'.format(
-            script = SCRIPT_NAME,
-            text   = PYVER.unicode(msg)
+            script=SCRIPT_NAME,
+            text=PYVER.unicode(msg)
             )))
 
 def debug_buffer_close_cb(data, buf):
@@ -274,8 +274,8 @@ def current_user(server_name):
 def irc_user(nick, server):
     """Build an IRC user string from a nick and server."""
     return '{nick}@{server}'.format(
-            nick   = nick,
-            server = server)
+            nick=nick,
+            server=server)
 
 def parse_irc_privmsg(message):
     """Parse an IRC PRIVMSG command and return a dictionary.
@@ -325,8 +325,8 @@ def first_instance(objs, klass):
 def config_prefix(option):
     """Add the config prefix to an option and return the full option name."""
     return '{script}.{option}'.format(
-            script = SCRIPT_NAME,
-            option = option)
+            script=SCRIPT_NAME,
+            option=option)
 
 def config_color(option):
     """Get the color of a color config option."""
@@ -392,9 +392,9 @@ def print_default_policies():
     prnt('', 'Current default OTR policies:')
     for policy, desc in sorted(POLICIES.items()):
         prnt('', '  {policy} ({desc}) is {value}'.format(
-            policy = policy,
-            desc   = desc,
-            value  = config_string('policy.default.{}'.format(policy))
+            policy=policy,
+            desc=desc,
+            value=config_string('policy.default.{}'.format(policy))
             ))
     prnt('', 'Change default policies with /otr policy default NAME on/off')
     return True
@@ -505,7 +505,7 @@ class IrcContext(potr.context.Context):
             elif newstate == potr.context.STATE_FINISHED:
                 self.print_buffer(
                     """{peer} has ended the private conversation. You should do the same:
-/otr finish""".format(peer = self.peer_nick))
+/otr finish""".format(peer=self.peer_nick))
         elif newstate == potr.context.STATE_ENCRYPTED:
             # unencrypted => encrypted
             trust = self.getCurrentTrust()
@@ -555,8 +555,8 @@ class IrcContext(potr.context.Context):
         """Get the buffer for this context."""
         return info_get(
             'irc_buffer', '{server},{nick}'.format(
-                server = self.peer_server,
-                nick   = self.peer_nick
+                server=self.peer_server,
+                nick=self.peer_nick
                 ))
 
     def print_buffer(self, msg):
@@ -566,12 +566,12 @@ class IrcContext(potr.context.Context):
         # add [nick] prefix if we have only a server buffer for the query
         if self.peer_nick and not buffer_is_private(buf):
             msg = '[{nick}] {msg}'.format(
-                    nick = self.peer_nick,
-                    msg  = msg)
+                    nick=self.peer_nick,
+                    msg=msg)
 
         prnt(buf, '{script}\t{msg}'.format(
-            script = SCRIPT_NAME,
-            msg    = msg))
+            script=SCRIPT_NAME,
+            msg=msg))
 
     def hint(self, msg):
         """Print a message to the buffer but only when hints are enabled."""
@@ -580,7 +580,7 @@ class IrcContext(potr.context.Context):
         if weechat.config_boolean(hints_option):
             self.print_buffer(msg)
 
-    def smp_finish(self, message = False):
+    def smp_finish(self, message=False):
         """Reset SMP state and send a message to the user."""
         self.in_smp = False
         self.smp_question = False
@@ -617,7 +617,7 @@ Respond with: /otr smp respond <secret>""")
                 self.print_buffer(
                     """Peer has requested SMP verification: {msg}
 Respond with: /otr smp respond <answer>""".format(
-                        msg = PYVER.to_unicode(smp1q.msg)))
+                        msg=PYVER.to_unicode(smp1q.msg)))
             elif first_instance(tlvs, potr.proto.SMP2TLV):
                 if not self.in_smp:
                     debug('Reveived unexpected SMP2')
@@ -665,11 +665,11 @@ Note: You can safely omit specifying the peer and server when
       executing these commands from the appropriate conversation
       buffer
 """.format(
-        your_fp     = self.user.getPrivkey(),
-        peer        = self.peer,
-        peer_nick   = self.peer_nick,
-        peer_server = self.peer_server,
-        peer_fp     = potr.human_hash(
+        your_fp=self.user.getPrivkey(),
+        peer=self.peer,
+        peer_nick=self.peer_nick,
+        peer_server=self.peer_server,
+        peer_fp=potr.human_hash(
             self.crypto.theirPubkey.cfingerprint()),
         )
 
@@ -688,13 +688,13 @@ Note: You can safely omit specifying the peer and server when
         buf = io.StringIO()
 
         buf.write('Current OTR policies for {peer}:\n'.format(
-            peer = self.peer))
+            peer=self.peer))
 
         for policy, desc in sorted(POLICIES.items()):
             buf.write('  {policy} ({desc}) : {value}\n'.format(
-                    policy = policy,
-                    desc   = desc,
-                    value  = 'on' if self.getPolicy(policy) else 'off'))
+                    policy=policy,
+                    desc=desc,
+                    value='on' if self.getPolicy(policy) else 'off'))
 
         buf.write('Change policies with: /otr policy NAME on|off')
 
@@ -709,9 +709,9 @@ Note: You can safely omit specifying the peer and server when
 
         for policy, desc in sorted(POLICIES.items()):
             buf.write('  {policy} ({desc}) : {value}\n'.format(
-                    policy = policy,
-                    desc   = desc,
-                    value  = config_string('policy.default.' + policy)))
+                    policy=policy,
+                    desc=desc,
+                    value=config_string('policy.default.' + policy)))
 
         buf.write('Change default policies with: /otr policy default NAME on|off')
 
@@ -914,9 +914,9 @@ class IrcHTMLParser(PYVER.html_parser.HTMLParser):
     def reset(self):
         """Forget all state, called from __init__"""
         PYVER.html_parser.HTMLParser.reset(self)
-        self.result     = ''
+        self.result = ''
         self.linktarget = ''
-        self.linkstart  = 0
+        self.linkstart = 0
 
     def handle_starttag(self, tag, attrs):
         """Called when a start tag is encountered"""
@@ -927,7 +927,7 @@ class IrcHTMLParser(PYVER.html_parser.HTMLParser):
             if 'href' in attrs:
                 self.result += '['
                 self.linktarget = attrs['href']
-                self.linkstart  = len(self.result)
+                self.linkstart = len(self.result)
 
     def handle_endtag(self, tag):
         """Called when an end tag is encountered"""
@@ -1120,7 +1120,7 @@ def command_cb(data, buf, args):
     result = weechat.WEECHAT_RC_ERROR
 
     try:
-        arg_parts = [ PYVER.to_unicode(arg) for arg in shlex.split(args) ]
+        arg_parts = [PYVER.to_unicode(arg) for arg in shlex.split(args)]
     except:
         debug("Command parsing error.")
         return result
@@ -1145,7 +1145,7 @@ def command_cb(data, buf, args):
             if not context.getPolicy('send_tag'):
                 context.hint(
                     'To try OTR on all conversations with {peer}: /otr policy send_tag on'.format(
-                    peer = context.peer))
+                    peer=context.peer))
 
             privmsg(server, nick, '?OTR?')
 
@@ -1284,13 +1284,13 @@ def command_cb(data, buf, args):
             if context.crypto.theirPubkey is not None:
                 context.setCurrentTrust('verified')
                 context.print_buffer('{peer} is now authenticated.'.format(
-                    peer = context.peer))
+                    peer=context.peer))
 
                 weechat.bar_item_update(SCRIPT_NAME)
             else:
                 context.print_buffer(
                     'No fingerprint for {peer}. Start an OTR conversation first: /otr start'.format(
-                        peer = context.peer))
+                        peer=context.peer))
 
             result = weechat.WEECHAT_RC_OK
     elif len(arg_parts) in (1, 3) and arg_parts[0] == 'distrust':
@@ -1304,13 +1304,13 @@ def command_cb(data, buf, args):
                 context.setCurrentTrust('')
                 context.print_buffer(
                     '{peer} is now de-authenticated.'.format(
-                        peer = context.peer))
+                        peer=context.peer))
 
                 weechat.bar_item_update(SCRIPT_NAME)
             else:
                 context.print_buffer(
                     'No fingerprint for {peer}. Start an OTR conversation first: /otr start'.format(
-                        peer = context.peer))
+                        peer=context.peer))
 
             result = weechat.WEECHAT_RC_OK
 
@@ -1416,8 +1416,8 @@ def command_cb(data, buf, args):
                 policy_var = context.policy_config_option(arg_parts[1].lower())
 
                 command('', '/set {policy} {value}'.format(
-                    policy = policy_var,
-                    value  = arg_parts[2]))
+                    policy=policy_var,
+                    value=arg_parts[2]))
 
                 context.print_buffer(context.format_policies())
 
@@ -1431,8 +1431,8 @@ def command_cb(data, buf, args):
             policy_var = "otr.policy.default." + arg_parts[2].lower()
 
             command('', '/set {policy} {value}'.format(
-                policy = policy_var,
-                value  = arg_parts[3]))
+                policy=policy_var,
+                value=arg_parts[3]))
 
             if nick is not None and server is not None:
                 context = ACCOUNTS[current_user(server)].getContext(
@@ -1520,9 +1520,9 @@ def otr_statusbar_cb(data, item, window):
 
         if result:
             result = '{color}{prefix}{result}'.format(
-                color  = config_color('status.default'),
-                prefix = config_string('look.bar.prefix'),
-                result = result)
+                color=config_color('status.default'),
+                prefix=config_string('look.bar.prefix'),
+                result=result)
 
     return result
 
