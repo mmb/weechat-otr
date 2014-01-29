@@ -11,9 +11,9 @@ import weechat_otr
 
 import sys
 
-class OtrInitInjectTestCase(WeechatOtrTestCase):
+class OtrSessionTestCase(WeechatOtrTestCase):
 
-    def test_inject_initial_otr_message(self):
+    def test_otr_session(self):
         account1 = weechat_otr_test.recording_account.RecordingAccount(
             'nick@server')
         weechat_otr.ACCOUNTS['nick@server'] = account1
