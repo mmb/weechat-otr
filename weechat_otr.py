@@ -437,7 +437,7 @@ class Assembler(object):
 
     def get(self):
         """Return the current value of the buffer and empty it."""
-        result = PYVER.to_str(self.value)
+        result = self.value
         self.clear()
 
         return result
