@@ -20,6 +20,12 @@ class IrcHTMLParserTestCase(WeechatOtrTestCase):
             'this is a [link](http://weechat.org)'
             )
 
+    def test_tag_a_non_ascii(self):
+        self.check_parse_result(
+            'this is a <a href="http://weechat.org">verknüpfung</a>',
+            'this is a [verknüpfung](http://weechat.org)'
+            )
+
     def test_tag_a_same(self):
         self.check_parse_result(
             '<a href="http://weechat.org">http://weechat.org</a>',
