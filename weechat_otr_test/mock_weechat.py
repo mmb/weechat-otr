@@ -44,6 +44,26 @@ class MockWeechat(types.ModuleType):
                 'irc_buffer' : 'non_private_buffer',
                 },
         }
+        self.buffers = {
+            None : {
+                'localvar_type' : 'private',
+                'localvar_channel' : 'nick',
+                'localvar_server' : 'server',
+                },
+            'server_nick_buffer' : {
+                'localvar_type' : 'private',
+                'localvar_channel' : 'nick',
+                'localvar_server' : 'server',
+                },
+            'server_nick2_buffer': {
+                'localvar_type' : 'private',
+                'localvar_channel' : 'nick2',
+                'localvar_server' : 'server',
+                },
+            'non_private_buffer' : {
+                'localvar_type' : 'non_private',
+                }
+            }
 
     def save(self):
         self.snapshot_weechat_dir()
@@ -75,28 +95,7 @@ class MockWeechat(types.ModuleType):
         pass
 
     def buffer_get_string(self, buf, string):
-        buffers = {
-            None : {
-                'localvar_type' : 'private',
-                'localvar_channel' : 'nick',
-                'localvar_server' : 'server',
-                },
-            'server_nick_buffer' : {
-                'localvar_type' : 'private',
-                'localvar_channel' : 'nick',
-                'localvar_server' : 'server',
-                },
-            'server_nick2_buffer': {
-                'localvar_type' : 'private',
-                'localvar_channel' : 'nick2',
-                'localvar_server' : 'server',
-                },
-            'non_private_buffer' : {
-                'localvar_type' : 'non_private',
-                }
-            }
-
-        return buffers[buf].get(string)
+        return self.buffers[buf].get(string)
 
     def command(*args):
         pass
