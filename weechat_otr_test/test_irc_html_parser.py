@@ -10,10 +10,6 @@ import weechat_otr
 
 class IrcHTMLParserTestCase(WeechatOtrTestCase):
 
-    def after_setup(self):
-        # pylint: disable=attribute-defined-outside-init
-        self.parser = weechat_otr.IrcHTMLParser()
-
     def test_tag_a(self):
         self.check_parse_result(
             'this is a <a href="http://weechat.org">link</a>',
@@ -59,9 +55,4 @@ class IrcHTMLParserTestCase(WeechatOtrTestCase):
             )
 
     def check_parse_result(self, html, result):
-        self.parser.feed(html)
-        self.parser.close()
-
-        self.assertEqual(self.parser.result, result)
-        self.assertEqual(
-            self.parser.result, weechat_otr.IrcHTMLParser.parse(html))
+        self.assertEqual(weechat_otr.IrcHTMLParser.parse(html), result)
