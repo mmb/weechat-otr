@@ -4,6 +4,7 @@
 # pylint: disable=no-self-use
 # pylint: disable=too-many-public-methods
 # pylint: disable=unused-argument
+# pylint: disable=too-many-instance-attributes
 
 from __future__ import unicode_literals
 
@@ -64,6 +65,8 @@ class MockWeechat(types.ModuleType):
                 'localvar_type' : 'non_private',
                 }
             }
+        self.config_written = []
+        self.bar_items_removed = []
 
     def save(self):
         self.snapshot_weechat_dir()
@@ -89,7 +92,7 @@ class MockWeechat(types.ModuleType):
             tar.extractall(self.weechat_dir)
 
     def bar_item_new(*args):
-        pass
+        return 'bar item'
 
     def bar_item_update(*args):
         pass
@@ -110,7 +113,7 @@ class MockWeechat(types.ModuleType):
         return self.config_options.get(key, '')
 
     def config_new(*args):
-        pass
+        return 'config file'
 
     def config_new_option(self, config_file, section, name, *args):
         parts = [self.script_name]
@@ -171,3 +174,18 @@ class MockWeechat(types.ModuleType):
 
     def set_server_current_nick(self, server, nick):
         self.infos[(server, )]['irc_nick'] = nick
+
+    def config_write(self, *args):
+        self.config_written.append(args)
+
+    def config_section_free_options(self, *args):
+        pass
+
+    def config_section_free(self, *args):
+        pass
+
+    def config_free(self, *args):
+        pass
+
+    def bar_item_remove(self, *args):
+        self.bar_items_removed.append(args)
