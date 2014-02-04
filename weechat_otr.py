@@ -896,7 +896,7 @@ class IrcOtrAccount(potr.context.Account):
 
     def end_all_private(self):
         """End all currently encrypted conversations."""
-        for context in self.ctxs.itervalues():
+        for context in self.ctxs.values():
             if context.is_encrypted():
                 context.disconnect()
 
@@ -1106,7 +1106,7 @@ def shutdown():
 
     weechat.config_write(CONFIG_FILE)
 
-    for account in ACCOUNTS.itervalues():
+    for account in ACCOUNTS.values():
         account.end_all_private()
 
     free_all_config()
@@ -1667,7 +1667,7 @@ def config_reload_cb(data, config_file):
 
 def free_all_config():
     """Free all config options, sections and config file."""
-    for section in CONFIG_SECTIONS.itervalues():
+    for section in CONFIG_SECTIONS.values():
         weechat.config_section_free_options(section)
         weechat.config_section_free(section)
 
