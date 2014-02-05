@@ -35,6 +35,7 @@ import shlex
 import sys
 
 class PythonVersion2(object):
+    """Python 2 version of code that must differ between Python 2 and 3."""
 
     def __init__(self):
         import cgi
@@ -47,24 +48,30 @@ class PythonVersion2(object):
         self.html_entities = htmlentitydefs
 
     def html_escape(self, strng):
+        """Escape HTML characters in a string."""
         return self.cgi.escape(strng)
 
     def unicode(self, *args, **kwargs):
+        """Return the Unicode version of a string."""
         return unicode(*args, **kwargs)
 
     def unichr(self, *args, **kwargs):
+        """Return the one character string of a Unicode character number."""
         return unichr(*args, **kwargs)
 
     def to_unicode(self, strng):
+        """Convert a utf-8 encoded string to a Unicode."""
         if isinstance(strng, unicode):
             return strng
         else:
             return strng.decode('utf-8', 'replace')
 
     def to_str(self, strng):
+        """Convert a Unicode to a utf-8 encoded string."""
         return strng.encode('utf-8', 'replace')
 
 class PythonVersion3(object):
+    """Python 3 version of code that must differ between Python 2 and 3."""
 
     def __init__(self):
         import html
@@ -77,21 +84,26 @@ class PythonVersion3(object):
         self.html_entities = html.entities
 
     def html_escape(self, strng):
+        """Escape HTML characters in a string."""
         return self.html.escape(strng, quote=False)
 
     def unicode(self, *args, **kwargs):
+        """Return the Unicode version of a string."""
         return str(*args, **kwargs)
 
     def unichr(self, *args, **kwargs):
+        """Return the one character string of a Unicode character number."""
         return chr(*args, **kwargs)
 
     def to_unicode(self, strng):
+        """Convert a utf-8 encoded string to unicode."""
         if isinstance(strng, bytes):
             return strng.decode('utf-8', 'replace')
         else:
             return strng
 
     def to_str(self, strng):
+        """Convert a Unicode to a utf-8 encoded string."""
         return strng
 
 if sys.version_info.major >= 3:
@@ -263,6 +275,7 @@ def debug(msg):
             )))
 
 def debug_buffer_close_cb(data, buf):
+    """Set the OTR debug buffer to None."""
     global otr_debug_buffer
     otr_debug_buffer = None
     return weechat.WEECHAT_RC_OK
