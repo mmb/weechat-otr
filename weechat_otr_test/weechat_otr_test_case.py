@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=missing-docstring
 # pylint: disable=too-many-public-methods
+# pylint: disable=invalid-name
 
 from __future__ import unicode_literals
 
@@ -19,6 +20,7 @@ class WeechatOtrTestCase(unittest.TestCase):
     def setUp(self):
         sys.modules['weechat'].save()
         weechat_otr.ACCOUNTS.clear()
+        weechat_otr.otr_debug_buffer = None
         self.after_setup()
 
     def tearDown(self):
