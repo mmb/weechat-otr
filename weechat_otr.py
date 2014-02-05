@@ -259,7 +259,7 @@ def prnt(buf, message):
     weechat.prnt(buf, PYVER.to_str(message))
 
 def debug(msg):
-    """Send a debug message to the WeeChat core buffer."""
+    """Send a debug message to the OTR debug buffer."""
     debug_option = weechat.config_get(config_prefix('general.debug'))
     global otr_debug_buffer
 
