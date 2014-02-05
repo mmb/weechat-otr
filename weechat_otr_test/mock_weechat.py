@@ -5,6 +5,7 @@
 # pylint: disable=too-many-public-methods
 # pylint: disable=unused-argument
 # pylint: disable=too-many-instance-attributes
+# pylint: disable=invalid-name
 
 from __future__ import unicode_literals
 
@@ -67,6 +68,9 @@ class MockWeechat(types.ModuleType):
             }
         self.config_written = []
         self.bar_items_removed = []
+        self.config_section_free_options_calls = []
+        self.config_section_free_calls = []
+        self.config_free_calls = []
 
     def save(self):
         self.snapshot_weechat_dir()
@@ -179,13 +183,13 @@ class MockWeechat(types.ModuleType):
         self.config_written.append(args)
 
     def config_section_free_options(self, *args):
-        pass
+        self.config_section_free_options_calls.append(args)
 
     def config_section_free(self, *args):
-        pass
+        self.config_section_free_calls.append(args)
 
     def config_free(self, *args):
-        pass
+        self.config_free_calls.append(args)
 
     def bar_item_remove(self, *args):
         self.bar_items_removed.append(args)

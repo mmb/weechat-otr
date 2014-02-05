@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=missing-docstring
 # pylint: disable=too-many-public-methods
+# pylint: disable=invalid-name
 
 from __future__ import unicode_literals
 
@@ -10,7 +11,6 @@ import weechat_otr_test.mock_account
 import weechat_otr
 
 import sys
-import unittest
 
 class ShutdownTestCase(WeechatOtrTestCase):
 
@@ -30,9 +30,37 @@ class ShutdownTestCase(WeechatOtrTestCase):
         self.assertEqual(account1.end_all_privates, 1)
         self.assertEqual(account2.end_all_privates, 1)
 
-    @unittest.skip('write me')
-    def test_frees_all_config(self):
-        pass
+    def test_frees_config_section_options(self):
+        weechat_otr.shutdown()
+
+        sections = sorted([
+          ('color', ),
+          ('policy', ),
+          ('look', ),
+          ('general', )
+          ])
+
+        self.assertEqual(sections,
+            sorted(sys.modules['weechat'].config_section_free_options_calls))
+
+    def test_frees_config_sections(self):
+        weechat_otr.shutdown()
+
+        sections = sorted([
+          ('color', ),
+          ('policy', ),
+          ('look', ),
+          ('general', )
+          ])
+
+        self.assertEqual(sections,
+            sorted(sys.modules['weechat'].config_section_free_calls))
+
+    def test_frees_config_file(self):
+        weechat_otr.shutdown()
+
+        self.assertEqual(
+            [('config file', )], sys.modules['weechat'].config_free_calls)
 
     def test_removes_bar_item(self):
         weechat_otr.shutdown()
