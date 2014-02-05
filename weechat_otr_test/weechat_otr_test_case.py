@@ -30,3 +30,9 @@ class WeechatOtrTestCase(unittest.TestCase):
 
     def after_teardown(self):
         pass
+
+    def assertPrinted(self, buf, text):
+        self.assertIn(text, sys.modules['weechat'].printed[buf])
+
+    def assertNotPrinted(self, buf, text):
+        self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))

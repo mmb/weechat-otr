@@ -170,9 +170,3 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             'otr\t[no_window_nick] Sending OTR query... Please await ' +
             'confirmation of the OTR session being started before sending a ' +
             'message.')
-
-    def assertPrinted(self, buf, text):
-        self.assertIn(text, sys.modules['weechat'].printed[buf])
-
-    def assertNotPrinted(self, buf, text):
-        self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))
