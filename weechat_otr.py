@@ -582,7 +582,7 @@ class IrcContext(potr.context.Context):
                     nick=self.peer_nick,
                     msg=msg)
 
-        prnt(buf, '{script}\t{msg}'.format(
+        prnt(buf, '{script}: {msg}'.format(
             script=SCRIPT_NAME,
             msg=msg))
 
