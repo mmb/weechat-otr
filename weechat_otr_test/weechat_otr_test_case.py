@@ -38,3 +38,12 @@ class WeechatOtrTestCase(unittest.TestCase):
 
     def assertNotPrinted(self, buf, text):
         self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))
+
+    def assertRegex(self, s, r):
+        # To get rid of deprecation warning in python 3.
+        try:
+            # Python 3.
+            super(WeechatOtrTestCase, self).assertRegex(s, r)
+        except AttributeError:
+            # Python 2.
+            self.assertRegexpMatches(s, r)

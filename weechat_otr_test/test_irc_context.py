@@ -11,12 +11,12 @@ import weechat_otr
 class IrcContextTestCase(WeechatOtrTestCase):
 
     def test_repr(self):
-        self.assertRegexpMatches(
+        self.assertRegex(
             weechat_otr.IrcContext(None, 'nick@server').__repr__(),
             r'<IrcContext [\da-f]+ peer_nick=nick peer_server=server>')
 
     def test_repr_non_ascii(self):
-        self.assertRegexpMatches(
+        self.assertRegex(
             weechat_otr.IrcContext(None, 'gefährte@gefährteserver').__repr__(),
             weechat_otr.PYVER.to_str(
                 r'<IrcContext [\da-f]+ '
