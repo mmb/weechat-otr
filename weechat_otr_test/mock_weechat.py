@@ -159,6 +159,14 @@ class MockWeechat(types.ModuleType):
     def info_get(self, name, *args):
         return self.infos[args].get(name)
 
+    def info_get_hashtable(self, name, *args):
+        if name == 'irc_message_parse':
+            # TODO: Python translation of WeeChat's message parsing code.
+            #
+            # https://github.com/weechat/weechat/blob/bd06f0f60f8c3f5ab883df9c
+            # b876fe29715055b3/src/plugins/irc/irc-message.c#L43-210
+            return {}
+
     def infolist_free(*args):
         pass
 
