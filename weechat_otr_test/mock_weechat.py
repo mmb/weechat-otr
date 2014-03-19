@@ -224,7 +224,7 @@ class MockWeechat(types.ModuleType):
                                             ptr_message[pos2:pos4]
                                     else:
                                         result['channel'] = ptr_message[pos2:]
-                                elif result['channel']:
+                                elif not result['channel']:
                                     result['channel'] = ptr_message[pos:pos3]
                 else:
                     result['command'] = ptr_message
