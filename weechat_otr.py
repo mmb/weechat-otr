@@ -173,9 +173,9 @@ IRC_PRIVMSG_RE = re.compile(r"""
     (?P<from>
         (?P<from_nick>.+?)
         !
-        (?P<from_user>.+?)
+        .+?
         @
-        (?P<from_host>.+?)
+        .+?
     )
 \ )?
 PRIVMSG
@@ -304,8 +304,6 @@ def parse_irc_privmsg(message):
 
     {'from': 'nick!user@host',
     'from_nick': 'nick',
-    'from_user': 'user',
-    'from_host': 'host',
     'to': '#weechat',
     'to_channel': '#weechat',
     'to_nick': None,
