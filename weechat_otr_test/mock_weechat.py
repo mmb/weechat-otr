@@ -209,7 +209,7 @@ class MockWeechat(types.ModuleType):
                             pos2 = ptr_message[pos:].find(' ')
                             if not result['nick']:
                                 if pos2 != -1:
-                                    result['nick'] = ptr_message[pos:pos2]
+                                    result['nick'] = ptr_message[pos:][:pos2]
                                 else:
                                     result['nick'] = ptr_message[pos:]
                             if pos2 != -1:
