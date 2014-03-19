@@ -167,23 +167,6 @@ READ_ONLY_POLICIES = {
     'allow_v1' : False,
     }
 
-IRC_PRIVMSG_RE = re.compile(r"""
-(
-    :
-    (?P<from>
-        (?P<from_nick>.+?)
-        !
-        .+?
-        @
-        .+?
-    )
-\ )?
-PRIVMSG
-\ (?P<to>.+?)
-\ :?
-(?P<text>.+)
-""", re.VERBOSE)
-
 ACTION_PREFIX = '/me '
 IRC_ACTION_RE = re.compile('^\x01ACTION (?P<text>.*)\x01$')
 PLAIN_ACTION_RE = re.compile('^'+ACTION_PREFIX+'(?P<text>.*)$')
@@ -310,16 +293,25 @@ def parse_irc_privmsg(message):
     'text': 'message here'}
     """
 
-    match = IRC_PRIVMSG_RE.match(message)
-    if match:
-        result = match.groupdict()
+    weechat_result = weechat.info_get_hashtable(
+        'irc_message_parse', dict(message=message))
 
-        if result['to'].startswith(('#', '&')):
-            result['to_channel'] = result['to']
+    if weechat_result['command'] == 'PRIVMSG':
+        to, text = weechat_result['arguments'].split(' :', 1)
+
+        result = {
+            'from': weechat_result['host'],
+            'from_nick': weechat_result['nick'],
+            'to' : to,
+            'text': text,
+            }
+
+        if to.startswith(('#', '&')):
+            result['to_channel'] = to
             result['to_nick'] = None
         else:
             result['to_channel'] = None
-            result['to_nick'] = result['to']
+            result['to_nick'] = to
 
         return result
 

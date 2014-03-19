@@ -159,13 +159,77 @@ class MockWeechat(types.ModuleType):
     def info_get(self, name, *args):
         return self.infos[args].get(name)
 
-    def info_get_hashtable(self, name, *args):
+    def info_get_hashtable(self, name, args):
+        # pylint: disable=too-many-branches
+        # pylint: disable=too-many-statements
         if name == 'irc_message_parse':
-            # TODO: Python translation of WeeChat's message parsing code.
+            # Python translation of WeeChat's message parsing code.
             #
             # https://github.com/weechat/weechat/blob/bd06f0f60f8c3f5ab883df9c
             # b876fe29715055b3/src/plugins/irc/irc-message.c#L43-210
-            return {}
+            result = {
+                'channel' : ''
+                }
+
+            ptr_message = args['message']
+
+            if ptr_message[0] == ':':
+                pos3 = ptr_message.find('@')
+                pos2 = ptr_message.find('!')
+                pos = ptr_message.find(' ')
+                if pos2 == -1 or (pos != -1 and pos2 > pos):
+                    pos2 = pos3
+                if pos2 != -1 and (pos == -1 or pos > pos2):
+                    result['nick'] = ptr_message[1:pos2]
+                elif pos != -1:
+                    result['nick'] = ptr_message[1:pos]
+                if pos != -1:
+                    result['host'] = ptr_message[1:pos]
+                    ptr_message = ptr_message[pos:].lstrip()
+                else:
+                    result['host'] = ptr_message[1:]
+                    ptr_message = ''
+
+            if ptr_message:
+                pos = ptr_message.find(' ')
+                if pos != -1:
+                    result['command'] = ptr_message[:pos]
+                    pos += 1
+                    while ptr_message[pos] == ' ':
+                        pos += 1
+                    result['arguments'] = ptr_message[pos:]
+                    if ptr_message[pos] != ':':
+                        if ptr_message[pos] in ('#', '&', '+', '!'):
+                            pos2 = ptr_message[pos:].find(' ')
+                            if pos2 != -1:
+                                result['channel'] = ptr_message[pos:pos2]
+                            else:
+                                result['channel'] = ptr_message[pos:]
+                        else:
+                            pos2 = ptr_message[pos:].find(' ')
+                            if not result['nick']:
+                                if pos2 != -1:
+                                    result['nick'] = ptr_message[pos:pos2]
+                                else:
+                                    result['nick'] = ptr_message[pos:]
+                            if pos2 != -1:
+                                pos3 = pos2
+                                pos2 += 1
+                                while ptr_message[pos2] == ' ':
+                                    pos2 += 1
+                                if ptr_message[pos2] in ('#', '&', '+', '!'):
+                                    pos4 = ptr_message[pos2:].find(' ')
+                                    if pos4 != -1:
+                                        result['channel'] = \
+                                            ptr_message[pos2:pos4]
+                                    else:
+                                        result['channel'] = ptr_message[pos2:]
+                                elif result['channel']:
+                                    result['channel'] = ptr_message[pos:pos3]
+                else:
+                    result['command'] = ptr_message
+
+            return result
 
     def infolist_free(*args):
         pass
