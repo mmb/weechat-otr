@@ -221,11 +221,11 @@ class MockWeechat(types.ModuleType):
                                     pos4 = ptr_message[pos2:].find(' ')
                                     if pos4 != -1:
                                         result['channel'] = \
-                                            ptr_message[pos2:pos4]
+                                            ptr_message[pos2:][:pos4]
                                     else:
                                         result['channel'] = ptr_message[pos2:]
                                 elif not result['channel']:
-                                    result['channel'] = ptr_message[pos:pos3]
+                                    result['channel'] = ptr_message[pos:][:pos3]
                 else:
                     result['command'] = ptr_message
 
