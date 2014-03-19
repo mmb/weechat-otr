@@ -202,7 +202,7 @@ class MockWeechat(types.ModuleType):
                         if ptr_message[pos] in ('#', '&', '+', '!'):
                             pos2 = ptr_message[pos:].find(' ')
                             if pos2 != -1:
-                                result['channel'] = ptr_message[pos:pos2]
+                                result['channel'] = ptr_message[pos:][:pos2]
                             else:
                                 result['channel'] = ptr_message[pos:]
                         else:
