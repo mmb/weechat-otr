@@ -168,7 +168,10 @@ class MockWeechat(types.ModuleType):
             # https://github.com/weechat/weechat/blob/bd06f0f60f8c3f5ab883df9c
             # b876fe29715055b3/src/plugins/irc/irc-message.c#L43-210
             result = {
-                'channel' : ''
+                'arguments' : '',
+                'channel' : '',
+                'host' : '',
+                'nick' : ''
                 }
 
             ptr_message = args['message']
