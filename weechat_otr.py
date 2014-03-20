@@ -273,6 +273,9 @@ def irc_user(nick, server):
             nick=nick,
             server=server)
 
+def is_a_channel(channel):
+    return channel.startswith(('#', '&', '+', '!'))
+
 def parse_irc_privmsg(message):
     """Parse an IRC PRIVMSG command and return a dictionary.
 
@@ -306,7 +309,7 @@ def parse_irc_privmsg(message):
             'text': text,
             }
 
-        if to.startswith(('#', '&')):
+        if is_a_channel(to):
             result['to_channel'] = to
             result['to_nick'] = None
         else:
