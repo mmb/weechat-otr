@@ -174,6 +174,8 @@ class MockWeechat(types.ModuleType):
                 'nick' : ''
                 }
 
+            nick_set = False
+
             ptr_message = args['message']
 
             if ptr_message[0] == ':':
@@ -184,8 +186,10 @@ class MockWeechat(types.ModuleType):
                     pos2 = pos3
                 if pos2 != -1 and (pos == -1 or pos > pos2):
                     result['nick'] = ptr_message[1:pos2]
+                    nick_set = True
                 elif pos != -1:
                     result['nick'] = ptr_message[1:pos]
+                    nick_set = True
                 if pos != -1:
                     result['host'] = ptr_message[1:pos]
                     ptr_message = ptr_message[pos:].lstrip()
@@ -210,7 +214,7 @@ class MockWeechat(types.ModuleType):
                                 result['channel'] = ptr_message[pos:]
                         else:
                             pos2 = ptr_message[pos:].find(' ')
-                            if not result['nick']:
+                            if not nick_set:
                                 if pos2 != -1:
                                     result['nick'] = ptr_message[pos:][:pos2]
                                 else:
