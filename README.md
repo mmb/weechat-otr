@@ -8,7 +8,9 @@ holes you find.
 
 Testing and security auditing are appreciated.
 
-This script requires the Python OTR package to be installed:
+This script requires the
+[Pure Python OTR](https://github.com/afflux/pure-python-otr)
+package to be installed:
 
 ```pip install python-potr```
 
