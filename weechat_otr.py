@@ -207,27 +207,27 @@ def privmsg(server, nick, message):
             nick=irc_sanitize(nick),
             line=irc_sanitize(line)))
 
-def build_privmsg_in(fromm, to, msg):
+def build_privmsg_in(fromm, target, msg):
     """Build inbound IRC PRIVMSG command."""
-    return ':{user} PRIVMSG {to} :{msg}'.format(
+    return ':{user} PRIVMSG {target} :{msg}'.format(
         user=irc_sanitize(fromm),
-        to=irc_sanitize(to),
+        target=irc_sanitize(target),
         msg=irc_sanitize(msg))
 
-def build_privmsgs_in(fromm, to, msg, prefix=''):
+def build_privmsgs_in(fromm, target, msg, prefix=''):
     """Build an inbound IRC PRIVMSG command for each line in msg.
     If prefix is supplied, prefix each line of msg with it."""
     cmd = []
     for line in msg.splitlines():
-        cmd.append(build_privmsg_in(fromm, to, prefix+line))
+        cmd.append(build_privmsg_in(fromm, target, prefix+line))
     return '\r\n'.join(cmd)
 
-def build_privmsg_out(to, msg):
+def build_privmsg_out(target, msg):
     """Build outbound IRC PRIVMSG command(s)."""
     cmd = []
     for line in msg.splitlines():
-        cmd.append('PRIVMSG {to} :{line}'.format(
-            to=irc_sanitize(to),
+        cmd.append('PRIVMSG {target} :{line}'.format(
+            target=irc_sanitize(target),
             line=irc_sanitize(line)))
     return '\r\n'.join(cmd)
 
@@ -300,21 +300,22 @@ def parse_irc_privmsg(message):
         'irc_message_parse', dict(message=message))
 
     if weechat_result['command'] == 'PRIVMSG':
-        to, text = PYVER.to_unicode(weechat_result['arguments']).split(' :', 1)
+        target, text = PYVER.to_unicode(
+            weechat_result['arguments']).split(' :', 1)
 
         result = {
             'from': PYVER.to_unicode(weechat_result['host']),
             'from_nick': PYVER.to_unicode(weechat_result['nick']),
-            'to' : to,
+            'to' : target,
             'text': text,
             }
 
-        if is_a_channel(to):
-            result['to_channel'] = to
+        if is_a_channel(target):
+            result['to_channel'] = target
             result['to_nick'] = None
         else:
             result['to_channel'] = None
-            result['to_nick'] = to
+            result['to_nick'] = target
 
         return result
 
