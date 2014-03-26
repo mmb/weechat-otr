@@ -300,11 +300,11 @@ def parse_irc_privmsg(message):
         'irc_message_parse', dict(message=message))
 
     if weechat_result['command'] == 'PRIVMSG':
-        to, text = weechat_result['arguments'].split(' :', 1)
+        to, text = PYVER.to_unicode(weechat_result['arguments']).split(' :', 1)
 
         result = {
-            'from': weechat_result['host'],
-            'from_nick': weechat_result['nick'],
+            'from': PYVER.to_unicode(weechat_result['host']),
+            'from_nick': PYVER.to_unicode(weechat_result['nick']),
             'to' : to,
             'text': text,
             }

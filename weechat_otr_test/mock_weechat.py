@@ -74,6 +74,7 @@ class MockWeechat(types.ModuleType):
         self.config_free_calls = []
         self.buffer_new_calls = []
         self.buffer_new_buffers = {}
+        self.info_hashtables = {}
 
     def save(self):
         self.snapshot_weechat_dir()
@@ -162,6 +163,8 @@ class MockWeechat(types.ModuleType):
     def info_get_hashtable(self, name, args):
         # pylint: disable=too-many-branches
         # pylint: disable=too-many-statements
+        if name in self.info_hashtables:
+            return self.info_hashtables[name].pop()
         if name == 'irc_message_parse':
             # Python translation of WeeChat's message parsing code.
             #
