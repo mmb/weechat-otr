@@ -28,11 +28,6 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             "PRIVMSG friend :\xc3" +
             " \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
-    def test_parse_irc_privmsg_channel_ampersand(self):
-        result = weechat_otr.parse_irc_privmsg(
-            ':nick!user@host PRIVMSG &channel :test')
-        self.assertEqual(result['to_channel'], '&channel')
-
     def test_build_privmsg_in_without_newline(self):
         result = weechat_otr.build_privmsg_in('f', 't', 'line1')
         self.assertEqual(result, ':f PRIVMSG t :line1')

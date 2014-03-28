@@ -13,6 +13,11 @@ import weechat_otr
 
 class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
+    def test_parse_irc_privmsg_channel_ampersand(self):
+        result = weechat_otr.parse_irc_privmsg(
+            ':nick!user@host PRIVMSG &channel :test')
+        self.assertEqual(result['to_channel'], '&channel')
+
     def test_parse_irc_privmsg_non_ascii(self):
         sys.modules['weechat'].info_hashtables = {
             'irc_message_parse' : [{
