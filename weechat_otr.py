@@ -274,6 +274,7 @@ def irc_user(nick, server):
             server=server)
 
 def is_a_channel(channel):
+    """Return true if a string has an IRC channel prefix."""
     return channel.startswith(('#', '&', '+', '!'))
 
 def parse_irc_privmsg(message):
