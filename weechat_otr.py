@@ -6,8 +6,9 @@
 # holes you find.
 #
 # Copyright (c) 2012-2013 Matthew M. Boedicker <matthewm@boedicker.org>
-#                    Nils Görs <weechatter@arcor.de>
-#                    Daniel "koolfy" Faucon <koolfy@koolfy.be>
+#                         Nils Görs <weechatter@arcor.de>
+#                         Daniel "koolfy" Faucon <koolfy@koolfy.be>
+#                         Felix Eckhofer <felix@tribut.de>
 #
 # Report issues at https://github.com/mmb/weechat-otr
 #
