@@ -73,6 +73,14 @@ class SmpTestCase(WeechatOtrTestCase):
 
         self.assertEqual(('secret', ), context.smp_got_secret)
 
+    def test_smp_respond_nick_server_secret(self):
+        context = self.setup_smp_context('nick@server', 'nick2@server')
+
+        weechat_otr.command_cb(
+            None, 'server_nick2_buffer', 'smp respond nick2 server secret')
+
+        self.assertEqual(('secret', ), context.smp_got_secret)
+
     def test_smp_respond_secret_non_ascii(self):
         context = self.setup_smp_context('nick@server', 'nick2@server')
 
