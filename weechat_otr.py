@@ -5,7 +5,7 @@
 # messaging in WeeChat, but I offer no guarantee. Please report any security
 # holes you find.
 #
-# Copyright (c) 2012-2013 Matthew M. Boedicker <matthewm@boedicker.org>
+# Copyright (c) 2012-2014 Matthew M. Boedicker <matthewm@boedicker.org>
 #                         Nils Görs <weechatter@arcor.de>
 #                         Daniel "koolfy" Faucon <koolfy@koolfy.be>
 #                         Felix Eckhofer <felix@tribut.de>
