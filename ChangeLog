@@ -1,7 +1,32 @@
+1.4.0
+	2014-04-11
+
+	Non-ascii character bug fixes
+
+	Use WeeChat IRC message parser
+
+	Make messages from the script look different from messages from a user to
+	prevent a user impersonating the script
+
+	Fix character encoding bug when writing trusts file
+
+	More experimental Python 3 support
+
+	Add ability to remove HTML from incoming messages with per-peer setting
+
+	Script version now includes git describe output if the script is in a git
+	tree
+
+	Add outbound HTML escaping with with per-peer setting
+
+	Better multiline message handling
+
+	Bug fix for SMP command parsing with nick, server and secret
+
 1.3.0
 	2013-12-13
 
-	Character encoding big fixes
+	Character encoding bug fixes
 
 	Update to latest version of python-potr
 
