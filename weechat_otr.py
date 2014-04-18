@@ -303,7 +303,9 @@ def parse_irc_privmsg(message):
 
     if weechat_result['command'] == 'PRIVMSG':
         target, text = PYVER.to_unicode(
-            weechat_result['arguments']).split(' :', 1)
+            weechat_result['arguments']).split(' ', 1)
+        if text.startswith(':'):
+            text = text[1:]
 
         result = {
             'from': PYVER.to_unicode(weechat_result['host']),

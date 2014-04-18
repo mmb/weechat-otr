@@ -13,6 +13,19 @@ import weechat_otr
 
 class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
+    def test_parse_privmsg_nick(self):
+        result = weechat_otr.parse_irc_privmsg(
+            ':nick!user@host PRIVMSG nick2 :the message')
+
+        self.assertEqual(result, {
+            'from': 'nick!user@host',
+            'from_nick': 'nick',
+            'to': 'nick2',
+            'to_channel': None,
+            'to_nick': 'nick2',
+            'text': 'the message'
+            })
+
     def test_parse_irc_privmsg_channel_ampersand(self):
         result = weechat_otr.parse_irc_privmsg(
             ':nick!user@host PRIVMSG &channel :test')
@@ -38,4 +51,30 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             'to_channel': None,
             'to_nick': 'nick2\xc3',
             'text': '\xc3'
+            })
+
+    def test_parse_privmsg_nick_no_colon(self):
+        result = weechat_otr.parse_irc_privmsg(
+            ':nick!user@host PRIVMSG nick2 test')
+
+        self.assertEqual(result, {
+            'from': 'nick!user@host',
+            'from_nick': 'nick',
+            'to': 'nick2',
+            'to_channel': None,
+            'to_nick': 'nick2',
+            'text': 'test'
+            })
+
+    def test_parse_privmsg_nick_no_colon_spaces(self):
+        result = weechat_otr.parse_irc_privmsg(
+            ':nick!user@host PRIVMSG nick2 the message')
+
+        self.assertEqual(result, {
+            'from': 'nick!user@host',
+            'from_nick': 'nick',
+            'to': 'nick2',
+            'to_channel': None,
+            'to_nick': 'nick2',
+            'text': 'the message'
             })
