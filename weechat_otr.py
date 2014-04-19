@@ -515,8 +515,8 @@ class IrcContext(potr.context.Context):
                     'Private conversation has been refreshed.')
             elif newstate == potr.context.STATE_FINISHED:
                 self.print_buffer(
-                    """{peer} has ended the private conversation. You should do the same:
-/otr finish""".format(peer=self.peer_nick))
+                    '{peer} has ended the private conversation. You should do '
+                    'the same:\n/otr finish'.format(peer=self.peer_nick))
         elif newstate == potr.context.STATE_ENCRYPTED:
             # unencrypted => encrypted
             trust = self.getCurrentTrust()
@@ -529,7 +529,13 @@ class IrcContext(potr.context.Context):
             else:
                 self.previous_log_level = self.get_log_level()
                 if self.is_logged():
-                    self.hint('You have enabled the recording to disk of OTR conversations. By doing this you are potentially putting yourself and your correspondent in danger. Please consider disabling this policy with "/otr policy default log off". To disable logging for this OTR session, use "/otr log stop"')
+                    self.hint(
+                        'You have enabled the recording to disk of OTR '
+                        'conversations. By doing this you are potentially '
+                        'putting yourself and your correspondent in danger. '
+                        'Please consider disabling this policy with '
+                        '"/otr policy default log off". To disable logging '
+                        'for this OTR session, use "/otr log stop"')
 
             if trust is None:
                 fpr = str(self.getCurrentKey())
