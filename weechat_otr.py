@@ -277,6 +277,10 @@ def is_a_channel(channel):
     """Return true if a string has an IRC channel prefix."""
     return channel.startswith(('#', '&', '+', '!'))
 
+# Exception class for PRIVMSG parsing exceptions.
+class PrivmsgParseException(Exception):
+    pass
+
 def parse_irc_privmsg(message):
     """Parse an IRC PRIVMSG command and return a dictionary.
 
@@ -321,6 +325,8 @@ def parse_irc_privmsg(message):
             result['to_nick'] = target
 
         return result
+    else:
+        raise PrivmsgParseException(message)
 
 def has_otr_end(msg):
     """Return True if the message is the end of an OTR message."""

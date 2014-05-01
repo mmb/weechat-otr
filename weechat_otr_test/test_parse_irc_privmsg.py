@@ -78,3 +78,8 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             'to_nick': 'nick2',
             'text': 'the message'
             })
+
+    def test_parse_irc_privmsg_not_privmsg(self):
+        with self.assertRaises(weechat_otr.PrivmsgParseException):
+            weechat_otr.parse_irc_privmsg(
+            ':nick!user@host OTHERCOMMAND nick2 the message')
