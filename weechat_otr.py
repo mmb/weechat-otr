@@ -184,7 +184,6 @@ otr_debug_buffer = None
 # strips trailing spaces from commands. This causes OTR initiation to fail so
 # the following code adds an extra tab at the end of the plaintext tags if
 # they end in a space.
-
 def patched__bytes__(self):
     data = self.msg + potr.proto.MESSAGE_TAG_BASE
     for v in self.versions:
