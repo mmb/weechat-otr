@@ -53,7 +53,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             'text': '\xc3'
             })
 
-    def test_parse_privmsg_nick_no_colon(self):
+    def test_parse_irc_privmsg_nick_no_colon(self):
         result = weechat_otr.parse_irc_privmsg(
             ':nick!user@host PRIVMSG nick2 test')
 
@@ -66,7 +66,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             'text': 'test'
             })
 
-    def test_parse_privmsg_nick_no_colon_spaces(self):
+    def test_parse_irc_privmsg_nick_no_colon_spaces(self):
         result = weechat_otr.parse_irc_privmsg(
             ':nick!user@host PRIVMSG nick2 the message')
 
