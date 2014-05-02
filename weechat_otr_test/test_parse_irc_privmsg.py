@@ -11,7 +11,7 @@ from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
 
 import weechat_otr
 
-class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
+class ParseIrcPrivmsgTestCase(WeechatOtrTestCase):
 
     def test_parse_irc_privmsg_nick(self):
         result = weechat_otr.parse_irc_privmsg(

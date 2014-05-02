@@ -9,7 +9,7 @@ from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
 
 import weechat_otr
 
-class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
+class MessageOutCbTestCase(WeechatOtrTestCase):
 
     def test_message_out_cb_nick_with_at(self):
         result = weechat_otr.message_out_cb(None, None, 'server',
