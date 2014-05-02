@@ -304,7 +304,7 @@ def parse_irc_privmsg(message):
     weechat_result = weechat.info_get_hashtable(
         'irc_message_parse', dict(message=message))
 
-    if weechat_result['command'] == 'PRIVMSG':
+    if weechat_result['command'].upper() == 'PRIVMSG':
         target, text = PYVER.to_unicode(
             weechat_result['arguments']).split(' ', 1)
         if text.startswith(':'):

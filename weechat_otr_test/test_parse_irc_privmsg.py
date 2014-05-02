@@ -83,3 +83,16 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         with self.assertRaises(weechat_otr.PrivmsgParseException):
             weechat_otr.parse_irc_privmsg(
             ':nick!user@host OTHERCOMMAND nick2 the message')
+
+    def test_parse_irc_privmsg_command_case_insensitive(self):
+        result = weechat_otr.parse_irc_privmsg(
+            ':nick!user@host privmsg nick2 :the message')
+
+        self.assertEqual(result, {
+            'from': 'nick!user@host',
+            'from_nick': 'nick',
+            'to': 'nick2',
+            'to_channel': None,
+            'to_nick': 'nick2',
+            'text': 'the message'
+            })
