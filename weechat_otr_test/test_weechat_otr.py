@@ -13,21 +13,6 @@ import weechat_otr
 
 class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
-    def test_message_out_cb(self):
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG friend :hello')
-        self.assertEqual(result, 'PRIVMSG friend :hello')
-
-    def test_message_out_cb_send_tag_non_ascii(self):
-        sys.modules['weechat'].config_options[
-            'otr.policy.server.nick.friend.send_tag'] = 'on'
-
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ":nick!user@host PRIVMSG friend :\xc3")
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
-            "PRIVMSG friend :\xc3" +
-            " \t  \t\t\t\t \t \t \t    \t\t  \t \t")
-
     def test_build_privmsg_in_without_newline(self):
         result = weechat_otr.build_privmsg_in('f', 't', 'line1')
         self.assertEqual(result, ':f PRIVMSG t :line1')
