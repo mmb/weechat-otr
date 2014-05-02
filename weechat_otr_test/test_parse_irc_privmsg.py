@@ -13,7 +13,7 @@ import weechat_otr
 
 class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
 
-    def test_parse_privmsg_nick(self):
+    def test_parse_irc_privmsg_nick(self):
         result = weechat_otr.parse_irc_privmsg(
             ':nick!user@host PRIVMSG nick2 :the message')
 
