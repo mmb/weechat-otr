@@ -35,6 +35,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         sys.modules['weechat'].info_hashtables = {
             'irc_message_parse' : [{
                 'arguments': weechat_otr.PYVER.to_str('nick2\xc3 :\xc3'),
+                'channel': weechat_otr.PYVER.to_str('nick2\xc3'),
                 'command': weechat_otr.PYVER.to_str('PRIVMSG'),
                 'host': weechat_otr.PYVER.to_str('nick\xc3!user@host'),
                 'nick': weechat_otr.PYVER.to_str('nick\xc3'),
