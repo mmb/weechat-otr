@@ -97,3 +97,16 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             'to_nick': 'nick2',
             'text': 'the message'
             })
+
+    def test_parse_irc_privmsg_no_from(self):
+        result = weechat_otr.parse_irc_privmsg(
+            'PRIVMSG nickserv :identify secret')
+
+        self.assertEqual(result, {
+            'from': '',
+            'from_nick': '',
+            'to': 'nickserv',
+            'to_channel': None,
+            'to_nick': 'nickserv',
+            'text': 'identify secret'
+            })
