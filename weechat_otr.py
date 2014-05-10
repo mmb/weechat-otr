@@ -788,22 +788,12 @@ Note: You can safely omit specifying the peer and server when
         # If previous_log_level has not been previously set, return the level
         # we detect now.
         if not hasattr(self, 'previous_log_level'):
-            infolist = weechat.infolist_get('logger_buffer', '', '')
+            previous_log_level = self.get_log_level()
 
-            buf = self.buffer()
-            previous_log_level = 0
-
-            while weechat.infolist_next(infolist):
-                if weechat.infolist_pointer(infolist, 'buffer') == buf:
-                    previous_log_level = weechat.infolist_integer(
-                        infolist, 'log_level')
-                    if self.is_logged():
-                        weechat.command(buf, '/mute logger disable')
-                        self.print_buffer(
-                            'Logs have been temporarily disabled for the session. They will be restored upon finishing the OTR session.')
-                        break
-
-            weechat.infolist_free(infolist)
+            if self.is_logged():
+                weechat.command(self.buffer(), '/mute logger disable')
+                self.print_buffer(
+                    'Logs have been temporarily disabled for the session. They will be restored upon finishing the OTR session.')
 
             return previous_log_level
 
