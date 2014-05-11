@@ -243,9 +243,15 @@ def prnt(buf, message):
 
 def print_buffer(buf, message):
     """Print message to buf with prefix."""
-    prnt(buf, '{script}: {msg}'.format(
-        script=SCRIPT_NAME,
+    prnt(buf, '{prefix}\t{msg}'.format(
+        prefix=get_prefix(),
         msg=message))
+
+def get_prefix():
+    """Returns configured message prefix."""
+    return weechat.string_eval_expression(
+        config_string('look.prefix'),
+        {}, {}, {})
 
 def debug(msg):
     """Send a debug message to the OTR debug buffer."""
@@ -1677,6 +1683,8 @@ def init_config():
          'bar_config_update_cb'),
         ('bar.state.separator', 'separator for states in the status bar', ',',
          'bar_config_update_cb'),
+        ('prefix', 'prefix used for messages from otr (note: content is evaluated, see /help eval)',
+         '${color:default}- ${color:brown}otr${color:default} -', ''),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['look'], option, 'string', desc, '',

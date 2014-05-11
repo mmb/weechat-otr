@@ -117,6 +117,9 @@ class MockWeechat(types.ModuleType):
         else:
             return 0
 
+    def config_string(self, key):
+        return self.config_get(key)
+
     def config_get(self, key):
         return self.config_options.get(key, '')
 
@@ -252,6 +255,9 @@ class MockWeechat(types.ModuleType):
 
     def mkdir_home(self, name, mode):
         os.mkdir(os.path.join(self.weechat_dir, name), mode)
+
+    def string_eval_expression(self, expr, pointers, extra_vars, options):
+        return expr
 
     def prnt(self, buf, message):
         self.printed.setdefault(buf, []).append(message)

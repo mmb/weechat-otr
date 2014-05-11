@@ -106,11 +106,11 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         weechat_otr.command_cb(None, None, 'start')
 
         self.assertPrinted('server_nick_buffer',
-          'otr: Sending OTR query... Please await confirmation of the OTR ' +
+          '\tSending OTR query... Please await confirmation of the OTR ' +
           'session being started before sending a message.')
 
         self.assertPrinted('server_nick_buffer',
-          'otr: To try OTR on all conversations with nick@server: /otr ' +
+          '\tTo try OTR on all conversations with nick@server: /otr ' +
           'policy send_tag on')
 
     def test_command_cb_start_send_tag_off_no_hints(self):
@@ -119,7 +119,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         weechat_otr.command_cb(None, None, 'start')
 
         self.assertNotPrinted('server_nick_buffer',
-            'otr: To try OTR on all conversations with nick@server: /otr ' +
+            '\tTo try OTR on all conversations with nick@server: /otr ' +
             'policy send_tag on')
 
     def test_command_cb_start_send_tag_off_with_hints(self):
@@ -127,7 +127,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         weechat_otr.command_cb(None, None, 'start')
 
         self.assertPrinted('server_nick_buffer',
-            'otr: To try OTR on all conversations with nick@server: /otr ' +
+            '\tTo try OTR on all conversations with nick@server: /otr ' +
             'policy send_tag on')
 
     def test_command_cb_start_send_tag_on(self):
@@ -136,7 +136,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         weechat_otr.command_cb(None, None, 'start')
 
         self.assertPrinted('server_nick_buffer',
-          'otr: Sending OTR query... Please await confirmation of the OTR ' +
+          '\tSending OTR query... Please await confirmation of the OTR ' +
           'session being started before sending a message.')
 
     def test_irc_sanitize(self):
@@ -147,6 +147,6 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
     def test_print_buffer_not_private(self):
         weechat_otr.command_cb(None, None, 'start no_window_nick server')
         self.assertPrinted('non_private_buffer',
-            'otr: [no_window_nick] Sending OTR query... Please await ' +
+            '\t[no_window_nick] Sending OTR query... Please await ' +
             'confirmation of the OTR session being started before sending a ' +
             'message.')
