@@ -259,6 +259,12 @@ class MockWeechat(types.ModuleType):
     def string_eval_expression(self, expr, pointers, extra_vars, options):
         return expr
 
+    def config_color(self, key):
+        return self.color(self.config_get(key))
+
+    def color(self, name):
+        return ''
+
     def prnt(self, buf, message):
         self.printed.setdefault(buf, []).append(message)
 
