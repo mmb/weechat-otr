@@ -1384,8 +1384,8 @@ def command_cb(data, buf, args):
                     irc_user(nick, server))
 
                 if arg_parts[1] == 'start' and \
-                    not context.is_logged() and \
-                    context.is_encrypted():
+                        not context.is_logged() and \
+                        context.is_encrypted():
                     if context.previous_log_level is None:
                         context.previous_log_level = context.get_log_level()
                     context.print_buffer('From this point on, this conversation will be logged. Please keep in mind that by doing so you are potentially putting yourself and your interlocutor at risk. You can disable this by doing /otr log stop')
@@ -1393,8 +1393,8 @@ def command_cb(data, buf, args):
                     result = weechat.WEECHAT_RC_OK
 
                 elif arg_parts[1] == 'stop' and \
-                    context.is_logged() and \
-                    context.is_encrypted():
+                        context.is_logged() and \
+                        context.is_encrypted():
                     if context.previous_log_level is None:
                         context.previous_log_level = context.get_log_level()
                     weechat.command(buf, '/mute logger set 0')
