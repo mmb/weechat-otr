@@ -765,7 +765,8 @@ Note: You can safely omit specifying the peer and server when
         return result
 
     def get_log_level(self):
-        """Return the current logging level for this context's peer."""
+        """Return the current logging level for this context's peer
+        or -1 if the buffer uses the default log level of weechat."""
         infolist = weechat.infolist_get('logger_buffer', '', '')
 
         buf = self.buffer()
@@ -775,11 +776,21 @@ Note: You can safely omit specifying the peer and server when
         while weechat.infolist_next(infolist):
             if weechat.infolist_pointer(infolist, 'buffer') == buf:
                 result = weechat.infolist_integer(infolist, 'log_level')
+                if not weechat.config_get(self.get_logger_option_name(buf)):
+                    result = -1
                 break
 
         weechat.infolist_free(infolist)
 
         return result
+
+    def get_logger_option_name(self, buf):
+        """Returns the logger config option for the specified buffer."""
+        name = weechat.buffer_get_string(buf, 'name')
+        plugin = weechat.buffer_get_string(buf, 'plugin')
+
+        return 'logger.level.{plugin}.{name}'.format(
+            plugin = plugin, name = name)
 
 
     def disable_logging(self):
@@ -788,22 +799,12 @@ Note: You can safely omit specifying the peer and server when
         # If previous_log_level has not been previously set, return the level
         # we detect now.
         if not hasattr(self, 'previous_log_level'):
-            infolist = weechat.infolist_get('logger_buffer', '', '')
+            previous_log_level = self.get_log_level()
 
-            buf = self.buffer()
-            previous_log_level = 0
-
-            while weechat.infolist_next(infolist):
-                if weechat.infolist_pointer(infolist, 'buffer') == buf:
-                    previous_log_level = weechat.infolist_integer(
-                        infolist, 'log_level')
-                    if self.is_logged():
-                        weechat.command(buf, '/mute logger disable')
-                        self.print_buffer(
-                            'Logs have been temporarily disabled for the session. They will be restored upon finishing the OTR session.')
-                        break
-
-            weechat.infolist_free(infolist)
+            if self.is_logged():
+                weechat.command(self.buffer(), '/mute logger disable')
+                self.print_buffer(
+                    'Logs have been temporarily disabled for the session. They will be restored upon finishing the OTR session.')
 
             return previous_log_level
 
@@ -824,6 +825,15 @@ Note: You can safely omit specifying the peer and server when
                     previous_log_level))
             weechat.command(buf, '/mute logger set {}'.format(
                 previous_log_level))
+
+        if previous_log_level == -1:
+            logger_option_name = self.get_logger_option_name(buf)
+            logger_option = weechat.config_get(logger_option_name)
+            self.print_buffer(
+                'Restoring buffer logging value to default ({})'.format(
+                    weechat.config_integer_default(logger_option)))
+            weechat.command(buf, '/mute unset {}'.format(
+                logger_option_name))
 
         del self.previous_log_level
 
