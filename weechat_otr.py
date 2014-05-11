@@ -1375,7 +1375,7 @@ def command_cb(data, buf, args):
                             'This conversation is currently NOT being logged.')
                         result = weechat.WEECHAT_RC_OK
                 else:
-                    print_buffer('', 'OTR LOG: Not in an OTR session')
+                    context.print_buffer('OTR LOG: Not in an OTR session')
                     result = weechat.WEECHAT_RC_OK
 
             else:
@@ -1406,7 +1406,7 @@ def command_cb(data, buf, args):
                     result = weechat.WEECHAT_RC_OK
 
                 elif not context.is_encrypted():
-                    print_buffer('', 'OTR LOG: Not in an OTR session')
+                    context.print_buffer('OTR LOG: Not in an OTR session')
                     result = weechat.WEECHAT_RC_OK
 
                 else:
