@@ -241,6 +241,12 @@ def prnt(buf, message):
     """Wrap weechat.prnt() with utf-8 encode."""
     weechat.prnt(buf, PYVER.to_str(message))
 
+def print_buffer(buf, message):
+    """Print message to buf with prefix."""
+    prnt(buf, '{script}: {msg}'.format(
+        script=SCRIPT_NAME,
+        msg=message))
+
 def debug(msg):
     """Send a debug message to the OTR debug buffer."""
     debug_option = weechat.config_get(config_prefix('general.debug'))
@@ -412,14 +418,14 @@ def default_peer_args(args, buf):
 
 def print_default_policies():
     """Print default policies values to the core buffer."""
-    prnt('', 'Current default OTR policies:')
+    print_buffer('', 'Current default OTR policies:')
     for policy, desc in sorted(POLICIES.items()):
-        prnt('', '  {policy} ({desc}) is {value}'.format(
+        print_buffer('', '  {policy} ({desc}) is {value}'.format(
             policy=policy,
             desc=desc,
             value=config_string('policy.default.{}'.format(policy))
             ))
-    prnt('', 'Change default policies with /otr policy default NAME on/off')
+    print_buffer('', 'Change default policies with /otr policy default NAME on/off')
     return True
 
 def to_bytes(strng):
@@ -598,9 +604,7 @@ class IrcContext(potr.context.Context):
                     nick=self.peer_nick,
                     msg=msg)
 
-        prnt(buf, '{script}: {msg}'.format(
-            script=SCRIPT_NAME,
-            msg=msg))
+        print_buffer(buf, msg)
 
     def hint(self, msg):
         """Print a message to the buffer but only when hints are enabled."""
@@ -1131,7 +1135,7 @@ def message_out_cb(data, modifier, modifier_data, string):
         weechat.bar_item_update(SCRIPT_NAME)
     except:
         try:
-            prnt('', traceback.format_exc())
+            print_buffer('', traceback.format_exc())
             context.print_buffer(
                 'Failed to send message. See core buffer for traceback.')
         except:
@@ -1371,11 +1375,11 @@ def command_cb(data, buf, args):
                             'This conversation is currently NOT being logged.')
                         result = weechat.WEECHAT_RC_OK
                 else:
-                    weechat.prnt('', 'OTR LOG: Not in an OTR session')
+                    print_buffer('', 'OTR LOG: Not in an OTR session')
                     result = weechat.WEECHAT_RC_OK
 
             else:
-                weechat.prnt('', 'OTR LOG: Not in an OTR session')
+                print_buffer('', 'OTR LOG: Not in an OTR session')
                 result = weechat.WEECHAT_RC_OK
 
         if len(arg_parts) == 2:
@@ -1402,7 +1406,7 @@ def command_cb(data, buf, args):
                     result = weechat.WEECHAT_RC_OK
 
                 elif not context.is_encrypted():
-                    weechat.prnt('', 'OTR LOG: Not in an OTR session')
+                    print_buffer('', 'OTR LOG: Not in an OTR session')
                     result = weechat.WEECHAT_RC_OK
 
                 else:
@@ -1410,7 +1414,7 @@ def command_cb(data, buf, args):
                     result = weechat.WEECHAT_RC_OK
 
             else:
-                weechat.prnt('', 'OTR LOG: Not in an OTR session')
+                print_buffer('', 'OTR LOG: Not in an OTR session')
 
     elif len(arg_parts) in (1, 2, 3, 4) and arg_parts[0] == 'policy':
         if len(arg_parts) == 1:
