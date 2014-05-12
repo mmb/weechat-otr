@@ -10,6 +10,7 @@
 
 from __future__ import unicode_literals
 
+import collections
 import copy
 import io
 import os
@@ -57,6 +58,8 @@ class MockWeechat(types.ModuleType):
                 'localvar_type' : 'private',
                 'localvar_channel' : 'nick',
                 'localvar_server' : 'server',
+                'plugin' : 'irc',
+                'name' : 'server_nick_buffer_name',
                 },
             'server_nick2_buffer': {
                 'localvar_type' : 'private',
@@ -75,6 +78,9 @@ class MockWeechat(types.ModuleType):
         self.buffer_new_calls = []
         self.buffer_new_buffers = {}
         self.info_hashtables = {}
+        self.infolists = {}
+        self.config_integer_defaults = {}
+        self.commands = []
 
     def save(self):
         self.snapshot_weechat_dir()
@@ -108,8 +114,8 @@ class MockWeechat(types.ModuleType):
     def buffer_get_string(self, buf, string):
         return self.buffers[buf].get(string)
 
-    def command(*args):
-        pass
+    def command(self, *args):
+        self.commands.append(args)
 
     def config_boolean(self, val):
         if val == 'on':
@@ -244,11 +250,19 @@ class MockWeechat(types.ModuleType):
     def infolist_free(*args):
         pass
 
-    def infolist_get(*args):
-        pass
+    def infolist_get(self, *args):
+        return collections.deque(self.infolists.get(args, []) + [False])
 
-    def infolist_next(*args):
-        pass
+    def infolist_next(self, infolist):
+        # The current item in the infolist is the last item.
+        infolist.rotate(-1)
+        return infolist[-1]
+
+    def infolist_integer(self, infolist, key):
+        return infolist[-1]['integer'][key]
+
+    def infolist_pointer(self, infolist, key):
+        return infolist[-1]['pointer'][key]
 
     def mkdir_home(self, name, mode):
         os.mkdir(os.path.join(self.weechat_dir, name), mode)
@@ -263,6 +277,9 @@ class MockWeechat(types.ModuleType):
 
     def set_server_current_nick(self, server, nick):
         self.infos[(server, )]['irc_nick'] = nick
+
+    def config_integer_default(self, key):
+        return self.config_integer_defaults.get(key)
 
     def config_write(self, *args):
         self.config_written.append(args)
