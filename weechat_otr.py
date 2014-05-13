@@ -793,7 +793,6 @@ Note: You can safely omit specifying the peer and server when
         return 'logger.level.{plugin}.{name}'.format(
             plugin = plugin, name = name)
 
-
     def disable_logging(self):
         """Return the previous logger level and set the buffer logger level
         to 0. If it was already 0, return None."""
