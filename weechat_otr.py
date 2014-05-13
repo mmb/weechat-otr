@@ -786,8 +786,8 @@ Note: You can safely omit specifying the peer and server when
 
     def get_logger_option_name(self, buf):
         """Returns the logger config option for the specified buffer."""
-        name = weechat.buffer_get_string(buf, 'name')
-        plugin = weechat.buffer_get_string(buf, 'plugin')
+        name = buffer_get_string(buf, 'name')
+        plugin = buffer_get_string(buf, 'plugin')
 
         return 'logger.level.{plugin}.{name}'.format(
             plugin = plugin, name = name)
