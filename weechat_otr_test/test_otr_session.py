@@ -68,11 +68,15 @@ class OtrSessionTestCase(SessionTestCase):
                 'localvar_type' : 'private',
                 'localvar_channel' : 'gefährte',
                 'localvar_server' : 'server',
+                'name' : 'server_gefährte_buffer_name',
+                'plugin' : 'irc',
                 },
             weechat_otr.PYVER.to_str('server_gefährte2_buffer') : {
                 'localvar_type' : 'private',
                 'localvar_channel' : 'gefährte2',
                 'localvar_server' : 'server',
+                'name' : 'server_gefährte2_buffer_name',
+                'plugin' : 'irc',
                 },
             })
 

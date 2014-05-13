@@ -771,16 +771,17 @@ Note: You can safely omit specifying the peer and server when
 
         buf = self.buffer()
 
-        result = 0
+        if not weechat.config_get(self.get_logger_option_name(buf)):
+            result = -1
+        else:
+            result = 0
 
-        while weechat.infolist_next(infolist):
-            if weechat.infolist_pointer(infolist, 'buffer') == buf:
-                result = weechat.infolist_integer(infolist, 'log_level')
-                if not weechat.config_get(self.get_logger_option_name(buf)):
-                    result = -1
-                break
+            while weechat.infolist_next(infolist):
+                if weechat.infolist_pointer(infolist, 'buffer') == buf:
+                    result = weechat.infolist_integer(infolist, 'log_level')
+                    break
 
-        weechat.infolist_free(infolist)
+            weechat.infolist_free(infolist)
 
         return result
 
