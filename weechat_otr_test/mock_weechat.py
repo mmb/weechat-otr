@@ -58,16 +58,20 @@ class MockWeechat(types.ModuleType):
                 'localvar_type' : 'private',
                 'localvar_channel' : 'nick',
                 'localvar_server' : 'server',
-                'plugin' : 'irc',
                 'name' : 'server_nick_buffer_name',
+                'plugin' : 'irc',
                 },
             'server_nick2_buffer': {
                 'localvar_type' : 'private',
                 'localvar_channel' : 'nick2',
                 'localvar_server' : 'server',
+                'name' : 'server_nick2_buffer_name',
+                'plugin' : 'irc',
                 },
             'non_private_buffer' : {
                 'localvar_type' : 'non_private',
+                'name' : 'non_private_buffer_name',
+                'plugin' : 'irc',
                 }
             }
         self.config_written = []
