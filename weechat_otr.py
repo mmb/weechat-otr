@@ -840,8 +840,12 @@ Note: You can safely omit specifying the peer and server when
     def msg_convert_in(self, msg):
         """Transform incoming OTR message to IRC format.
         This includes stripping html, converting plain-text ACTIONs
-        and character encoding conversion."""
+        and character encoding conversion.
+        Only character encoding is changed if context is unencrypted."""
         msg = PYVER.to_unicode(msg)
+
+        if not self.is_encrypted():
+            return msg
 
         if self.getPolicy('html_filter'):
             try:
@@ -854,11 +858,13 @@ Note: You can safely omit specifying the peer and server when
     def msg_convert_out(self, msg):
         """Convert an outgoing IRC message to be sent over OTR.
         This includes escaping html, converting ACTIONs to plain-text
-        and character encoding conversion."""
-        msg = msg_plain_from_irc(msg)
+        and character encoding conversion
+        Only character encoding is changed if context is unencrypted."""
+        if self.is_encrypted():
+            msg = msg_plain_from_irc(msg)
 
-        if self.getPolicy('html_escape'):
-            msg = PYVER.html_escape(msg)
+            if self.getPolicy('html_escape'):
+                msg = PYVER.html_escape(msg)
 
         # potr expects bytes to be returned
         return to_bytes(msg)
