@@ -828,10 +828,8 @@ Note: You can safely omit specifying the peer and server when
 
         if previous_log_level == -1:
             logger_option_name = self.get_logger_option_name(buf)
-            logger_option = weechat.config_get(logger_option_name)
             self.print_buffer(
-                'Restoring buffer logging value to default ({})'.format(
-                    weechat.config_integer_default(logger_option)))
+                'Restoring buffer logging value to default')
             weechat.command(buf, '/mute unset {}'.format(
                 logger_option_name))
 
