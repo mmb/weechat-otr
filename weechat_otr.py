@@ -649,7 +649,7 @@ Respond with: /otr smp respond <answer>""".format(
                         msg=PYVER.to_unicode(smp1q.msg)))
             elif first_instance(tlvs, potr.proto.SMP2TLV):
                 if not self.in_smp:
-                    debug('Reveived unexpected SMP2')
+                    debug('Received unexpected SMP2')
                     self.smp_finish()
                 else:
                     debug('SMP2')
