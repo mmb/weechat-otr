@@ -1425,13 +1425,10 @@ def command_cb(data, buf, args):
                     irc_user(nick, server))
 
                 context.print_buffer(context.format_policies())
-
-                result = weechat.WEECHAT_RC_OK
-
             else:
                 print_default_policies()
 
-                result = weechat.WEECHAT_RC_OK
+            result = weechat.WEECHAT_RC_OK
 
         elif len(arg_parts) == 2 and arg_parts[1].lower() == 'default':
             nick, server = default_peer_args([], buf)
@@ -1441,13 +1438,10 @@ def command_cb(data, buf, args):
                     irc_user(nick, server))
 
                 context.print_buffer(context.format_default_policies())
-
-                result = weechat.WEECHAT_RC_OK
-
             else:
                 print_default_policies()
 
-                result = weechat.WEECHAT_RC_OK
+            result = weechat.WEECHAT_RC_OK
 
         elif len(arg_parts) == 3 and arg_parts[1].lower() in POLICIES:
             nick, server = default_peer_args([], buf)
@@ -1482,12 +1476,10 @@ def command_cb(data, buf, args):
                     irc_user(nick, server))
 
                 context.print_buffer(context.format_default_policies())
-
-                result = weechat.WEECHAT_RC_OK
-
             else:
                 print_default_policies()
-                result = weechat.WEECHAT_RC_OK
+
+            result = weechat.WEECHAT_RC_OK
 
     return result
 
