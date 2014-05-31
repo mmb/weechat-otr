@@ -410,16 +410,21 @@ def default_peer_args(args, buf):
 
     return result
 
-def print_default_policies():
-    """Print default policies values to the core buffer."""
-    prnt('', 'Current default OTR policies:')
+def format_default_policies():
+    """Return current default policies formatted as a string for the user."""
+    buf = io.StringIO()
+
+    buf.write('Current default OTR policies:\n')
+
     for policy, desc in sorted(POLICIES.items()):
-        prnt('', '  {policy} ({desc}) is {value}'.format(
-            policy=policy,
-            desc=desc,
-            value=config_string('policy.default.{}'.format(policy))
-            ))
-    prnt('', 'Change default policies with /otr policy default NAME on/off')
+        buf.write('  {policy} ({desc}) : {value}\n'.format(
+                policy=policy,
+                desc=desc,
+                value=config_string('policy.default.{}'.format(policy))))
+
+    buf.write('Change default policies with: /otr policy default NAME on|off')
+
+    return buf.getvalue()
 
 def to_bytes(strng):
     """Convert a python str or unicode to bytes."""
@@ -725,23 +730,6 @@ Note: You can safely omit specifying the peer and server when
                     value='on' if self.getPolicy(policy) else 'off'))
 
         buf.write('Change policies with: /otr policy NAME on|off')
-
-        return buf.getvalue()
-
-    def format_default_policies(self):
-        """Return current default policies formatted as a string for the
-        user."""
-        buf = io.StringIO()
-
-        buf.write('Current default OTR policies:\n')
-
-        for policy, desc in sorted(POLICIES.items()):
-            buf.write('  {policy} ({desc}) : {value}\n'.format(
-                    policy=policy,
-                    desc=desc,
-                    value=config_string('policy.default.' + policy)))
-
-        buf.write('Change default policies with: /otr policy default NAME on|off')
 
         return buf.getvalue()
 
@@ -1426,7 +1414,7 @@ def command_cb(data, buf, args):
 
                 context.print_buffer(context.format_policies())
             else:
-                print_default_policies()
+                prnt('', format_default_policies())
 
             result = weechat.WEECHAT_RC_OK
 
@@ -1437,9 +1425,9 @@ def command_cb(data, buf, args):
                 context = ACCOUNTS[current_user(server)].getContext(
                     irc_user(nick, server))
 
-                context.print_buffer(context.format_default_policies())
+                context.print_buffer(format_default_policies())
             else:
-                print_default_policies()
+                prnt('', format_default_policies())
 
             result = weechat.WEECHAT_RC_OK
 
@@ -1475,9 +1463,9 @@ def command_cb(data, buf, args):
                 context = ACCOUNTS[current_user(server)].getContext(
                     irc_user(nick, server))
 
-                context.print_buffer(context.format_default_policies())
+                context.print_buffer(format_default_policies())
             else:
-                print_default_policies()
+                prnt('', format_default_policies())
 
             result = weechat.WEECHAT_RC_OK
 

@@ -149,6 +149,9 @@ class MockWeechat(types.ModuleType):
     def config_read(*args):
         pass
 
+    def config_string(self, key):
+        return key
+
     def current_buffer(*args):
         pass
 
