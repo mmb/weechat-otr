@@ -90,6 +90,14 @@ class SmpTestCase(WeechatOtrTestCase):
         self.assertEqual((weechat_otr.PYVER.to_str('deathtöngue'), ),
             context.smp_got_secret)
 
+    def test_smp_abort(self):
+        context = self.setup_smp_context('nick@server', 'nick2@server')
+        context.in_smp = True
+
+        weechat_otr.command_cb(None, 'server_nick2_buffer', 'smp abort')
+
+        self.assertEqual([('SMP aborted.',)], context.smp_finishes)
+
     def setup_smp_context(self, account_name, context_name):
         # pylint: disable=no-self-use
         context = weechat_otr_test.mock_context.MockContext()
