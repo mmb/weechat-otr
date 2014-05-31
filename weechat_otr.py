@@ -420,7 +420,6 @@ def print_default_policies():
             value=config_string('policy.default.{}'.format(policy))
             ))
     prnt('', 'Change default policies with /otr policy default NAME on/off')
-    return True
 
 def to_bytes(strng):
     """Convert a python str or unicode to bytes."""
