@@ -25,8 +25,7 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
         result = weechat_otr.message_out_cb(None, None, 'server',
             ":nick!user@host PRIVMSG friend :\xc3")
         self.assertEqual(weechat_otr.PYVER.to_unicode(result),
-            "PRIVMSG friend :\xc3" +
-            " \t  \t\t\t\t \t \t \t    \t\t  \t \t")
+            "PRIVMSG friend :\xc3 \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
     def test_message_out_cb_nick_with_at(self):
         result = weechat_otr.message_out_cb(None, None, 'server',
