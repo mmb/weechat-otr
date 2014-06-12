@@ -18,7 +18,7 @@ class ContextTestCase(WeechatOtrTestCase):
         context.print_buffer('a message from the script')
 
         self.assertPrinted('server_nick_buffer',
-            'otr: a message from the script')
+            '\ta message from the script')
 
     def test_print_buffer_non_ascii(self):
         account = weechat_otr_test.mock_account.MockAccount()
@@ -26,4 +26,4 @@ class ContextTestCase(WeechatOtrTestCase):
         context.print_buffer('gefährte')
 
         self.assertPrinted('server_nick_buffer',
-            weechat_otr.PYVER.to_str('otr: gefährte'))
+            weechat_otr.PYVER.to_str('\tgefährte'))
