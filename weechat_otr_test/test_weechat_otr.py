@@ -107,13 +107,13 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         weechat_otr.command_cb(None, None, 'start')
 
         self.assertPrinted('server_nick_buffer', (
-          'eval(${color:default}- ${color:brown}otr${color:default} -)\t'
+          'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
           '(color lightblue)'
           'Sending OTR query... Please await confirmation of the OTR '
           'session being started before sending a message.'))
 
         self.assertPrinted('server_nick_buffer', (
-          'eval(${color:default}- ${color:brown}otr${color:default} -)\t'
+          'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
           '(color lightblue)'
           'To try OTR on all conversations with nick@server: /otr '
           'policy send_tag on'))
@@ -124,7 +124,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         weechat_otr.command_cb(None, None, 'start')
 
         self.assertNotPrinted('server_nick_buffer', (
-            'eval(${color:default}- ${color:brown}otr${color:default} -)\t'
+            'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
             '(color lightblue)'
             'To try OTR on all conversations with nick@server: /otr '
             'policy send_tag on'))
@@ -134,7 +134,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         weechat_otr.command_cb(None, None, 'start')
 
         self.assertPrinted('server_nick_buffer', (
-            'eval(${color:default}- ${color:brown}otr${color:default} -)\t'
+            'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
             '(color lightblue)'
             'To try OTR on all conversations with nick@server: /otr '
             'policy send_tag on'))
@@ -145,7 +145,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
         weechat_otr.command_cb(None, None, 'start')
 
         self.assertPrinted('server_nick_buffer', (
-          'eval(${color:default}- ${color:brown}otr${color:default} -)\t'
+          'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
           '(color lightblue)'
           'Sending OTR query... Please await confirmation of the OTR '
           'session being started before sending a message.'))
@@ -158,7 +158,7 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
     def test_print_buffer_not_private(self):
         weechat_otr.command_cb(None, None, 'start no_window_nick server')
         self.assertPrinted('non_private_buffer', (
-            'eval(${color:default}- ${color:brown}otr${color:default} -)\t'
+            'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
             '(color lightblue)'
             '[no_window_nick] Sending OTR query... Please await confirmation '
             'of the OTR session being started before sending a message.'))

@@ -15,7 +15,7 @@ class TestPolicy(WeechatOtrTestCase):
         weechat_otr.command_cb(None, None, 'policy default')
 
         self.assertPrinted('server_nick_buffer', (
-            'eval(${color:default}- ${color:brown}otr${color:default} -)\t'
+            'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
             '(color default)'
             'Current default OTR policies:\r\n'
             '(color default)'

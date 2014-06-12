@@ -1696,7 +1696,7 @@ def init_config():
         ('bar.state.separator', 'separator for states in the status bar', ',',
          'bar_config_update_cb'),
         ('prefix', 'prefix used for messages from otr (note: content is evaluated, see /help eval)',
-         '${color:default}- ${color:brown}otr${color:default} -', ''),
+         '${color:default}:! ${color:brown}otr${color:default} !:', ''),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['look'], option, 'string', desc, '',
