@@ -278,10 +278,10 @@ class MockWeechat(types.ModuleType):
         return 'eval({})'.format(expr)
 
     def config_color(self, key):
-        return self.color(self.config_get(key))
+        return key
 
     def color(self, name):
-        return ''
+        return '(color {})'.format(name)
 
     def prnt(self, buf, message):
         self.printed.setdefault(buf, []).append(message)

@@ -19,7 +19,7 @@ class ContextTestCase(WeechatOtrTestCase):
 
         self.assertPrinted('server_nick_buffer',
             'eval(${color:default}- ${color:brown}otr${color:default} -)\t'
-            'a message from the script')
+            '(color default)a message from the script')
 
     def test_print_buffer_non_ascii(self):
         account = weechat_otr_test.mock_account.MockAccount()
@@ -29,4 +29,4 @@ class ContextTestCase(WeechatOtrTestCase):
         self.assertPrinted('server_nick_buffer',
             weechat_otr.PYVER.to_str(
               'eval(${color:default}- ${color:brown}otr${color:default} -)\t'
-              'gefährte'))
+              '(color default)gefährte'))
