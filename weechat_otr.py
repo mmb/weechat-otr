@@ -241,7 +241,7 @@ def prnt(buf, message):
     """Wrap weechat.prnt() with utf-8 encode."""
     weechat.prnt(buf, PYVER.to_str(message))
 
-def print_buffer(buf, message, level = 'info'):
+def print_buffer(buf, message, level='info'):
     """Print message to buf with prefix,
     using color according to level."""
     prnt(buf, '{prefix}\t{msg}'.format(
@@ -585,10 +585,12 @@ class IrcContext(potr.context.Context):
 
             if bool(trust):
                 self.print_buffer(
-                    'Authenticated secured OTR conversation started.', 'success')
+                    'Authenticated secured OTR conversation started.',
+                    'success')
             else:
                 self.print_buffer(
-                    'Unauthenticated secured OTR conversation started.', 'warning')
+                    'Unauthenticated secured OTR conversation started.',
+                    'warning')
                 self.hint(self.verify_instructions())
 
         if self.state != potr.context.STATE_PLAINTEXT and \
@@ -617,7 +619,7 @@ class IrcContext(potr.context.Context):
                 nick=self.peer_nick
                 ))
 
-    def print_buffer(self, msg, level = 'info'):
+    def print_buffer(self, msg, level='info'):
         """Print a message to the buffer for this context.
         level is used to colorize the message."""
         buf = self.buffer()
@@ -804,7 +806,7 @@ Note: You can safely omit specifying the peer and server when
         plugin = buffer_get_string(buf, 'plugin')
 
         return 'logger.level.{plugin}.{name}'.format(
-            plugin = plugin, name = name)
+            plugin=plugin, name=name)
 
     def disable_logging(self):
         """Return the previous logger level and set the buffer logger level
