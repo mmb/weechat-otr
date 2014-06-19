@@ -1620,10 +1620,10 @@ def buffer_switch_cb(data, signal, signal_data):
 
     return weechat.WEECHAT_RC_OK
 
-def buffer_closed_cb(data, signal, signal_data):
+def buffer_closing_cb(data, signal, signal_data):
     """Callback for buffer closed.
 
-    It closes the OTR session when the buffer is closed.
+    It closes the OTR session when the buffer is about to be closed.
     """
     result = weechat.WEECHAT_RC_ERROR
     nick, server = default_peer_args([], signal_data)
@@ -1823,7 +1823,7 @@ if weechat.register(
     weechat.hook_config('logger.level.irc.*', 'logger_level_update_cb', '')
 
     weechat.hook_signal('buffer_switch', 'buffer_switch_cb', '')
-    weechat.hook_signal('buffer_closing', 'buffer_closed_cb', '')
+    weechat.hook_signal('buffer_closing', 'buffer_closing_cb', '')
 
     OTR_STATUSBAR = weechat.bar_item_new(SCRIPT_NAME, 'otr_statusbar_cb', '')
     weechat.bar_item_update(SCRIPT_NAME)
