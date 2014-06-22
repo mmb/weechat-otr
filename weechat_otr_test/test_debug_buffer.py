@@ -13,19 +13,19 @@ import sys
 
 class ShutdownTestCase(WeechatOtrTestCase):
 
-    def xtest_debug_option_off(self):
+    def test_debug_option_off(self):
         sys.modules['weechat'].config_options['otr.general.debug'] = 'off'
         weechat_otr.debug('test')
 
         self.assertNotPrinted('OTR Debug', 'otr debug\ttest')
 
-    def xtest_debug_buffer_on(self):
+    def test_debug_buffer_on(self):
         sys.modules['weechat'].config_options['otr.general.debug'] = 'on'
         weechat_otr.debug('test')
 
         self.assertPrinted('OTR Debug', 'otr debug\ttest')
 
-    def xtest_debug_buffer_non_ascii(self):
+    def test_debug_buffer_non_ascii(self):
         sys.modules['weechat'].config_options['otr.general.debug'] = 'on'
         weechat_otr.debug('gefährte')
 
