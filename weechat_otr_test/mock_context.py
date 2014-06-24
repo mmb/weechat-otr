@@ -9,6 +9,7 @@ class MockContext(object):
         self.smp_got_secret = None
         self.in_smp = False
         self.smp_finishes = []
+        self.disconnects = 0
 
     def smpAbort(self):
         pass
@@ -24,3 +25,6 @@ class MockContext(object):
 
     def print_buffer(self, *args):
         pass
+
+    def disconnect(self):
+        self.disconnects += 1
