@@ -27,6 +27,33 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
         self.assertEqual(weechat_otr.PYVER.to_unicode(result),
             "PRIVMSG friend :\xc3 \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
+    def xtest_message_out_cb_send_tag_chanserv(self):
+        sys.modules['weechat'].config_options[
+            'otr.policy.default.send_tag'] = 'on'
+
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG ChanServ :register channel secret desc')
+        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+            'PRIVMSG ChanServ :register channel secret desc')
+
+    def xtest_message_out_cb_send_tag_memoserv(self):
+        sys.modules['weechat'].config_options[
+            'otr.policy.default.send_tag'] = 'on'
+
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG MemoServ :send friend hi')
+        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+            'PRIVMSG MemoServ :send friend hi')
+
+    def xtest_message_out_cb_send_tag_nickserv(self):
+        sys.modules['weechat'].config_options[
+            'otr.policy.default.send_tag'] = 'on'
+
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            ":nick!user@host PRIVMSG NickServ :identify secret")
+        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+            "PRIVMSG NickServ :identify secret")
+
     def test_message_out_cb_nick_with_at(self):
         result = weechat_otr.message_out_cb(None, None, 'server',
             ':nick!user@host PRIVMSG @#chan :hello')
