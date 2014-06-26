@@ -522,6 +522,8 @@ class IrcContext(potr.context.Context):
 
         if key_lower in READ_ONLY_POLICIES:
             result = READ_ONLY_POLICIES[key_lower]
+        elif key_lower == 'send_tag' and self.is_serv():
+            result = False
         else:
             option = weechat.config_get(self.policy_config_option(key))
 
@@ -881,6 +883,13 @@ Note: You can safely omit specifying the peer and server when
 
         # potr expects bytes to be returned
         return to_bytes(msg)
+
+    def is_serv(self):
+        return self.peer_nick.lower() in [
+            'chanserv',
+            'memoserv',
+            'nickserv'
+            ]
 
     def __repr__(self):
         return PYVER.to_str(('<{} {:x} peer_nick={c.peer_nick} '
