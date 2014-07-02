@@ -28,6 +28,7 @@
 from __future__ import unicode_literals
 
 import collections
+import glob
 import io
 import os
 import re
@@ -454,6 +455,21 @@ def colorize(msg, color):
             msg=line))
 
     return '\r\n'.join(result)
+
+def accounts():
+    """Return a list of all IrcOtrAccounts sorted by name."""
+    result = []
+    for key_path in glob.iglob(os.path.join(OTR_DIR, '*.key3')):
+        key_name, _ = os.path.splitext(os.path.basename(key_path))
+        result.append(ACCOUNTS[key_name])
+
+    return sorted(result, key=lambda account: account.name)
+
+def show_account_fingerprints():
+    """Print all account names and their fingerprints to the core buffer."""
+    for account in accounts():
+        print_buffer('', '{} fingerprint {}'.format(
+            account.name, account.getPrivkey()))
 
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
@@ -1510,6 +1526,10 @@ def command_cb(data, buf, args):
                 prnt('', format_default_policies())
 
             result = weechat.WEECHAT_RC_OK
+    elif len(arg_parts) in (1, 2) and arg_parts[0] == 'fingerprint':
+        if len(arg_parts) == 1:
+            show_account_fingerprints()
+        result = weechat.WEECHAT_RC_OK
 
     return result
 
@@ -1812,7 +1832,8 @@ if weechat.register(
         'trust [NICK SERVER] || '
         'distrust [NICK SERVER] || '
         'log [on|off] || '
-        'policy [POLICY on|off]',
+        'policy [POLICY on|off] || '
+        'fingerprint [SEARCH|all]',
         '',
         'start %(nick) %(irc_servers) %-||'
         'finish %(nick) %(irc_servers) %-||'
@@ -1822,7 +1843,8 @@ if weechat.register(
         'trust %(nick) %(irc_servers) %-||'
         'distrust %(nick) %(irc_servers) %-||'
         'log on|off %-||'
-        'policy %(otr_policy) on|off %-||',
+        'policy %(otr_policy) on|off %-||'
+        'fingerprint all %-||',
         'command_cb',
         '')
 

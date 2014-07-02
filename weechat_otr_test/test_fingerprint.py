@@ -11,9 +11,12 @@ import weechat_otr
 
 class FingerprintTestCase(WeechatOtrTestCase):
 
-    def xtest_fingerprint(self):
+    def test_fingerprint(self):
         account1 = weechat_otr.ACCOUNTS['nick@server']
+        account1.getPrivkey()
+
         account2 = weechat_otr.ACCOUNTS['nick2@server2']
+        account2.getPrivkey()
 
         weechat_otr.command_cb(None, None, 'fingerprint')
 
