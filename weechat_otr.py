@@ -1029,7 +1029,8 @@ class IrcHTMLParser(PYVER.html_parser.HTMLParser):
     def handle_entityref(self, name):
         """Called for entity references, such as &amp;"""
         try:
-            self.result += PYVER.unichr(PYVER.html_entities.name2codepoint[name])
+            self.result += PYVER.unichr(
+                PYVER.html_entities.name2codepoint[name])
         except KeyError:
             self.result += '&{};'.format(name)
 
@@ -1180,7 +1181,8 @@ def message_out_cb(data, modifier, modifier_data, string):
         try:
             print_buffer('', traceback.format_exc(), 'error')
             context.print_buffer(
-                'Failed to send message. See core buffer for traceback.', 'error')
+                'Failed to send message. See core buffer for traceback.',
+                'error')
         except:
             pass
 
@@ -1253,7 +1255,8 @@ def command_cb(data, buf, args):
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
             if context.is_encrypted():
-                context.print_buffer("This conversation is encrypted.", 'success')
+                context.print_buffer(
+                    'This conversation is encrypted.', 'success')
                 context.print_buffer("Your fingerprint is: {}".format(
                     context.user.getPrivkey()))
                 context.print_buffer("Your peer's fingerprint is: {}".format(
@@ -1413,7 +1416,8 @@ def command_cb(data, buf, args):
                 if context.is_encrypted():
                     if context.is_logged():
                         context.print_buffer(
-                            'This conversation is currently being logged.', 'warning')
+                            'This conversation is currently being logged.',
+                            'warning')
                         result = weechat.WEECHAT_RC_OK
 
                     else:
@@ -1421,7 +1425,8 @@ def command_cb(data, buf, args):
                             'This conversation is currently NOT being logged.')
                         result = weechat.WEECHAT_RC_OK
                 else:
-                    context.print_buffer('OTR LOG: Not in an OTR session', 'error')
+                    context.print_buffer(
+                        'OTR LOG: Not in an OTR session', 'error')
                     result = weechat.WEECHAT_RC_OK
 
             else:
@@ -1452,7 +1457,8 @@ def command_cb(data, buf, args):
                     result = weechat.WEECHAT_RC_OK
 
                 elif not context.is_encrypted():
-                    context.print_buffer('OTR LOG: Not in an OTR session', 'error')
+                    context.print_buffer(
+                        'OTR LOG: Not in an OTR session', 'error')
                     result = weechat.WEECHAT_RC_OK
 
                 else:
