@@ -39,6 +39,10 @@ class WeechatOtrTestCase(unittest.TestCase):
     def assertNotPrinted(self, buf, text):
         self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))
 
+    def assertNoPrintedContains(self, buf, text):
+        for line in sys.modules['weechat'].printed.get(buf, []):
+            self.assertNotIn(text, line)
+
     def assertRegex(self, s, r):
         # To get rid of deprecation warning in python 3.
         try:
