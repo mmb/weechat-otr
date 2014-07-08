@@ -33,8 +33,42 @@ class FingerprintTestCase(WeechatOtrTestCase):
             ' !:)\t(color default)nick2@server2 fingerprint '
             '{fingerprint}'.format(fingerprint=account2.getPrivkey())))
 
-    def xtest_fingerprint_pattern(self):
-        pass
+    def test_fingerprint_pattern(self):
+        fpr_path1 = os.path.join(
+            sys.modules['weechat'].weechat_dir,
+            'otr',
+            'nick@server.fpr')
+        with open(fpr_path1, 'w') as f:
+            for fields in [
+                ['notamachxxx@server', 'nick@server', 'irc', 'fp', ''],
+                ['matchxxxxxx@server', 'nick@server', 'irc', 'fp', ''],
+                ['beforematch@server', 'nick@server', 'irc', 'fp', ''],
+                ['before@servermatch', 'nick@server', 'irc', 'fp', ''],
+                ]:
+                f.write("\t".join(fields))
+                f.write("\n")
+
+        account1 = weechat_otr.ACCOUNTS['nick@server']
+        account1.getPrivkey()
+
+        weechat_otr.command_cb(None, None, 'fingerprint match')
+
+        self.assertNoPrintedContains('', 'notamachxxx@server')
+
+        self.assertPrinted('', (
+            'eval(${color:default}:! ${color:brown}otr${color:default}'
+            ' !:)\t(color default)matchxxxxxx@server (nick@server) fingerprint '
+            'fp unverified'))
+
+        self.assertPrinted('', (
+            'eval(${color:default}:! ${color:brown}otr${color:default}'
+            ' !:)\t(color default)beforematch@server (nick@server) fingerprint '
+            'fp unverified'))
+
+        self.assertPrinted('', (
+            'eval(${color:default}:! ${color:brown}otr${color:default}'
+            ' !:)\t(color default)before@servermatch (nick@server) fingerprint '
+            'fp unverified'))
 
     def test_fingerprint_all(self):
         fpr_path1 = os.path.join(

@@ -471,8 +471,10 @@ def show_account_fingerprints():
         print_buffer('', '{} fingerprint {}'.format(
             account.name, account.getPrivkey()))
 
-def show_peer_fingerprints():
-    """Print all peer names and their fingerprints to the core buffer."""
+def show_peer_fingerprints(grep=None):
+    """Print peer names and their fingerprints to the core buffer.
+
+    If grep is passed in, show all peer names containing that substring."""
     trust_descs = {
         '' : 'unverified',
         'smp' : 'SMP verified',
@@ -482,12 +484,13 @@ def show_peer_fingerprints():
     for account in accounts():
         for peer, peer_data in account.trusts.items():
             for fingerprint, trust in peer_data.items():
-                print_buffer('', '{peer_name} ({account_name}) fingerprint '
-                '{fp} {trust}'.format(
-                peer_name=peer,
-                account_name=account.name,
-                fp=fingerprint,
-                trust=trust_descs[trust]))
+                if grep is None or grep in peer:
+                    print_buffer('', '{peer_name} ({account_name}) '
+                        'fingerprint {fp} {trust}'.format(
+                        peer_name=peer,
+                        account_name=account.name,
+                        fp=fingerprint,
+                        trust=trust_descs[trust]))
 
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
@@ -1557,7 +1560,9 @@ def command_cb(data, buf, args):
         elif len(arg_parts) == 2:
             if arg_parts[1] == 'all':
                 show_peer_fingerprints()
-                result = weechat.WEECHAT_RC_OK
+            else:
+                show_peer_fingerprints(grep=arg_parts[1])
+            result = weechat.WEECHAT_RC_OK
 
     return result
 
