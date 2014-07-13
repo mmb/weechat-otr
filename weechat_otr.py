@@ -492,7 +492,7 @@ def show_peer_fingerprints(grep=None):
                     table_formatter.add_row([
                       peer,
                       account.name,
-                      fingerprint,
+                      potr.human_hash(fingerprint),
                       trust_descs[trust],
                     ])
     print_buffer('', table_formatter.format())

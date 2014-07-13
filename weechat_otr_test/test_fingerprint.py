@@ -38,10 +38,10 @@ class FingerprintTestCase(WeechatOtrTestCase):
             'nick@server.fpr')
         with open(fpr_path1, 'w') as f:
             for fields in [
-                ['notamachxxx@server', 'nick@server', 'irc', 'fp', ''],
-                ['matchxxxxxx@server', 'nick@server', 'irc', 'fp', ''],
-                ['beforematch@server', 'nick@server', 'irc', 'fp', ''],
-                ['before@servermatch', 'nick@server', 'irc', 'fp', ''],
+                ['notamachxxx@server', 'nick@server', 'irc', 'fp123', ''],
+                ['matchxxxxxx@server', 'nick@server', 'irc', 'fp123', ''],
+                ['beforematch@server', 'nick@server', 'irc', 'fp123', ''],
+                ['before@servermatch', 'nick@server', 'irc', 'fp123', ''],
                 ]:
                 f.write("\t".join(fields))
                 f.write("\n")
@@ -56,9 +56,12 @@ class FingerprintTestCase(WeechatOtrTestCase):
         self.assertPrinted('', (
             'eval(${color:default}:! ${color:brown}otr${color:default}'
             ' !:)\t'
-            '(color default)before@servermatch |nick@server |fp |unverified\r\n'
-            '(color default)beforematch@server |nick@server |fp |unverified\r\n'
-            '(color default)matchxxxxxx@server |nick@server |fp |unverified'))
+            '(color default)before@servermatch |nick@server |F P 1 2 3 |'
+            'unverified\r\n'
+            '(color default)beforematch@server |nick@server |F P 1 2 3 |'
+            'unverified\r\n'
+            '(color default)matchxxxxxx@server |nick@server |F P 1 2 3 |'
+            'unverified'))
 
     def test_fingerprint_all(self):
         fpr_path1 = os.path.join(
@@ -67,9 +70,9 @@ class FingerprintTestCase(WeechatOtrTestCase):
             'nick@server.fpr')
         with open(fpr_path1, 'w') as f:
             for fields in [
-                ['peer1@server', 'nick@server', 'irc', 'fp1', ''],
-                ['peer2@server', 'nick@server', 'irc', 'fp2', 'smp'],
-                ['peer3@server', 'nick@server', 'irc', 'fp3', 'verified'],
+                ['peer1@server', 'nick@server', 'irc', 'fp111', ''],
+                ['peer2@server', 'nick@server', 'irc', 'fp222', 'smp'],
+                ['peer3@server', 'nick@server', 'irc', 'fp333', 'verified'],
                 ]:
                 f.write("\t".join(fields))
                 f.write("\n")
@@ -83,7 +86,7 @@ class FingerprintTestCase(WeechatOtrTestCase):
             'nick2@server2.fpr')
         with open(fpr_path2, 'w') as f:
             for fields in [
-                ['peer4@server2', 'nick2@server2', 'irc', 'fp4', 'verified'],
+                ['peer4@server2', 'nick2@server2', 'irc', 'fp444', 'verified'],
                 ]:
                 f.write("\t".join(fields))
                 f.write("\n")
@@ -96,7 +99,11 @@ class FingerprintTestCase(WeechatOtrTestCase):
         self.assertPrinted('', (
             'eval(${color:default}:! ${color:brown}otr${color:default}'
             ' !:)\t'
-            '(color default)peer4@server2 |nick2@server2 |fp4 |verified    \r\n'
-            '(color default)peer1@server  |nick@server   |fp1 |unverified  \r\n'
-            '(color default)peer2@server  |nick@server   |fp2 |SMP verified\r\n'
-            '(color default)peer3@server  |nick@server   |fp3 |verified    '))
+            '(color default)peer4@server2 |nick2@server2 |F P 4 4 4 |'
+            'verified    \r\n'
+            '(color default)peer1@server  |nick@server   |F P 1 1 1 |'
+            'unverified  \r\n'
+            '(color default)peer2@server  |nick@server   |F P 2 2 2 |'
+            'SMP verified\r\n'
+            '(color default)peer3@server  |nick@server   |F P 3 3 3 |'
+            'verified    '))
