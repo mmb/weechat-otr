@@ -1065,6 +1065,31 @@ class IrcHTMLParser(PYVER.html_parser.HTMLParser):
         except ValueError:
             self.result += '&#{};'.format(name)
 
+class TableFormatter(object):
+    """Format lists of string into aligned tables."""
+
+    def __init__(self):
+        self.rows = []
+        self.max_widths = None
+
+    def add_row(self, row):
+        """Add a row to the table."""
+        self.rows.append(row)
+        row_widths = [ len(s) for s in row ]
+        if self.max_widths is None:
+            self.max_widths = row_widths
+        else:
+            self.max_widths = list(map(max, self.max_widths, row_widths))
+
+    def format(self):
+        """Return the formatted table as a string."""
+        return '\n'.join([ self.format_row(row) for row in self.rows ])
+
+    def format_row(self, row):
+        """Format a single row as a string."""
+        return ' |'.join(
+            [ s.ljust(self.max_widths[i]) for i, s in enumerate(row) ])
+
 def message_in_cb(data, modifier, modifier_data, string):
     """Incoming message callback"""
     debug(('message_in_cb', data, modifier, modifier_data, string))
