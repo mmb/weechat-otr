@@ -467,9 +467,12 @@ def accounts():
 
 def show_account_fingerprints():
     """Print all account names and their fingerprints to the core buffer."""
+    table_formatter = TableFormatter()
     for account in accounts():
-        print_buffer('', '{} fingerprint {}'.format(
-            account.name, account.getPrivkey()))
+        table_formatter.add_row([
+          account.name,
+          str(account.getPrivkey())])
+    print_buffer('', table_formatter.format())
 
 def show_peer_fingerprints(grep=None):
     """Print peer names and their fingerprints to the core buffer.
@@ -481,16 +484,18 @@ def show_peer_fingerprints(grep=None):
         'verified' : 'verified',
         }
 
+    table_formatter = TableFormatter()
     for account in accounts():
-        for peer, peer_data in account.trusts.items():
-            for fingerprint, trust in peer_data.items():
+        for peer, peer_data in sorted(account.trusts.items()):
+            for fingerprint, trust in sorted(peer_data.items()):
                 if grep is None or grep in peer:
-                    print_buffer('', '{peer_name} ({account_name}) '
-                        'fingerprint {fp} {trust}'.format(
-                        peer_name=peer,
-                        account_name=account.name,
-                        fp=fingerprint,
-                        trust=trust_descs[trust]))
+                    table_formatter.add_row([
+                      peer,
+                      account.name,
+                      fingerprint,
+                      trust_descs[trust],
+                    ])
+    print_buffer('', table_formatter.format())
 
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""

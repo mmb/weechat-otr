@@ -25,13 +25,11 @@ class FingerprintTestCase(WeechatOtrTestCase):
 
         self.assertPrinted('', (
             'eval(${{color:default}}:! ${{color:brown}}otr${{color:default}}'
-            ' !:)\t(color default)nick@server fingerprint '
-            '{fingerprint}'.format(fingerprint=account1.getPrivkey())))
-
-        self.assertPrinted('', (
-            'eval(${{color:default}}:! ${{color:brown}}otr${{color:default}}'
-            ' !:)\t(color default)nick2@server2 fingerprint '
-            '{fingerprint}'.format(fingerprint=account2.getPrivkey())))
+            ' !:)\t'
+            '(color default)nick2@server2 |{fp2}\r\n'
+            '(color default)nick@server   |{fp1}').format(
+              fp1=account1.getPrivkey(),
+              fp2=account2.getPrivkey()))
 
     def test_fingerprint_pattern(self):
         fpr_path1 = os.path.join(
@@ -57,18 +55,10 @@ class FingerprintTestCase(WeechatOtrTestCase):
 
         self.assertPrinted('', (
             'eval(${color:default}:! ${color:brown}otr${color:default}'
-            ' !:)\t(color default)matchxxxxxx@server (nick@server) fingerprint '
-            'fp unverified'))
-
-        self.assertPrinted('', (
-            'eval(${color:default}:! ${color:brown}otr${color:default}'
-            ' !:)\t(color default)beforematch@server (nick@server) fingerprint '
-            'fp unverified'))
-
-        self.assertPrinted('', (
-            'eval(${color:default}:! ${color:brown}otr${color:default}'
-            ' !:)\t(color default)before@servermatch (nick@server) fingerprint '
-            'fp unverified'))
+            ' !:)\t'
+            '(color default)before@servermatch |nick@server |fp |unverified\r\n'
+            '(color default)beforematch@server |nick@server |fp |unverified\r\n'
+            '(color default)matchxxxxxx@server |nick@server |fp |unverified'))
 
     def test_fingerprint_all(self):
         fpr_path1 = os.path.join(
@@ -105,20 +95,8 @@ class FingerprintTestCase(WeechatOtrTestCase):
 
         self.assertPrinted('', (
             'eval(${color:default}:! ${color:brown}otr${color:default}'
-            ' !:)\t(color default)peer1@server (nick@server) fingerprint '
-            'fp1 unverified'))
-
-        self.assertPrinted('', (
-            'eval(${color:default}:! ${color:brown}otr${color:default}'
-            ' !:)\t(color default)peer2@server (nick@server) fingerprint '
-            'fp2 SMP verified'))
-
-        self.assertPrinted('', (
-            'eval(${color:default}:! ${color:brown}otr${color:default}'
-            ' !:)\t(color default)peer3@server (nick@server) fingerprint '
-            'fp3 verified'))
-
-        self.assertPrinted('', (
-            'eval(${color:default}:! ${color:brown}otr${color:default}'
-            ' !:)\t(color default)peer4@server2 (nick2@server2) fingerprint '
-            'fp4 verified'))
+            ' !:)\t'
+            '(color default)peer4@server2 |nick2@server2 |fp4 |verified    \r\n'
+            '(color default)peer1@server  |nick@server   |fp1 |unverified  \r\n'
+            '(color default)peer2@server  |nick@server   |fp2 |SMP verified\r\n'
+            '(color default)peer3@server  |nick@server   |fp3 |verified    '))
