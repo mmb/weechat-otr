@@ -121,7 +121,8 @@ class PythonVersion3(object):
         """Convert a Unicode to a utf-8 encoded string."""
         return strng
 
-if sys.version_info.major >= 3:
+# We cannot use version_info.major as this is only supported on python >= 2.7
+if sys.version_info[0] >= 3:
     PYVER = PythonVersion3(sys.version_info.minor)
 else:
     PYVER = PythonVersion2()
