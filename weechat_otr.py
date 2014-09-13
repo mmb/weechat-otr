@@ -567,7 +567,8 @@ class IrcContext(potr.context.Context):
         elif key_lower == 'send_tag' and self.is_serv():
             result = False
         else:
-            option = weechat.config_get(self.policy_config_option(key))
+            option = weechat.config_get(
+                PYVER.to_str(self.policy_config_option(key)))
 
             if option == '':
                 option = weechat.config_get(

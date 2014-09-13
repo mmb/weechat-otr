@@ -62,8 +62,8 @@ class HtmlEscapePolicyTestCase(WeechatOtrTestCase):
         self.assertEqual(result, 'PRIVMSG friend :< > " \' &')
 
     def test_html_escape_policy_non_ascii(self):
-        sys.modules['weechat'].config_options[
-            'otr.policy.server.nick.gefährte.html_escape'] = 'on'
+        sys.modules['weechat'].config_options[weechat_otr.PYVER.to_str(
+              'otr.policy.server.nick.gefährte.html_escape')] = 'on'
         self.account.getContext('gefährte@server').is_encrypted_fake = True
 
         result = weechat_otr.message_out_cb(None, None, 'server',
