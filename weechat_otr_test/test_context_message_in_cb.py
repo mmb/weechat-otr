@@ -16,12 +16,12 @@ class ContextMessageInCbTestCase(WeechatOtrTestCase):
         account = \
             weechat_otr_test.raising_account.RaisingAccount('nick@server')
         weechat_otr.ACCOUNTS['nick@server'] = account
-        context = account.getContext('nick@server')
+        context = account.getContext('friend@server')
         context.unencrypted = ['\x01ACTION lols\x01']
 
         result = weechat_otr.message_in_cb(
-            None, None, 'server', ':nick!user@host PRIVMSG friend :test')
+            None, None, 'server', ':friend!user@host PRIVMSG nick :test')
 
         self.assertEqual(result,
-            ':nick!user@host PRIVMSG friend :Unencrypted message received: '
+            ':friend!user@host PRIVMSG nick :Unencrypted message received: '
             '/me lols')
