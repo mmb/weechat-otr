@@ -1,3 +1,30 @@
+1.5.0
+	2014-09-30
+
+	Handle nicks containing unicode characters
+
+	Add /otr fingerprint command for showing fingerprints
+
+	Disable send_tag for ChanServ, MemoServ and NickServer
+
+	End OTR sessions when their buffer is closed
+
+	Colorize a lot of output that was previously not colored
+
+	User configurable prefix for messages from script
+	
+	Handle incoming IRC ACTION in unencrypted messages
+
+	Only modify actions if the context is encrypted
+
+	Restore default log level after OTR conversation
+
+	Make PRIVMSG parsing case insensitive
+
+	Raise an exception when a PRIVMSG can't be parsed
+
+	Fix parsing PRIVMSGs where the message doesn't start with :
+
 1.4.0
 	2014-04-11
 
