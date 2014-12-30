@@ -1207,26 +1207,27 @@ def message_out_cb(data, modifier, modifier_data, string):
                    'Wait for the OTR connection or change the policy to allow '
                    'clear-text messages:\n'
                    '/policy set require_encryption off')
+                result = ''
+            else:
+                try:
+                    ret = context.sendMessage(
+                        potr.context.FRAGMENT_SEND_ALL,
+                        context.msg_convert_out(parsed['text']))
 
-            try:
-                ret = context.sendMessage(
-                    potr.context.FRAGMENT_SEND_ALL,
-                    context.msg_convert_out(parsed['text']))
-
-                if ret:
-                    debug(('sendMessage returned', ret))
-                    result = PYVER.to_str(
-                        build_privmsg_out(
-                            parsed['to_nick'], PYVER.to_unicode(ret)
+                    if ret:
+                        debug(('sendMessage returned', ret))
+                        result = PYVER.to_str(
+                            build_privmsg_out(
+                                parsed['to_nick'], PYVER.to_unicode(ret)
                             ))
 
-            except potr.context.NotEncryptedError as err:
-                if err.args[0] == potr.context.EXC_FINISHED:
-                    context.print_buffer(
-                        """Your message was not sent. End your private conversation:\n/otr finish""",
-                        'error')
-                else:
-                    raise
+                except potr.context.NotEncryptedError as err:
+                    if err.args[0] == potr.context.EXC_FINISHED:
+                        context.print_buffer(
+                            """Your message was not sent. End your private conversation:\n/otr finish""",
+                            'error')
+                    else:
+                        raise
 
         weechat.bar_item_update(SCRIPT_NAME)
     except:
