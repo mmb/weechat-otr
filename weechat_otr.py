@@ -157,7 +157,6 @@ OTR_DIR_NAME = 'otr'
 OTR_QUERY_RE = re.compile(r'\?OTR(\?|\??v[a-z\d]*\?)')
 
 POLICIES = {
-    'allow_v2' : 'allow OTR protocol version 2',
     'require_encryption' : 'refuse to send unencrypted messages',
     'log' : 'enable logging of OTR conversations',
     'send_tag' : 'advertise your OTR capability using the whitespace tag',
@@ -167,6 +166,7 @@ POLICIES = {
 
 READ_ONLY_POLICIES = {
     'allow_v1' : False,
+    'allow_v2' : True,
     }
 
 ACTION_PREFIX = '/me '
@@ -1816,7 +1816,6 @@ def init_config():
         'policy_create_option_cb', '', '', '')
 
     for option, desc, default in [
-        ('default.allow_v2', 'default allow OTR v2 policy', 'on'),
         ('default.require_encryption', 'default require encryption policy',
          'off'),
         ('default.log', 'default enable logging to disk', 'off'),
