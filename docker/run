@@ -1,0 +1,10 @@
+#!/bin/sh
+
+docker run \
+  --interactive=true \
+  --tty=true \
+  --volume=$(readlink -f ..):/weechat-otr \
+  --workdir=/weechat-otr \
+  --rm=true \
+  weechat-otr \
+  /bin/bash
