@@ -145,6 +145,8 @@ View default OTR policies: /otr policy default
 Start/Stop log recording for the current OTR session: /otr log [start|stop]
 This will be reverted back to the previous log setting at the end of the session.
 
+To refresh the OTR session: /otr refresh
+
 To end your private conversation: /otr finish
 """.format(description=SCRIPT_DESC)
 
@@ -1265,7 +1267,7 @@ def command_cb(data, buf, args):
         debug("Command parsing error.")
         return result
 
-    if len(arg_parts) in (1, 3) and arg_parts[0] == 'start':
+    if len(arg_parts) in (1, 3) and arg_parts[0] in ('start', 'refresh'):
         nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
@@ -1888,6 +1890,7 @@ if weechat.register(
     weechat.hook_command(
         SCRIPT_NAME, SCRIPT_HELP,
         'start [NICK SERVER] || '
+        'refresh [NICK SERVER] || '
         'finish [NICK SERVER] || '
         'end [NICK SERVER] || '
         'status [NICK SERVER] || '
@@ -1901,6 +1904,7 @@ if weechat.register(
         'fingerprint [SEARCH|all]',
         '',
         'start %(nick) %(irc_servers) %-||'
+        'refresh %(nick) %(irc_servers) %-||'
         'finish %(nick) %(irc_servers) %-||'
         'end %(nick) %(irc_servers) %-||'
         'status %(nick) %(irc_servers) %-||'
