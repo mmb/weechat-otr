@@ -1889,6 +1889,7 @@ if weechat.register(
         SCRIPT_NAME, SCRIPT_HELP,
         'start [NICK SERVER] || '
         'finish [NICK SERVER] || '
+        'end [NICK SERVER] || '
         'status [NICK SERVER] || '
         'smp ask [NICK SERVER] [QUESTION] SECRET || '
         'smp respond [NICK SERVER] SECRET || '
@@ -1901,6 +1902,7 @@ if weechat.register(
         '',
         'start %(nick) %(irc_servers) %-||'
         'finish %(nick) %(irc_servers) %-||'
+        'end %(nick) %(irc_servers) %-||'
         'status %(nick) %(irc_servers) %-||'
         'smp ask|respond %(nick) %(irc_servers) %-||'
         'smp abort %(nick) %(irc_servers) %-||'
