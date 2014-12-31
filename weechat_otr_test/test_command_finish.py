@@ -30,3 +30,15 @@ class CommandFinishTestCase(WeechatOtrTestCase):
         weechat_otr.command_cb(None, None, 'finish nick2 server')
 
         self.assertEqual(self.context.disconnects, 1)
+
+    # /otr end is an alias for /otr finish
+
+    def test_end_buffer(self):
+        weechat_otr.command_cb(None, 'server_nick2_buffer', 'end')
+
+        self.assertEqual(self.context.disconnects, 1)
+
+    def test_end_args(self):
+        weechat_otr.command_cb(None, None, 'end nick2 server')
+
+        self.assertEqual(self.context.disconnects, 1)

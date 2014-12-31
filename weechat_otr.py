@@ -1290,7 +1290,7 @@ def command_cb(data, buf, args):
             privmsg(server, nick, '?OTR?')
 
             result = weechat.WEECHAT_RC_OK
-    elif len(arg_parts) in (1, 3) and arg_parts[0] == 'finish':
+    elif len(arg_parts) in (1, 3) and arg_parts[0] in ('finish', 'end'):
         nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
