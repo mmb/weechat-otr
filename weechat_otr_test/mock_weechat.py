@@ -87,6 +87,7 @@ class MockWeechat(types.ModuleType):
         self.config_integer_defaults = {}
         self.commands = []
         self.hook_signals = []
+        self.info_gets = []
 
     def save(self):
         self.snapshot_weechat_dir()
@@ -173,6 +174,8 @@ class MockWeechat(types.ModuleType):
         self.hook_signals.append(args)
 
     def info_get(self, name, *args):
+        self.info_gets.append((name, args))
+
         return self.infos[args].get(name)
 
     def info_get_hashtable(self, name, args):

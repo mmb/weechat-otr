@@ -36,3 +36,7 @@ class WeechatVersionOkTestCase(WeechatOtrTestCase):
         self.assertNotPrinted('',
             'otr requires WeeChat version >= 0.4.0. The current version is '
             '1.0.1.')
+
+    def test_version_checked_during_setup(self):
+        self.assertIn(
+            ('version_number', ('',)), sys.modules['weechat'].info_gets)
