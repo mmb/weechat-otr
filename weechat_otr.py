@@ -1875,13 +1875,13 @@ def git_info():
 def weechat_version_ok():
     """Check if the WeeChat version is compatible with this script.
 
-    If WeeChat version < 0.4.0 log an error to the core buffer and return
+    If WeeChat version < 0.4.2 log an error to the core buffer and return
     False. Otherwise return True.
     """
     weechat_version = weechat.info_get('version_number', '') or 0
-    if int(weechat_version) < 0x00040000:
+    if int(weechat_version) < 0x00040200:
         error_message = (
-            '{script_name} requires WeeChat version >= 0.4.0. The current '
+            '{script_name} requires WeeChat version >= 0.4.2. The current '
             'version is {current_version}.').format(
             script_name=SCRIPT_NAME,
             current_version=weechat.info_get('version', ''))
