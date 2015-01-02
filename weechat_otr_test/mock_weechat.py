@@ -34,6 +34,7 @@ class MockWeechat(types.ModuleType):
         self.infos = {
             ('',) : {
                 'weechat_dir': self.weechat_dir,
+                'version_number': 0x01000100,
                 },
             ('server',) : {
                 'irc_nick': 'nick',

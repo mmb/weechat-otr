@@ -1872,59 +1872,79 @@ def git_info():
 
     return result
 
+def weechat_version_ok():
+    """Check if the WeeChat version is compatible with this script.
+
+    If WeeChat version < 0.4.0 log an error to the core buffer and return
+    False. Otherwise return True.
+    """
+    weechat_version = weechat.info_get('version_number', '') or 0
+    if int(weechat_version) < 0x00040000:
+        error_message = (
+            '{script_name} requires WeeChat version >= 0.4.0. The current '
+            'version is {current_version}.').format(
+            script_name=SCRIPT_NAME,
+            current_version=weechat.info_get('version', ''))
+        prnt('', error_message)
+        return False
+    else:
+        return True
+
 SCRIPT_VERSION = git_info() or SCRIPT_VERSION
 
 if weechat.register(
     SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, SCRIPT_DESC,
     'shutdown', ''):
-    init_config()
+    if weechat_version_ok():
+        init_config()
 
-    OTR_DIR = os.path.join(info_get('weechat_dir', ''), OTR_DIR_NAME)
-    create_dir()
+        OTR_DIR = os.path.join(info_get('weechat_dir', ''), OTR_DIR_NAME)
+        create_dir()
 
-    ACCOUNTS = AccountDict()
+        ACCOUNTS = AccountDict()
 
-    weechat.hook_modifier('irc_in_privmsg', 'message_in_cb', '')
-    weechat.hook_modifier('irc_out_privmsg', 'message_out_cb', '')
+        weechat.hook_modifier('irc_in_privmsg', 'message_in_cb', '')
+        weechat.hook_modifier('irc_out_privmsg', 'message_out_cb', '')
 
-    weechat.hook_command(
-        SCRIPT_NAME, SCRIPT_HELP,
-        'start [NICK SERVER] || '
-        'refresh [NICK SERVER] || '
-        'finish [NICK SERVER] || '
-        'end [NICK SERVER] || '
-        'status [NICK SERVER] || '
-        'smp ask [NICK SERVER] [QUESTION] SECRET || '
-        'smp respond [NICK SERVER] SECRET || '
-        'smp abort [NICK SERVER] || '
-        'trust [NICK SERVER] || '
-        'distrust [NICK SERVER] || '
-        'log [on|off] || '
-        'policy [POLICY on|off] || '
-        'fingerprint [SEARCH|all]',
-        '',
-        'start %(nick) %(irc_servers) %-||'
-        'refresh %(nick) %(irc_servers) %-||'
-        'finish %(nick) %(irc_servers) %-||'
-        'end %(nick) %(irc_servers) %-||'
-        'status %(nick) %(irc_servers) %-||'
-        'smp ask|respond %(nick) %(irc_servers) %-||'
-        'smp abort %(nick) %(irc_servers) %-||'
-        'trust %(nick) %(irc_servers) %-||'
-        'distrust %(nick) %(irc_servers) %-||'
-        'log on|off %-||'
-        'policy %(otr_policy) on|off %-||'
-        'fingerprint all %-||',
-        'command_cb',
-        '')
+        weechat.hook_command(
+            SCRIPT_NAME, SCRIPT_HELP,
+            'start [NICK SERVER] || '
+            'refresh [NICK SERVER] || '
+            'finish [NICK SERVER] || '
+            'end [NICK SERVER] || '
+            'status [NICK SERVER] || '
+            'smp ask [NICK SERVER] [QUESTION] SECRET || '
+            'smp respond [NICK SERVER] SECRET || '
+            'smp abort [NICK SERVER] || '
+            'trust [NICK SERVER] || '
+            'distrust [NICK SERVER] || '
+            'log [on|off] || '
+            'policy [POLICY on|off] || '
+            'fingerprint [SEARCH|all]',
+            '',
+            'start %(nick) %(irc_servers) %-||'
+            'refresh %(nick) %(irc_servers) %-||'
+            'finish %(nick) %(irc_servers) %-||'
+            'end %(nick) %(irc_servers) %-||'
+            'status %(nick) %(irc_servers) %-||'
+            'smp ask|respond %(nick) %(irc_servers) %-||'
+            'smp abort %(nick) %(irc_servers) %-||'
+            'trust %(nick) %(irc_servers) %-||'
+            'distrust %(nick) %(irc_servers) %-||'
+            'log on|off %-||'
+            'policy %(otr_policy) on|off %-||'
+            'fingerprint all %-||',
+            'command_cb',
+            '')
 
-    weechat.hook_completion(
-        'otr_policy', 'OTR policies', 'policy_completion_cb', '')
+        weechat.hook_completion(
+            'otr_policy', 'OTR policies', 'policy_completion_cb', '')
 
-    weechat.hook_config('logger.level.irc.*', 'logger_level_update_cb', '')
+        weechat.hook_config('logger.level.irc.*', 'logger_level_update_cb', '')
 
-    weechat.hook_signal('buffer_switch', 'buffer_switch_cb', '')
-    weechat.hook_signal('buffer_closing', 'buffer_closing_cb', '')
+        weechat.hook_signal('buffer_switch', 'buffer_switch_cb', '')
+        weechat.hook_signal('buffer_closing', 'buffer_closing_cb', '')
 
-    OTR_STATUSBAR = weechat.bar_item_new(SCRIPT_NAME, 'otr_statusbar_cb', '')
-    weechat.bar_item_update(SCRIPT_NAME)
+        OTR_STATUSBAR = weechat.bar_item_new(
+            SCRIPT_NAME, 'otr_statusbar_cb', '')
+        weechat.bar_item_update(SCRIPT_NAME)
