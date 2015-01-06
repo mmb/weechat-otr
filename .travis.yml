@@ -1,4 +1,5 @@
 language: python
+sudo: false
 python:
   - "2.7"
   - "3.3"
@@ -7,3 +8,5 @@ install:
   - "pip install pylint==1.2.0"
   - "pip install python-potr"
 script: ./run_tests.sh
+matrix:
+  fast_finish: true
