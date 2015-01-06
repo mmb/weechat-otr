@@ -296,15 +296,23 @@ def irc_user(nick, server):
             nick=nick,
             server=server)
 
-def is_a_channel(channel):
+def isupport_value(server, feature):
+    """Get the value of an IRC server feature."""
+    args = '{server},{feature}'.format(server=server, feature=feature)
+    return info_get('irc_server_isupport_value', args)
+
+def is_a_channel(channel, server):
     """Return true if a string has an IRC channel prefix."""
-    return channel.startswith(('#', '&', '+', '!', '@'))
+    chantypes = tuple(isupport_value(server, 'CHANTYPES'))
+    statusmsg = tuple(isupport_value(server, 'STATUSMSG'))
+
+    return channel.startswith(chantypes + statusmsg)
 
 # Exception class for PRIVMSG parsing exceptions.
 class PrivmsgParseException(Exception):
     pass
 
-def parse_irc_privmsg(message):
+def parse_irc_privmsg(message, server):
     """Parse an IRC PRIVMSG command and return a dictionary.
 
     Either the to_channel key or the to_nick key will be set depending on
@@ -347,7 +355,7 @@ def parse_irc_privmsg(message):
         else:
             result['from_nick'] = unicode_nick
 
-        if is_a_channel(target):
+        if is_a_channel(target, server):
             result['to_channel'] = target
             result['to_nick'] = None
         else:
@@ -1109,7 +1117,8 @@ def message_in_cb(data, modifier, modifier_data, string):
     """Incoming message callback"""
     debug(('message_in_cb', data, modifier, modifier_data, string))
 
-    parsed = parse_irc_privmsg(PYVER.to_unicode(string))
+    parsed = parse_irc_privmsg(
+        PYVER.to_unicode(string), PYVER.to_unicode(modifier_data))
     debug(('parsed message', parsed))
 
     # skip processing messages to public channels
@@ -1171,7 +1180,8 @@ def message_out_cb(data, modifier, modifier_data, string):
     try:
         debug(('message_out_cb', data, modifier, modifier_data, string))
 
-        parsed = parse_irc_privmsg(PYVER.to_unicode(string))
+        parsed = parse_irc_privmsg(
+            PYVER.to_unicode(string), PYVER.to_unicode(modifier_data))
         debug(('parsed message', parsed))
 
         # skip processing messages to public channels

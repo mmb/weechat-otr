@@ -9,22 +9,32 @@ from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
 
 import weechat_otr
 
+import sys
+
 class IsAChannelTestCase(WeechatOtrTestCase):
 
     def test_hash(self):
-        self.assertTrue(weechat_otr.is_a_channel('#channel'))
+        self.assertTrue(weechat_otr.is_a_channel('#channel', 'server'))
 
     def test_ampersand(self):
-        self.assertTrue(weechat_otr.is_a_channel('&channel'))
+        self.add_channel_prefix('&')
+        self.assertTrue(weechat_otr.is_a_channel('&channel', 'server'))
 
     def test_plus(self):
-        self.assertTrue(weechat_otr.is_a_channel('+channel'))
+        self.add_channel_prefix('+')
+        self.assertTrue(weechat_otr.is_a_channel('+channel', 'server'))
 
     def test_bang(self):
-        self.assertTrue(weechat_otr.is_a_channel('!channel'))
+        self.add_channel_prefix('!')
+        self.assertTrue(weechat_otr.is_a_channel('!channel', 'server'))
 
     def test_at(self):
-        self.assertTrue(weechat_otr.is_a_channel('@#channel'))
+        self.assertTrue(weechat_otr.is_a_channel('@#channel', 'server'))
 
     def test_not_a_channel(self):
-        self.assertFalse(weechat_otr.is_a_channel('nick'))
+        self.assertFalse(weechat_otr.is_a_channel('nick', 'server'))
+
+    def add_channel_prefix(self, prefix):
+        sys.modules['weechat'].infos[
+            ('server,CHANTYPES',)][
+            'irc_server_isupport_value'] += prefix

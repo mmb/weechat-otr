@@ -48,6 +48,12 @@ class MockWeechat(types.ModuleType):
             ('server,no_window_nick',) : {
                 'irc_buffer' : 'non_private_buffer',
                 },
+            ('server,STATUSMSG',) : {
+                'irc_server_isupport_value' : '@+',
+                },
+            ('server,CHANTYPES',) : {
+                'irc_server_isupport_value' : '#',
+                },
         }
         self.buffers = {
             None : {
