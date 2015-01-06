@@ -291,7 +291,7 @@ def irc_user(nick, server):
 
 def is_a_channel(channel):
     """Return true if a string has an IRC channel prefix."""
-    return channel.startswith(('#', '&', '+', '!'))
+    return channel.startswith(('#', '&', '+', '!', '@'))
 
 # Exception class for PRIVMSG parsing exceptions.
 class PrivmsgParseException(Exception):

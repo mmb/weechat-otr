@@ -23,5 +23,8 @@ class IsAChannelTestCase(WeechatOtrTestCase):
     def test_bang(self):
         self.assertTrue(weechat_otr.is_a_channel('!channel'))
 
+    def test_at(self):
+        self.assertTrue(weechat_otr.is_a_channel('@#channel'))
+
     def test_not_a_channel(self):
         self.assertFalse(weechat_otr.is_a_channel('nick'))

@@ -57,4 +57,4 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
     def test_message_out_cb_nick_with_at(self):
         result = weechat_otr.message_out_cb(None, None, 'server',
             ':nick!user@host PRIVMSG @#chan :hello')
-        self.assertEqual(result, 'PRIVMSG @#chan :hello')
+        self.assertEqual(result, ':nick!user@host PRIVMSG @#chan :hello')
