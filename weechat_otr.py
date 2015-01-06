@@ -45,6 +45,7 @@ class PythonVersion2(object):
 
         import HTMLParser
         self.html_parser = HTMLParser
+        self.html_parser_init_kwargs = {}
 
         import htmlentitydefs
         self.html_entities = htmlentitydefs
@@ -81,6 +82,7 @@ class PythonVersion3(object):
 
         import html.parser
         self.html_parser = html.parser
+        self.html_parser_init_kwargs = { 'convert_charrefs' : True }
 
         import html.entities
         self.html_entities = html.entities
@@ -1018,7 +1020,7 @@ class IrcHTMLParser(PYVER.html_parser.HTMLParser):
     @staticmethod
     def parse(data):
         """Create a temporary IrcHTMLParser and parse a single string"""
-        parser = IrcHTMLParser()
+        parser = IrcHTMLParser(**PYVER.html_parser_init_kwargs)
         parser.feed(data)
         parser.close()
         return parser.result
