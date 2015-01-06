@@ -76,13 +76,18 @@ class PythonVersion2(object):
 class PythonVersion3(object):
     """Python 3 version of code that must differ between Python 2 and 3."""
 
-    def __init__(self):
+    def __init__(self, minor):
+        self.minor = minor
+
         import html
         self.html = html
 
         import html.parser
         self.html_parser = html.parser
-        self.html_parser_init_kwargs = { 'convert_charrefs' : True }
+        if self.minor >= 4:
+            self.html_parser_init_kwargs = { 'convert_charrefs' : True }
+        else:
+            self.html_parser_init_kwargs = {}
 
         import html.entities
         self.html_entities = html.entities
@@ -111,7 +116,7 @@ class PythonVersion3(object):
         return strng
 
 if sys.version_info.major >= 3:
-    PYVER = PythonVersion3()
+    PYVER = PythonVersion3(sys.version_info.minor)
 else:
     PYVER = PythonVersion2()
 
