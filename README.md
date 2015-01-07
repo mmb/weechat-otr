@@ -10,7 +10,7 @@ Testing and security auditing are appreciated.
 
 #Installation
 
-This script requires Weechat 0.4.0 or later and the
+This script requires Weechat 0.4.2 or later and the
 [Pure Python OTR](https://github.com/afflux/pure-python-otr)
 package to be installed:
 
