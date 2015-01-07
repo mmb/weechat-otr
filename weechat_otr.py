@@ -155,6 +155,8 @@ This will be reverted back to the previous log setting at the end of the session
 To refresh the OTR session: /otr refresh
 
 To end your private conversation: /otr finish
+
+This script supports only OTR protocol version 2.
 """.format(description=SCRIPT_DESC)
 
 SCRIPT_AUTHOR = 'Matthew M. Boedicker'
@@ -166,8 +168,10 @@ OTR_DIR_NAME = 'otr'
 OTR_QUERY_RE = re.compile(r'\?OTR(\?|\??v[a-z\d]*\?)')
 
 POLICIES = {
-    'allow_v2' : 'allow OTR protocol version 2',
-    'require_encryption' : 'refuse to send unencrypted messages',
+    'allow_v2' : 'allow OTR protocol version 2, effectively enable OTR '
+        'since v2 is the only supported version',
+    'require_encryption' : 'refuse to send unencrypted messages when OTR is '
+        'enabled',
     'log' : 'enable logging of OTR conversations',
     'send_tag' : 'advertise your OTR capability using the whitespace tag',
     'html_escape' : 'escape HTML special characters in outbound messages',
