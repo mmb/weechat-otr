@@ -58,3 +58,22 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
         result = weechat_otr.message_out_cb(None, None, 'server',
             ':nick!user@host PRIVMSG @#chan :hello')
         self.assertEqual(result, ':nick!user@host PRIVMSG @#chan :hello')
+
+    def test_otr_disabled_require_encryption(self):
+        sys.modules['weechat'].config_options.update({
+            'otr.policy.default.allow_v2' : 'off',
+            'otr.policy.default.require_encryption' : 'on'
+        })
+
+        weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG nick2 :hello')
+
+        self.assertNotPrinted('server_nick2_buffer',
+            'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
+            '(color lightred)Your message will not be sent, because policy '
+            'requires an encrypted connection.')
+        self.assertNotPrinted('server_nick2_buffer',
+            'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
+            '(color lightblue)Wait for the OTR connection or change the '
+            'policy to allow clear-text messages:\r\n(color '
+            'lightblue)/policy set require_encryption off')

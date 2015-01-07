@@ -1217,8 +1217,10 @@ def message_out_cb(data, modifier, modifier_data, string):
             debug(('context send message', parsed['text'], parsed['to_nick'],
                    server))
 
-            if not context.is_encrypted() and not is_query and \
-                    context.getPolicy('require_encryption'):
+            if context.policyOtrEnabled() and \
+                not context.is_encrypted() and \
+                not is_query and \
+                context.getPolicy('require_encryption'):
                 context.print_buffer(
                    'Your message will not be sent, because policy requires an '
                    'encrypted connection.', 'error')
