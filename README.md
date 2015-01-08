@@ -28,7 +28,7 @@ in WeeChat.
 
 #Support
 
-IRC channel: [#weechat-otr on Freenode](ircs://chat.freenode.net:6697).
+IRC channel: #weechat-otr on Freenode
 
 Create GitHub issues/pull requests for questions, comments and patches or
 email matthewm@boedicker.org or koolfy@koolfy.be.
