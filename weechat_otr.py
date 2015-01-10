@@ -269,7 +269,7 @@ def print_buffer(buf, message, level='info'):
     using color according to level."""
     prnt(buf, '{prefix}\t{msg}'.format(
         prefix=get_prefix(),
-        msg=colorize(message, 'buffer.{}'.format(level))))
+        msg=colorize(message, 'buffer.{0}'.format(level))))
 
 def get_prefix():
     """Returns configured message prefix."""
@@ -395,7 +395,7 @@ def config_prefix(option):
 def config_color(option):
     """Get the color of a color config option."""
     return weechat.color(weechat.config_color(config_get_prefixed(
-        'color.{}'.format(option))))
+        'color.{0}'.format(option))))
 
 def config_string(option):
     """Get the string value of a config option with utf-8 decode."""
@@ -469,7 +469,7 @@ def format_default_policies():
         buf.write('  {policy} ({desc}) : {value}\n'.format(
             policy=policy,
             desc=desc,
-            value=config_string('policy.default.{}'.format(policy))))
+            value=config_string('policy.default.{0}'.format(policy))))
 
     buf.write('Change default policies with: /otr policy default NAME on|off')
 
@@ -534,7 +534,7 @@ def show_peer_fingerprints(grep=None):
 
 def private_key_file_path(account_name):
     """Return the private key file path for an account."""
-    return os.path.join(OTR_DIR, '{}.key3'.format(account_name))
+    return os.path.join(OTR_DIR, '{0}.key3'.format(account_name))
 
 def read_private_key(key_file_path):
     """Return the private key in a private key file."""
@@ -632,7 +632,7 @@ class IrcContext(potr.context.Context):
 
             if option == '':
                 option = config_get_prefixed(
-                    'policy.default.{}'.format(key_lower))
+                    'policy.default.{0}'.format(key_lower))
 
             result = bool(weechat.config_boolean(option))
 
@@ -647,7 +647,7 @@ class IrcContext(potr.context.Context):
         else:
             msg = PYVER.to_unicode(msg)
 
-        debug(('inject', msg, 'len {}'.format(len(msg)), appdata))
+        debug(('inject', msg, 'len {0}'.format(len(msg)), appdata))
 
         privmsg(self.peer_server, self.peer_nick, msg)
 
@@ -685,7 +685,7 @@ class IrcContext(potr.context.Context):
 
             if trust is None:
                 fpr = str(self.getCurrentKey())
-                self.print_buffer('New fingerprint: {}'.format(fpr), 'warning')
+                self.print_buffer('New fingerprint: {0}'.format(fpr), 'warning')
                 self.setCurrentTrust('')
 
             if bool(trust):
@@ -712,7 +712,7 @@ class IrcContext(potr.context.Context):
         """Return the max message size for this context."""
         # remove 'PRIVMSG <nick> :' from max message size
         result = self.user.maxMessageSize - 10 - len(self.peer_nick)
-        debug('max message size {}'.format(result))
+        debug('max message size {0}'.format(result))
 
         return result
 
@@ -942,16 +942,16 @@ Note: You can safely omit specifying the peer and server when
 
         if (previous_log_level >= 0) and (previous_log_level < 10):
             self.print_buffer(
-                'Restoring buffer logging value to: {}'.format(
+                'Restoring buffer logging value to: {0}'.format(
                     previous_log_level), 'warning')
-            weechat.command(buf, '/mute logger set {}'.format(
+            weechat.command(buf, '/mute logger set {0}'.format(
                 previous_log_level))
 
         if previous_log_level == -1:
             logger_option_name = self.get_logger_option_name()
             self.print_buffer(
                 'Restoring buffer logging value to default', 'warning')
-            weechat.command(buf, '/mute unset {}'.format(
+            weechat.command(buf, '/mute unset {0}'.format(
                 logger_option_name))
 
         del self.previous_log_level
@@ -1001,7 +1001,7 @@ Note: You can safely omit specifying the peer and server when
 
     def __repr__(self):
         return PYVER.to_str((
-            '<{} {:x} peer_nick={c.peer_nick} peer_server={c.peer_server}>'
+            '<{0} {1:x} peer_nick={c.peer_nick} peer_server={c.peer_server}>'
             ).format(self.__class__.__name__, id(self), c=self))
 
 class IrcOtrAccount(potr.context.Account):
@@ -1023,7 +1023,7 @@ class IrcOtrAccount(potr.context.Account):
         self.defaultQuery = self.defaultQuery.replace("\n", ' ')
 
         self.key_file_path = private_key_file_path(name)
-        self.fpr_file_path = os.path.join(OTR_DIR, '{}.fpr'.format(name))
+        self.fpr_file_path = os.path.join(OTR_DIR, '{0}.fpr'.format(name))
 
         self.load_trusts()
 
@@ -1125,7 +1125,7 @@ class IrcHTMLParser(PYVER.html_parser.HTMLParser):
                 if self.result[self.linkstart:] == self.linktarget:
                     self.result += ']'
                 else:
-                    self.result += ']({})'.format(self.linktarget)
+                    self.result += ']({0})'.format(self.linktarget)
                 self.linktarget = ''
 
     def handle_data(self, data):
@@ -1138,7 +1138,7 @@ class IrcHTMLParser(PYVER.html_parser.HTMLParser):
             self.result += PYVER.unichr(
                 PYVER.html_entities.name2codepoint[name])
         except KeyError:
-            self.result += '&{};'.format(name)
+            self.result += '&{0};'.format(name)
 
     def handle_charref(self, name):
         """Called for character references, such as &#39;"""
@@ -1148,7 +1148,7 @@ class IrcHTMLParser(PYVER.html_parser.HTMLParser):
             else:
                 self.result += PYVER.unichr(int(name))
         except ValueError:
-            self.result += '&#{};'.format(name)
+            self.result += '&#{0};'.format(name)
 
 class TableFormatter(object):
     """Format lists of string into aligned tables."""
@@ -1210,7 +1210,7 @@ def message_in_cb(data, modifier, modifier_data, string):
 
             context.handle_tlvs(tlvs)
         except potr.context.ErrorReceived as err:
-            context.print_buffer('Received OTR error: {}'.format(
+            context.print_buffer('Received OTR error: {0}'.format(
                 PYVER.to_unicode(err.args[0])), 'error')
         except potr.context.NotEncryptedError:
             context.print_buffer(
@@ -1386,9 +1386,9 @@ def command_cb(data, buf, args):
             if context.is_encrypted():
                 context.print_buffer(
                     'This conversation is encrypted.', 'success')
-                context.print_buffer("Your fingerprint is: {}".format(
+                context.print_buffer("Your fingerprint is: {0}".format(
                     context.user.getPrivkey()))
-                context.print_buffer("Your peer's fingerprint is: {}".format(
+                context.print_buffer("Your peer's fingerprint is: {0}".format(
                     potr.human_hash(context.crypto.theirPubkey.cfingerprint())))
                 if context.is_verified():
                     context.print_buffer(
@@ -1464,7 +1464,7 @@ def command_cb(data, buf, args):
                 context.smpInit(secret, question)
             except potr.context.NotEncryptedError:
                 context.print_buffer(
-                    'There is currently no encrypted session with {}.'.format(
+                    'There is currently no encrypted session with {0}.'.format(
                         context.peer), 'error')
             else:
                 if question:
@@ -1491,7 +1491,7 @@ def command_cb(data, buf, args):
                     context.smpAbort()
                 except potr.context.NotEncryptedError:
                     context.print_buffer(
-                        'There is currently no encrypted session with {}.'
+                        'There is currently no encrypted session with {0}.'
                         .format(context.peer), 'error')
                 else:
                     debug('SMP aborted')

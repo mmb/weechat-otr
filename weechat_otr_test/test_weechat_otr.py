@@ -56,9 +56,9 @@ class WeechatOtrGeneralTestCase(WeechatOtrTestCase):
             fromm, to, 'line1\nline2', prefix)
         self.assertEqual(result, '{msg1}\r\n{msg2}'.format(
             msg1=weechat_otr.build_privmsg_in(
-                fromm, to, '{}line1'.format(prefix)),
+                fromm, to, '{0}line1'.format(prefix)),
             msg2=weechat_otr.build_privmsg_in(
-                fromm, to, '{}line2'.format(prefix))))
+                fromm, to, '{0}line2'.format(prefix))))
 
     def test_build_privmsg_out_without_newline(self):
         result = weechat_otr.build_privmsg_out('t', 'line1')

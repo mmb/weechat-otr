@@ -298,13 +298,13 @@ class MockWeechat(types.ModuleType):
         os.mkdir(os.path.join(self.weechat_dir, name), mode)
 
     def string_eval_expression(self, expr, pointers, extra_vars, options):
-        return 'eval({})'.format(expr)
+        return 'eval({0})'.format(expr)
 
     def config_color(self, key):
         return key
 
     def color(self, name):
-        return '(color {})'.format(name)
+        return '(color {0})'.format(name)
 
     def prnt(self, buf, message):
         self.printed.setdefault(buf, []).append(message)
