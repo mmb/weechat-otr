@@ -2023,13 +2023,19 @@ def git_info():
     if os.path.isdir(git_dir):
         import subprocess
         try:
-            result = PYVER.to_unicode(subprocess.check_output([
+            # We can't use check_output here without breaking compatibility
+            # for Python 2.6, but we ignore the return value anyway, so Popen
+            # is only slightly more complicated:
+            process = subprocess.Popen([
                 'git',
                 '--git-dir', git_dir,
                 '--work-tree', script_dir,
                 'describe', '--dirty', '--always',
-                ])).lstrip('v').rstrip()
-        except (OSError, subprocess.CalledProcessError):
+                ], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+            output = process.communicate()[0]
+            if output:
+                result = PYVER.to_unicode(output).lstrip('v').rstrip()
+        except (OSError):
             pass
 
     return result
