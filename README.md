@@ -18,6 +18,9 @@ package to be installed:
 
 The latest release version of WeeChat OTR can be found in the
 [WeeChat scripts repository](https://www.weechat.org/scripts/source/otr.py.html/).
+To install from within WeeChat:
+
+`/script install otr.py`
 
 To install manually, download `weechat_otr.py` from GitHub and save it in
 `~/.weechat/python`. Then either symlink it into
