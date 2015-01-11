@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mmb/weechat-otr.png)](https://travis-ci.org/mmb/weechat-otr)
+[![Build Status](https://travis-ci.org/mmb/weechat-otr.svg?branch=master)](https://travis-ci.org/mmb/weechat-otr)
 
 WeeChat script for Off-the-Record messaging
 
