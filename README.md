@@ -14,7 +14,7 @@ This script requires Weechat 0.4.2 or later and the
 [Pure Python OTR](https://github.com/afflux/pure-python-otr)
 package to be installed:
 
-`pip install python-potr`
+`pip install --user python-potr`
 
 The latest release version of WeeChat OTR can be found in the
 [WeeChat scripts repository](https://www.weechat.org/scripts/source/otr.py.html/).
