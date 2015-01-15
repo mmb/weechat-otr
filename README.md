@@ -12,15 +12,15 @@ Testing and security auditing are appreciated.
 
 This script requires Weechat 0.4.2 or later and the
 [Pure Python OTR](https://github.com/afflux/pure-python-otr)
-package to be installed:
+package to be installed (see below if this command fails):
 
-`pip install --user python-potr`
+    pip install --upgrade --user python-potr
 
 The latest release version of WeeChat OTR can be found in the
 [WeeChat scripts repository](https://www.weechat.org/scripts/source/otr.py.html/).
 To install from within WeeChat:
 
-`/script install otr.py`
+    /script install otr.py
 
 To install manually, download `weechat_otr.py` from GitHub and save it in
 `~/.weechat/python`. Then either symlink it into
@@ -28,6 +28,13 @@ To install manually, download `weechat_otr.py` from GitHub and save it in
 in WeeChat.
 
 [Latest unstable version from GitHub](https://raw.githubusercontent.com/mmb/weechat-otr/master/weechat_otr.py)
+
+### Requirements for building Pure Python OTR
+
+If python-potr fails to install, you are probably missing some packages.
+To install all the requirements on a Debian/Ubuntu system, run
+
+    sudo apt-get install python-pip build-essential python-dev
 
 ## Support
 
