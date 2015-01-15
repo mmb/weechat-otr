@@ -24,7 +24,7 @@ To install from within WeeChat:
 
 To install manually, download `weechat_otr.py` from GitHub and save it in
 `~/.weechat/python`. Then either symlink it into
-`~/.weechat/python/autoload` or `/python load python/weechat_otr.py`
+`~/.weechat/python/autoload` or `/python load weechat_otr.py`
 in WeeChat.
 
 [Latest unstable version from GitHub](https://raw.githubusercontent.com/mmb/weechat-otr/master/weechat_otr.py)
