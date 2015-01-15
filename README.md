@@ -1,14 +1,14 @@
-[![Build Status](https://travis-ci.org/mmb/weechat-otr.svg?branch=master)](https://travis-ci.org/mmb/weechat-otr)
+# WeeChat script for Off-the-Record (OTR) Messaging
 
-WeeChat script for Off-the-Record messaging
-
-DISCLAIMER: This script makes every effort to securely provide OTR
-messaging in WeeChat but offers no guarantee. Please report any security
-holes you find.
+> **Please note**: This script makes every effort to securely provide OTR
+> Messaging in WeeChat but offers no guarantee. Please report any security
+> problems you find.
 
 Testing and security auditing are appreciated.
 
-#Installation
+[![Build Status](https://travis-ci.org/mmb/weechat-otr.svg?branch=master)](https://travis-ci.org/mmb/weechat-otr)
+
+## Installation
 
 This script requires Weechat 0.4.2 or later and the
 [Pure Python OTR](https://github.com/afflux/pure-python-otr)
@@ -29,14 +29,14 @@ in WeeChat.
 
 [Latest unstable version from GitHub](https://raw.githubusercontent.com/mmb/weechat-otr/master/weechat_otr.py)
 
-#Support
+## Support
 
-IRC channel: #weechat-otr on Freenode
+IRC channel: `#weechat-otr` on Freenode
 
 Create GitHub issues/pull requests for questions, comments and patches or
 email matthewm@boedicker.org or koolfy@koolfy.be.
 
-#Thanks
+## Thanks
 
 Thanks to Kjell Braden for the Pure Python OTR library and the Gajim
 Python plugin which was used as a reference.
