@@ -1,5 +1,7 @@
 # WeeChat script for Off-the-Record (OTR) Messaging
 
+![Screenshot](https://cloud.githubusercontent.com/assets/24275/5772021/262c6dd6-9cff-11e4-964f-1812a6a545c6.png)
+
 > **Please note**: This script makes every effort to securely provide OTR
 > Messaging in WeeChat but offers no guarantee. Please report any security
 > problems you find.
