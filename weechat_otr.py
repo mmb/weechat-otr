@@ -1364,6 +1364,8 @@ def command_cb(data, buf, args):
             elif len(arg_parts) == 5:
                 nick, server = default_peer_args(arg_parts[2:4], buf)
                 secret = arg_parts[4]
+            else:
+                return weechat.WEECHAT_RC_ERROR
 
             if secret:
                 secret = PYVER.to_str(secret)
@@ -1397,7 +1399,8 @@ def command_cb(data, buf, args):
                 nick, server = default_peer_args(arg_parts[2:4], buf)
                 secret = arg_parts[5]
                 question = arg_parts[4]
-
+            else:
+                return weechat.WEECHAT_RC_ERROR
 
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
@@ -1428,6 +1431,9 @@ def command_cb(data, buf, args):
             # Nickname and server are specified
             elif len(arg_parts) == 4:
                 nick, server = default_peer_args(arg_parts[2:4], buf)
+            else:
+                return weechat.WEECHAT_RC_ERROR
+
             context = ACCOUNTS[current_user(server)].getContext(
                 irc_user(nick, server))
 
