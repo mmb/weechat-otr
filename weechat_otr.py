@@ -31,6 +31,7 @@ import collections
 import glob
 import io
 import os
+import platform
 import re
 import traceback
 import shlex
@@ -1920,6 +1921,30 @@ def weechat_version_ok():
         return True
 
 SCRIPT_VERSION = git_info() or SCRIPT_VERSION
+
+def dependency_versions():
+    """Return a string containing the versions of all dependencies."""
+    return ('weechat-otr {script_version}, '
+        'potr {potr_major}.{potr_minor}.{potr_patch}-{potr_sub}, '
+        'Python {python_version}, '
+        'WeeChat {weechat_version}'
+        ).format(
+        script_version=SCRIPT_VERSION,
+        potr_major=potr.VERSION[0],
+        potr_minor=potr.VERSION[1],
+        potr_patch=potr.VERSION[2],
+        potr_sub=potr.VERSION[3],
+        python_version=platform.python_version(),
+        weechat_version=weechat.info_get('version', ''))
+
+def excepthook(typ, value, traceback):
+    sys.stderr.write('Versions: ')
+    sys.stderr.write(dependency_versions())
+    sys.stderr.write('\n')
+
+    sys.__excepthook__(typ, value, traceback)
+
+sys.excepthook = excepthook
 
 if weechat.register(
     SCRIPT_NAME, SCRIPT_AUTHOR, SCRIPT_VERSION, SCRIPT_LICENCE, SCRIPT_DESC,
