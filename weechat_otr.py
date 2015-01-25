@@ -308,10 +308,16 @@ def isupport_value(server, feature):
 
 def is_a_channel(channel, server):
     """Return true if a string has an IRC channel prefix."""
-    chantypes = tuple(isupport_value(server, 'CHANTYPES'))
-    statusmsg = tuple(isupport_value(server, 'STATUSMSG'))
+    prefixes = \
+        tuple(isupport_value(server, 'CHANTYPES')) + \
+        tuple(isupport_value(server, 'STATUSMSG'))
 
-    return channel.startswith(chantypes + statusmsg)
+    # If the server returns nothing for CHANTYPES and STATUSMSG use
+    # default prefixes.
+    if not prefixes:
+        prefixes = ('#', '&', '+', '!', '@')
+
+    return channel.startswith(prefixes)
 
 # Exception class for PRIVMSG parsing exceptions.
 class PrivmsgParseException(Exception):

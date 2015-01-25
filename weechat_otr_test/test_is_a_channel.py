@@ -34,6 +34,38 @@ class IsAChannelTestCase(WeechatOtrTestCase):
     def test_not_a_channel(self):
         self.assertFalse(weechat_otr.is_a_channel('nick', 'server'))
 
+    def test_hash_server_doesnt_isupport(self):
+        self.server_no_chantypes()
+        self.assertTrue(weechat_otr.is_a_channel('#channel', 'server'))
+
+    def test_ampersand_server_doesnt_isupport(self):
+        self.server_no_chantypes()
+        self.assertTrue(weechat_otr.is_a_channel('&channel', 'server'))
+
+    def test_plus_server_doesnt_isupport(self):
+        self.server_no_chantypes()
+        self.assertTrue(weechat_otr.is_a_channel('+channel', 'server'))
+
+    def test_bang_server_doesnt_isupport(self):
+        self.server_no_chantypes()
+        self.assertTrue(weechat_otr.is_a_channel('!channel', 'server'))
+
+    def test_at_server_doesnt_isupport(self):
+        self.server_no_chantypes()
+        self.assertTrue(weechat_otr.is_a_channel('@#channel', 'server'))
+
+    def test_not_a_channel_server_doesnt_isupport(self):
+        self.server_no_chantypes()
+        self.assertFalse(weechat_otr.is_a_channel('nick', 'server'))
+
+    def server_no_chantypes(self):
+        sys.modules['weechat'].infos[
+            ('server,CHANTYPES',)][
+            'irc_server_isupport_value'] = ''
+        sys.modules['weechat'].infos[
+            ('server,STATUSMSG',)][
+            'irc_server_isupport_value'] = ''
+
     def add_channel_prefix(self, prefix):
         sys.modules['weechat'].infos[
             ('server,CHANTYPES',)][
