@@ -358,13 +358,10 @@ def parse_irc_privmsg(message, server):
             'text': text,
             }
 
-        # Normally weechat_result['nick'] is the 'from' nick. If there is no
-        # 'from' nick, weechat_result['nick'] will be the 'to' nick.
-        unicode_nick = PYVER.to_unicode(weechat_result['nick'])
-        if unicode_nick == target:
-            result['from_nick'] = ''
+        if weechat_result['host']:
+            result['from_nick'] = PYVER.to_unicode(weechat_result['nick'])
         else:
-            result['from_nick'] = unicode_nick
+            result['from_nick'] = ''
 
         if is_a_channel(target, server):
             result['to_channel'] = target
