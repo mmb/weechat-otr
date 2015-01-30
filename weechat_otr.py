@@ -1261,6 +1261,8 @@ def message_out_cb(data, modifier, modifier_data, string):
     except:
         try:
             print_buffer('', traceback.format_exc(), 'error')
+            print_buffer('', 'Versions: {versions}'.format(
+                versions=dependency_versions()), 'error')
             context.print_buffer(
                 'Failed to send message. See core buffer for traceback.',
                 'error')

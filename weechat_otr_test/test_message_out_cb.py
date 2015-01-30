@@ -5,7 +5,10 @@
 
 from __future__ import unicode_literals
 
+import platform
 import sys
+
+import potr
 
 from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
 
@@ -91,3 +94,24 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
         weechat_otr.message_out_cb(None, None, 'server',
             ':nick!user@host PRIVMSG nick2 :hello')
         self.assertPrintedContains('', 'Exception: test')
+
+    def test_exception_raised_prints_versions(self):
+        sys.modules['weechat'].info_get_hashtable_raise = Exception('test')
+        sys.modules['weechat'].infos[('',)]['version'] = '9.8.7'
+
+        version_str = (
+            'Versions: weechat-otr {script_version}, '
+            'potr {potr_major}.{potr_minor}.{potr_patch}-{potr_sub}, '
+            'Python {python_version}, '
+            'WeeChat 9.8.7'
+            ).format(
+            script_version=weechat_otr.SCRIPT_VERSION,
+            potr_major=potr.VERSION[0],
+            potr_minor=potr.VERSION[1],
+            potr_patch=potr.VERSION[2],
+            potr_sub=potr.VERSION[3],
+            python_version=platform.python_version())
+
+        weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG nick2 :hello')
+        self.assertPrintedContains('', version_str)
