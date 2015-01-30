@@ -89,6 +89,7 @@ class MockWeechat(types.ModuleType):
         self.buffer_new_calls = []
         self.buffer_new_buffers = {}
         self.info_hashtables = {}
+        self.info_get_hashtable_raise = None
         self.infolists = {}
         self.config_integer_defaults = {}
         self.commands = []
@@ -187,6 +188,8 @@ class MockWeechat(types.ModuleType):
     def info_get_hashtable(self, name, args):
         # pylint: disable=too-many-branches
         # pylint: disable=too-many-statements
+        if self.info_get_hashtable_raise:
+            raise self.info_get_hashtable_raise
         if name in self.info_hashtables:
             return self.info_hashtables[name].pop()
         if name == 'irc_message_parse':

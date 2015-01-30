@@ -36,6 +36,11 @@ class WeechatOtrTestCase(unittest.TestCase):
     def assertPrinted(self, buf, text):
         self.assertIn(text, sys.modules['weechat'].printed[buf])
 
+    def assertPrintedContains(self, buf, regex):
+        self.assertRegex(
+            ''.join(sys.modules['weechat'].printed.get(buf, [])),
+            regex)
+
     def assertNotPrinted(self, buf, text):
         self.assertNotIn(text, sys.modules['weechat'].printed.get(buf, []))
 

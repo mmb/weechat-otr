@@ -77,3 +77,17 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
             '(color lightblue)Wait for the OTR connection or change the '
             'policy to allow clear-text messages:\r\n(color '
             'lightblue)/policy set require_encryption off')
+
+    def test_exception_raised_returns_empty_string(self):
+        sys.modules['weechat'].info_get_hashtable_raise = Exception('test')
+
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG nick2 :hello')
+        self.assertEqual(result, '')
+
+    def test_exception_raised_prints_traceback(self):
+        sys.modules['weechat'].info_get_hashtable_raise = Exception('test')
+
+        weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG nick2 :hello')
+        self.assertPrintedContains('', 'Exception: test')
