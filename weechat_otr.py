@@ -199,7 +199,15 @@ otr_debug_buffer = None
 # strips trailing spaces from commands. This causes OTR initiation to fail so
 # the following code adds an extra tab at the end of the plaintext tags if
 # they end in a space.
+#
+# The patched version also skips OTR tagging for CTCP messages because it
+# breaks the CTCP format.
 def patched__bytes__(self):
+    # Do not tag CTCP messages.
+    if self.msg.startswith(b'\x01') and \
+        self.msg.endswith(b'\x01'):
+        return self.msg
+
     data = self.msg + potr.proto.MESSAGE_TAG_BASE
     for v in self.versions:
         data += potr.proto.MESSAGE_TAGS[v]

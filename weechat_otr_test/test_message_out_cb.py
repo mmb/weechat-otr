@@ -57,6 +57,15 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
         self.assertEqual(weechat_otr.PYVER.to_unicode(result),
             "PRIVMSG NickServ :identify secret")
 
+    def test_message_out_cb_send_tag_ctcp(self):
+        sys.modules['weechat'].config_options[
+            'otr.policy.default.send_tag'] = 'on'
+
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG friend :\x01CTCP VERSION\x01')
+        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+            'PRIVMSG friend :\x01CTCP VERSION\x01')
+
     def test_message_out_cb_nick_with_at(self):
         result = weechat_otr.message_out_cb(None, None, 'server',
             ':nick!user@host PRIVMSG @#chan :hello')
