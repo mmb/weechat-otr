@@ -973,9 +973,13 @@ Note: You can safely omit specifying the peer and server when
 
     def is_serv(self):
         return self.peer_nick.lower() in [
+            'botserv',
             'chanserv',
+            'hostserv',
             'memoserv',
-            'nickserv'
+            'nickserv',
+            'operserv',
+            'statserv'
             ]
 
     def __repr__(self):
