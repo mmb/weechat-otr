@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 
 import os
+import re
 import sys
 
 from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
@@ -38,3 +39,20 @@ class KeyGenerationTestCase(WeechatOtrTestCase):
             'gefährte@server.key3')
 
         self.assertGreater(os.path.getsize(key_path), 0)
+
+    def test_reads_key_file(self):
+        sys.modules['weechat'].set_server_current_nick('server', 'noob')
+
+        weechat_otr.message_in_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG noob :?OTRv2?')
+
+        key_path = os.path.join(
+            sys.modules['weechat'].weechat_dir,
+            'otr',
+            'noob@server.key3')
+
+        account = weechat_otr.ACCOUNTS['noob@server']
+        priv_key = account.getPrivkey()
+        account.privkey = None
+
+        self.assertEqual(priv_key, account.getPrivkey())
