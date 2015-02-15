@@ -534,6 +534,13 @@ def private_key_file_path(account_name):
     """Return the private key file path for an account."""
     return os.path.join(OTR_DIR, '{}.key3'.format(account_name))
 
+def read_private_key(key_file_path):
+    """Return the private key in a private key file."""
+    debug(('read private key', key_file_path))
+
+    with open(key_file_path, 'rb') as key_file:
+        return potr.crypt.PK.parsePrivateKey(key_file.read())[0]
+
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
 
@@ -1019,8 +1026,7 @@ class IrcOtrAccount(potr.context.Account):
         debug(('load private key', self.key_file_path))
 
         if os.path.exists(self.key_file_path):
-            with open(self.key_file_path, 'rb') as key_file:
-                return potr.crypt.PK.parsePrivateKey(key_file.read())[0]
+            return read_private_key(self.key_file_path)
 
     def savePrivkey(self):
         """Save key file."""
