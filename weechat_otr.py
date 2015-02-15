@@ -530,6 +530,10 @@ def show_peer_fingerprints(grep=None):
                     ])
     print_buffer('', table_formatter.format())
 
+def private_key_file_path(account_name):
+    """Return the private key file path for an account."""
+    return os.path.join(OTR_DIR, '{}.key3'.format(account_name))
+
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
 
@@ -990,7 +994,7 @@ class IrcOtrAccount(potr.context.Account):
         # need to be one message
         self.defaultQuery = self.defaultQuery.replace("\n", ' ')
 
-        self.key_file_path = os.path.join(OTR_DIR, '{}.key3'.format(name))
+        self.key_file_path = private_key_file_path(name)
         self.fpr_file_path = os.path.join(OTR_DIR, '{}.fpr'.format(name))
 
         self.load_trusts()
