@@ -973,12 +973,21 @@ Note: You can safely omit specifying the peer and server when
 
     def is_serv(self):
         return self.peer_nick.lower() in [
+            'alis',
             'botserv',
+            'chanfix',
             'chanserv',
+            'gameserv',
+            'global',
+            'groupserv',
+            'helpserv',
             'hostserv',
+            'infoserv',
             'memoserv',
             'nickserv',
             'operserv',
+            'rpgserv',
+            'saslserv',
             'statserv'
             ]
 
