@@ -31,67 +31,25 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
             "PRIVMSG friend :\xc3 \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
     def test_message_out_cb_send_tag_botserv(self):
-        sys.modules['weechat'].config_options[
-            'otr.policy.default.send_tag'] = 'on'
-
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG BotServ :test')
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
-            'PRIVMSG BotServ :test')
+        self.assertNickIsNotTagged('BotServ')
 
     def test_message_out_cb_send_tag_chanserv(self):
-        sys.modules['weechat'].config_options[
-            'otr.policy.default.send_tag'] = 'on'
-
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG ChanServ :register channel secret desc')
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
-            'PRIVMSG ChanServ :register channel secret desc')
+        self.assertNickIsNotTagged('ChanServ')
 
     def test_message_out_cb_send_tag_hostserv(self):
-        sys.modules['weechat'].config_options[
-            'otr.policy.default.send_tag'] = 'on'
-
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG HostServ :test')
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
-            'PRIVMSG HostServ :test')
+        self.assertNickIsNotTagged('HostServ')
 
     def test_message_out_cb_send_tag_memoserv(self):
-        sys.modules['weechat'].config_options[
-            'otr.policy.default.send_tag'] = 'on'
-
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG MemoServ :send friend hi')
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
-            'PRIVMSG MemoServ :send friend hi')
+        self.assertNickIsNotTagged('MemoServ')
 
     def test_message_out_cb_send_tag_nickserv(self):
-        sys.modules['weechat'].config_options[
-            'otr.policy.default.send_tag'] = 'on'
-
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ":nick!user@host PRIVMSG NickServ :identify secret")
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
-            "PRIVMSG NickServ :identify secret")
+        self.assertNickIsNotTagged('NickServ')
 
     def test_message_out_cb_send_tag_operserv(self):
-        sys.modules['weechat'].config_options[
-            'otr.policy.default.send_tag'] = 'on'
-
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG OperServ :test')
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
-            'PRIVMSG OperServ :test')
+        self.assertNickIsNotTagged('OperServ')
 
     def test_message_out_cb_send_tag_statserv(self):
-        sys.modules['weechat'].config_options[
-            'otr.policy.default.send_tag'] = 'on'
-
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG StatServ :test')
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
-            'PRIVMSG StatServ :test')
+        self.assertNickIsNotTagged('StatServ')
 
     def test_message_out_cb_send_tag_ctcp(self):
         sys.modules['weechat'].config_options[
@@ -160,3 +118,13 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
         weechat_otr.message_out_cb(None, None, 'server',
             ':nick!user@host PRIVMSG nick2 :hello')
         self.assertPrintedContains('', version_str)
+
+    def assertNickIsNotTagged(self, nick):
+        sys.modules['weechat'].config_options[
+            'otr.policy.default.send_tag'] = 'on'
+
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG {nick} :send friend hi'.format(
+            nick=nick))
+        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+            'PRIVMSG {nick} :send friend hi'.format(nick=nick))
