@@ -30,14 +30,35 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
         self.assertEqual(weechat_otr.PYVER.to_unicode(result),
             "PRIVMSG friend :\xc3 \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
+    def test_message_out_cb_send_tag_alis(self):
+        self.assertNickIsNotTagged('Alis')
+
     def test_message_out_cb_send_tag_botserv(self):
         self.assertNickIsNotTagged('BotServ')
+
+    def test_message_out_cb_send_tag_chanfix(self):
+        self.assertNickIsNotTagged('ChanFix')
 
     def test_message_out_cb_send_tag_chanserv(self):
         self.assertNickIsNotTagged('ChanServ')
 
+    def test_message_out_cb_send_tag_gameserv(self):
+        self.assertNickIsNotTagged('GameServ')
+
+    def test_message_out_cb_send_tag_global(self):
+        self.assertNickIsNotTagged('Global')
+
+    def test_message_out_cb_send_tag_groupserv(self):
+        self.assertNickIsNotTagged('GroupServ')
+
+    def test_message_out_cb_send_tag_helpserv(self):
+        self.assertNickIsNotTagged('HelpServ')
+
     def test_message_out_cb_send_tag_hostserv(self):
         self.assertNickIsNotTagged('HostServ')
+
+    def test_message_out_cb_send_tag_infoserv(self):
+        self.assertNickIsNotTagged('InfoServ')
 
     def test_message_out_cb_send_tag_memoserv(self):
         self.assertNickIsNotTagged('MemoServ')
@@ -48,8 +69,14 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
     def test_message_out_cb_send_tag_operserv(self):
         self.assertNickIsNotTagged('OperServ')
 
+    def test_message_out_cb_send_tag_rpgserv(self):
+        self.assertNickIsNotTagged('RpgServ')
+
     def test_message_out_cb_send_tag_statserv(self):
         self.assertNickIsNotTagged('StatServ')
+
+    def test_message_out_cb_send_tag_saslserv(self):
+        self.assertNickIsNotTagged('SaslServ')
 
     def test_message_out_cb_send_tag_ctcp(self):
         sys.modules['weechat'].config_options[
