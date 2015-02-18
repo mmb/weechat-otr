@@ -100,11 +100,6 @@ class KeyGenerationTestCase(WeechatOtrTestCase):
         weechat_otr.message_in_cb(None, None, 'server',
             ':nick!user@host PRIVMSG noob :?OTRv2?')
 
-        key_path = os.path.join(
-            sys.modules['weechat'].weechat_dir,
-            'otr',
-            'noob@server.key3')
-
         account = weechat_otr.ACCOUNTS['noob@server']
         priv_key = account.getPrivkey()
         account.privkey = None
