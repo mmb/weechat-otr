@@ -35,6 +35,7 @@ import platform
 import re
 import traceback
 import shlex
+import shutil
 import sys
 
 class PythonVersion2(object):
@@ -1035,11 +1036,22 @@ class IrcOtrAccount(potr.context.Account):
                         self.setTrust(context, fpr, trust)
 
     def loadPrivkey(self):
-        """Load key file."""
+        """Load key file.
+
+        If no key file exists, load the default key. If there is no default
+        key, a new key will be generated automatically by potr."""
         debug(('load private key', self.key_file_path))
 
         if os.path.exists(self.key_file_path):
             return read_private_key(self.key_file_path)
+        else:
+            default_key = config_string('general.defaultkey')
+            if default_key:
+                default_key_path = private_key_file_path(default_key)
+
+                if os.path.exists(default_key_path):
+                    shutil.copyfile(default_key_path, self.key_file_path)
+                    return read_private_key(self.key_file_path)
 
     def savePrivkey(self):
         """Save key file."""
@@ -1811,6 +1823,8 @@ def init_config():
     for option, typ, desc, default in [
         ('debug', 'boolean', 'OTR script debugging', 'off'),
         ('hints', 'boolean', 'Give helpful hints how to use this script and how to stay secure while using OTR (recommended)', 'on'),
+        ('defaultkey', 'string',
+         'default private key to use for new accounts (nick@server)', ''),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['general'], option, typ, desc, '', 0,
