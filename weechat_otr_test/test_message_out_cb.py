@@ -87,6 +87,24 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
         self.assertEqual(weechat_otr.PYVER.to_unicode(result),
             'PRIVMSG friend :\x01CTCP VERSION\x01')
 
+    def test_message_out_cb_no_send_tag_regex_non_ascii(self):
+        sys.modules['weechat'].config_options[
+            'otr.general.no_send_tag_regex'] = \
+            weechat_otr.PYVER.to_str('^gefährte$')
+
+        self.assertNickIsNotTagged('gefährte')
+
+    def test_message_out_cb_empty_no_send_tag_regex(self):
+        sys.modules['weechat'].config_options[
+            'otr.policy.default.send_tag'] = 'on'
+        sys.modules['weechat'].config_options[
+            'otr.general.no_send_tag_regex'] = weechat_otr.PYVER.to_str('')
+
+        result = weechat_otr.message_out_cb(None, None, 'server',
+            weechat_otr.PYVER.to_str(":nick!user@host PRIVMSG friend :hi"))
+        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+            "PRIVMSG friend :hi \t  \t\t\t\t \t \t \t    \t\t  \t \t")
+
     def test_message_out_cb_nick_with_at(self):
         result = weechat_otr.message_out_cb(None, None, 'server',
             ':nick!user@host PRIVMSG @#chan :hello')

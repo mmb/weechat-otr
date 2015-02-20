@@ -609,7 +609,7 @@ class IrcContext(potr.context.Context):
 
         if key_lower in READ_ONLY_POLICIES:
             result = READ_ONLY_POLICIES[key_lower]
-        elif key_lower == 'send_tag' and self.is_serv():
+        elif key_lower == 'send_tag' and self.no_send_tag():
             result = False
         else:
             option = weechat.config_get(
@@ -972,26 +972,17 @@ Note: You can safely omit specifying the peer and server when
         # potr expects bytes to be returned
         return to_bytes(msg)
 
-    def is_serv(self):
-        return self.peer_nick.lower() in [
-            'alis',
-            'botserv',
-            'chanfix',
-            'chanserv',
-            'gameserv',
-            'global',
-            'groupserv',
-            'helpserv',
-            'hostserv',
-            'infoserv',
-            'memoserv',
-            'nickserv',
-            'operserv',
-            'rpgserv',
-            'saslserv',
-            'statserv'
-            ]
+    def no_send_tag(self):
+        """Skip OTR whitespace tagging to bots and services.
 
+        Any nicks matching the otr.general.no_send_tag_regex config setting
+        will not be tagged.
+        """
+        no_send_tag_regex = config_string('general.no_send_tag_regex')
+        debug(('no_send_tag', no_send_tag_regex, self.peer_nick))
+        if no_send_tag_regex:
+            return re.match(no_send_tag_regex, self.peer_nick, re.IGNORECASE)
+ 
     def __repr__(self):
         return PYVER.to_str(('<{} {:x} peer_nick={c.peer_nick} '
             'peer_server={c.peer_server}>').format(
@@ -1825,6 +1816,10 @@ def init_config():
         ('hints', 'boolean', 'Give helpful hints how to use this script and how to stay secure while using OTR (recommended)', 'on'),
         ('defaultkey', 'string',
          'default private key to use for new accounts (nick@server)', ''),
+        ('no_send_tag_regex', 'string',
+         'do not OTR whitespace tag messages to nicks matching this regex '
+         '(case insensitive)',
+         '^(alis|chanfix|global|.+serv)$'),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['general'], option, typ, desc, '', 0,
