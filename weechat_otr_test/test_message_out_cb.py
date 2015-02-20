@@ -151,7 +151,8 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
             'otr.policy.default.send_tag'] = 'on'
 
         result = weechat_otr.message_out_cb(None, None, 'server',
+            weechat_otr.PYVER.to_str(
             ':nick!user@host PRIVMSG {nick} :send friend hi'.format(
-            nick=nick))
+            nick=nick)))
         self.assertEqual(weechat_otr.PYVER.to_unicode(result),
             'PRIVMSG {nick} :send friend hi'.format(nick=nick))
