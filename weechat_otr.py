@@ -1819,7 +1819,7 @@ def init_config():
         ('no_send_tag_regex', 'string',
          'do not OTR whitespace tag messages to nicks matching this regex '
          '(case insensitive)',
-         '^(alis|chanfix|global|.+serv)$'),
+         '^(alis|chanfix|global|.+serv|\*.+)$'),
         ]:
         weechat.config_new_option(
             CONFIG_FILE, CONFIG_SECTIONS['general'], option, typ, desc, '', 0,

@@ -78,6 +78,9 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
     def test_message_out_cb_send_tag_saslserv(self):
         self.assertNickIsNotTagged('SaslServ')
 
+    def test_message_out_cb_send_tag_star(self):
+        self.assertNickIsNotTagged('*man')
+
     def test_message_out_cb_send_tag_ctcp(self):
         sys.modules['weechat'].config_options[
             'otr.policy.default.send_tag'] = 'on'
