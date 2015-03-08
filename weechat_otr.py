@@ -1019,7 +1019,7 @@ class IrcOtrAccount(potr.context.Account):
                     debug(('load trust check', line))
 
                     context, account, protocol, fpr, trust = \
-                        line[:-1].split('\t')
+                        PYVER.to_unicode(line[:-1]).split('\t')
 
                     if account == self.name and \
                             protocol == IrcOtrAccount.PROTOCOL:
