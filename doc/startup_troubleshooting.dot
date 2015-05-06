@@ -26,7 +26,7 @@ pip_python -> pip_version [label="No"];
 install_potr [shape=box, label="$ pip install --upgrade --user python-potr"];
 install_potr -> potr_installed;
 
-pip_version [shape=box, label="$ python2.7 `which pip` install --upgrade --user python-potr"];
+pip_version [shape=box, label="$ python2.7 $(which pip) install --upgrade --user python-potr"];
 pip_version -> potr_installed;
 
 help [shape=box, label="/help otr"];
