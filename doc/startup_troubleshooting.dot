@@ -1,0 +1,33 @@
+digraph {
+start [shape=box, label="Start"];
+start -> python;
+
+python [shape=box, label="Is WeeChat compiled with Python support?\n/python"];
+python -> python_version [label="Yes"];
+python -> recompile [label="No"];
+
+python_version [shape=box, label="Which version of Python is WeeChat using?\n/debug libs"];
+python_version -> potr_installed;
+
+recompile [shape=box, label="Recompile WeeChat with Python support"];
+recompile -> start;
+
+potr_installed [shape=box, label="Is potr installed in that version of Python?\n$ python --version\n$ python -c 'import potr'"];
+potr_installed -> script [label="Yes"];
+potr_installed -> pip_python [label="No"];
+
+script [shape=box, label="Install weechat-otr\n/script install otr.py"];
+script -> help;
+
+pip_python [shape="box", label="Is pip using that version of Python?\n$ pip --version"];
+pip_python -> install_potr [label="Yes"];
+pip_python -> pip_version [label="No"];
+
+install_potr [shape=box, label="$ pip install --upgrade --user python-potr"];
+install_potr -> potr_installed;
+
+pip_version [shape=box, label="$ python2.7 `which pip` install --upgrade --user python-potr"];
+pip_version -> potr_installed;
+
+help [shape=box, label="/help otr"];
+}
