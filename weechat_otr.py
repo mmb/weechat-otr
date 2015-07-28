@@ -620,6 +620,10 @@ class IrcContext(potr.context.Context):
                     PYVER.to_str(self.user.policy_config_option(key)))
 
             if option == '':
+                option = weechat.config_get(config_prefix('.'.join(
+                    ['policy', self.peer_server, key_lower])))
+
+            if option == '':
                 option = weechat.config_get(
                     config_prefix('policy.default.{}'.format(key_lower)))
 
