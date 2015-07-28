@@ -6,3 +6,6 @@ class MockUser(object):
 
     def __init__(self, nick):
         self.nick = nick
+
+    def policy_config_option(self, key):
+        return ''

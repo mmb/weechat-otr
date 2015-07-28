@@ -617,6 +617,10 @@ class IrcContext(potr.context.Context):
 
             if option == '':
                 option = weechat.config_get(
+                    PYVER.to_str(self.user.policy_config_option(key)))
+
+            if option == '':
+                option = weechat.config_get(
                     config_prefix('policy.default.{}'.format(key_lower)))
 
             result = bool(weechat.config_boolean(option))
@@ -1068,6 +1072,11 @@ class IrcOtrAccount(potr.context.Account):
         for context in self.ctxs.values():
             if context.is_encrypted():
                 context.disconnect()
+
+    def policy_config_option(self, policy):
+        """Get the option name of a policy option for this account."""
+        return config_prefix('.'.join([
+                    'policy', self.server, self.nick, policy.lower()]))
 
 class IrcHTMLParser(PYVER.html_parser.HTMLParser):
     """A simple HTML parser that throws away anything but newlines and links"""
