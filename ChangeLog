@@ -1,3 +1,22 @@
+1.7.0
+	2015-08-02
+
+	Allow setting policies on a per server and per account basis. Peer policies
+	override account policies which override server policies.
+
+	Convert data loaded from trust files to unicode.
+
+	Do not OTR whitespace tag nicks starting with *.
+
+	Nicks to skip OTR tagging for are now a user-configurable regex. Set the
+	general.no_send_tag_regex option.
+
+	Add otr.general.default.key option to share a key across accounts. Set
+	this to nick@server of the account with the key you want to use as the
+	default key for new accounts.
+
+	Do not OTR whitespace tag CTCP messages.
+
 1.6.0
 	2015-02-06
 
