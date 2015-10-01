@@ -1228,7 +1228,7 @@ def message_out_cb(data, modifier, modifier_data, string):
     """Outgoing message callback."""
     result = ''
 
-    # If any exception is raised in this function, WeeChat will send the
+    # If any exception is raised in this function, WeeChat will not send the
     # outgoing message, which could be something that the user intended to be
     # encrypted. This paranoid exception handling ensures that the system
     # fails closed and not open.
