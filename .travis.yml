@@ -6,7 +6,7 @@ python:
   - "3.4"
   - "3.5"
 install:
-  - "pip install pylint==1.2.0"
+  - "pip install pylint"
   - "pip install -r requirements.txt"
 script: ./run_tests.sh
 matrix:
