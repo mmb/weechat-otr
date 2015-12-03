@@ -120,3 +120,88 @@ class OtrSessionTestCase(SessionTestCase):
 
         self.assertEqual(result, weechat_otr.PYVER.to_str(
             ':gefährte!user@host PRIVMSG gefährte2 :hi'))
+
+    def test_otr_change_my_nick_case(self):
+        sys.modules['weechat'].set_server_current_nick('server', 'nick')
+
+        account1 = weechat_otr_test.recording_account.RecordingAccount(
+            'nick@server')
+        weechat_otr.ACCOUNTS['nick@server'] = account1
+
+        account2 = weechat_otr_test.recording_account.RecordingAccount(
+            'nick2@server')
+        weechat_otr.ACCOUNTS['nick2@server'] = account2
+
+        context1 = account2.getContext('nick@server')
+        context2 = account1.getContext('nick2@server')
+
+        weechat_otr.message_in_cb(None, None, 'server',
+            ':nick2!user@host PRIVMSG nick :?OTRv2?')
+
+        sys.modules['weechat'].set_server_current_nick('server', 'nick2')
+        self.send_all('nick', 'nick2', context2.injected)
+
+        sys.modules['weechat'].set_server_current_nick('server', 'nick')
+        self.send_all('nick2', 'nick', context1.injected)
+
+        sys.modules['weechat'].set_server_current_nick('server', 'nick2')
+        self.send_all('nick', 'nick2', context2.injected)
+
+        sys.modules['weechat'].set_server_current_nick('server', 'nick')
+        self.send_all('nick2', 'nick', context1.injected)
+
+        self.assertTrue(context1.is_encrypted())
+        self.assertTrue(context2.is_encrypted())
+
+        sys.modules['weechat'].set_server_current_nick('server', 'NiCk')
+        weechat_otr.message_out_cb(None, None, 'server',
+            ':NiCk!user@host PRIVMSG nick2 :hi')
+
+        sys.modules['weechat'].set_server_current_nick('server', 'nick2')
+
+        result = weechat_otr.message_in_cb(None, None, 'server',
+            ':NiCk!user@host PRIVMSG nick2 :%s' % context2.injected.pop())
+
+        self.assertEqual(result, ':NiCk!user@host PRIVMSG nick2 :hi')
+
+    def test_otr_change_peer_nick_case(self):
+        sys.modules['weechat'].set_server_current_nick('server', 'nick')
+
+        account1 = weechat_otr_test.recording_account.RecordingAccount(
+            'nick@server')
+        weechat_otr.ACCOUNTS['nick@server'] = account1
+
+        account2 = weechat_otr_test.recording_account.RecordingAccount(
+            'nick2@server')
+        weechat_otr.ACCOUNTS['nick2@server'] = account2
+
+        context1 = account2.getContext('nick@server')
+        context2 = account1.getContext('nick2@server')
+
+        weechat_otr.message_in_cb(None, None, 'server',
+            ':nick2!user@host PRIVMSG nick :?OTRv2?')
+
+        sys.modules['weechat'].set_server_current_nick('server', 'nick2')
+        self.send_all('nick', 'nick2', context2.injected)
+
+        sys.modules['weechat'].set_server_current_nick('server', 'nick')
+        self.send_all('nick2', 'nick', context1.injected)
+
+        sys.modules['weechat'].set_server_current_nick('server', 'nick2')
+        self.send_all('nick', 'nick2', context2.injected)
+
+        sys.modules['weechat'].set_server_current_nick('server', 'nick')
+        self.send_all('nick2', 'nick', context1.injected)
+
+        self.assertTrue(context1.is_encrypted())
+        self.assertTrue(context2.is_encrypted())
+
+        weechat_otr.message_out_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG NiCk2 :hi')
+
+        sys.modules['weechat'].set_server_current_nick('server', 'nick2')
+
+        result = weechat_otr.message_in_cb(None, None, 'server',
+            ':nick!user@host PRIVMSG nick2 :%s' % context2.injected.pop())
+
+        self.assertEqual(result, ':nick!user@host PRIVMSG nick2 :hi')

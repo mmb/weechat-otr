@@ -307,7 +307,7 @@ def current_user(server_name):
 def irc_user(nick, server):
     """Build an IRC user string from a nick and server."""
     return '{nick}@{server}'.format(
-            nick=nick,
+            nick=nick.lower(),
             server=server)
 
 def isupport_value(server, feature):
