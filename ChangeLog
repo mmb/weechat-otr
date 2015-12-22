@@ -1,3 +1,9 @@
+1.8.0
+	2015-12-21
+
+	IRC nicks are case insensitive. Treat all cases of a nick as
+	equivalent.
+
 1.7.0
 	2015-08-02
 
