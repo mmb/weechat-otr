@@ -11,12 +11,6 @@
 <p>Import the public key</p>
 
 <pre>
-echo hi | gpg --auto-key-locate pka -ear matthewm@boedicker.org
-</pre>
-
-or
-
-<pre>
 curl https://s3.amazonaws.com/matthewm.boedicker.org/matthewm@boedicker.org_pgp_public_key.txt | gpg --import
 </pre>
 
