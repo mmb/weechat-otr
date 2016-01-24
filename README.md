@@ -16,13 +16,23 @@ This script requires Weechat 0.4.2 or later and the
 [Pure Python OTR](https://github.com/afflux/pure-python-otr)
 package to be installed with one of the following methods:
 
+Python package:
 ```bash
-# Arch
-yaourt -S python2-potr
-# Debian based systems
-sudo apt-get install python-potr
-# If this fails, read "Requirements for building Pure Python OTR" below.
 pip install --upgrade --user python-potr
+```
+
+If this fails, read
+[Requirements for building Pure Python OTR](#requirements-for-building-pure-python-otr)
+below.
+
+Arch:
+```bash
+yaourt -S python2-potr
+```
+
+Debian based systems:
+```bash
+sudo apt-get install python-potr
 ```
 
 The latest release version of WeeChat OTR can be found in the
