@@ -48,6 +48,9 @@ in WeeChat.
 
 [Latest unstable version from GitHub](https://raw.githubusercontent.com/mmb/weechat-otr/master/weechat_otr.py)
 
+If you are using an official release of the script, it is a good idea to
+[verify the signature](https://s3.amazonaws.com/weechat-otr-signatures/index.html).
+
 ### Requirements for building Pure Python OTR
 
 If python-potr fails to install, you are probably missing some packages.
