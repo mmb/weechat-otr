@@ -60,6 +60,7 @@ class MockWeechat(types.ModuleType):
                 'localvar_type' : 'private',
                 'localvar_channel' : 'nick',
                 'localvar_server' : 'server',
+                'localvar_nick' : 'me',
                 },
             'server_nick_buffer' : {
                 'localvar_type' : 'private',
@@ -95,6 +96,7 @@ class MockWeechat(types.ModuleType):
         self.commands = []
         self.hook_signals = []
         self.info_gets = []
+        self.window_get_pointers = {}
 
     def save(self):
         self.snapshot_weechat_dir()
@@ -340,3 +342,6 @@ class MockWeechat(types.ModuleType):
 
     def buffer_set(self, name, key, value):
         self.buffer_new_buffers[name]['buf_sets'][key] = value
+
+    def window_get_pointer(self, *args):
+        return self.window_get_pointers[args]

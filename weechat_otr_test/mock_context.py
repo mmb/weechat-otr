@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=invalid-name
 # pylint: disable=missing-docstring
+# pylint: disable=too-many-instance-attributes
 
 class MockContext(object):
 
@@ -10,6 +11,9 @@ class MockContext(object):
         self.in_smp = False
         self.smp_finishes = []
         self.disconnects = 0
+        self.encrypted = False
+        self.verified = False
+        self.logged = False
 
     def smpAbort(self):
         pass
@@ -28,3 +32,12 @@ class MockContext(object):
 
     def disconnect(self):
         self.disconnects += 1
+
+    def is_encrypted(self):
+        return self.encrypted
+
+    def is_verified(self):
+        return self.verified
+
+    def is_logged(self):
+        return self.logged
