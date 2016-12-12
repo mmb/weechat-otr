@@ -56,3 +56,12 @@ class WeechatOtrTestCase(unittest.TestCase):
         except AttributeError:
             # Python 2.
             self.assertRegexpMatches(s, r)
+
+    def setup_context(self, account_name, context_name):
+        # pylint: disable=no-self-use
+        context = weechat_otr_test.mock_context.MockContext()
+        account = weechat_otr_test.mock_account.MockAccount()
+        account.add_context(context_name, context)
+        weechat_otr.ACCOUNTS[account_name] = account
+
+        return context
