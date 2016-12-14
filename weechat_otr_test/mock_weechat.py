@@ -88,7 +88,7 @@ class MockWeechat(types.ModuleType):
         self.config_section_free_calls = []
         self.config_free_calls = []
         self.buffer_new_calls = []
-        self.buffer_new_buffers = {}
+        self.buffer_sets = {}
         self.info_hashtables = {}
         self.info_get_hashtable_raise = None
         self.infolists = {}
@@ -328,20 +328,13 @@ class MockWeechat(types.ModuleType):
     def bar_item_remove(self, *args):
         self.bar_items_removed.append(args)
 
-    def buffer_new(self, name, input_cb, input_cb_args, close_cb,
-        close_cb_args):
-        self.buffer_new_calls.append((name, input_cb, input_cb_args, close_cb))
-        self.buffer_new_buffers[name] = dict(
-            input_cb=input_cb,
-            input_cb_args=input_cb_args,
-            close_cb=close_cb,
-            close_cb_args=close_cb_args,
-            buf_sets={})
+    def buffer_new(self, *args):
+        self.buffer_new_calls.append(args)
 
-        return name
+        return args[0]
 
     def buffer_set(self, name, key, value):
-        self.buffer_new_buffers[name]['buf_sets'][key] = value
+        self.buffer_sets.setdefault(name, {}).update({key: value})
 
     def window_get_pointer(self, *args):
         return self.window_get_pointers[args]

@@ -36,18 +36,13 @@ class ShutdownTestCase(WeechatOtrTestCase):
         sys.modules['weechat'].config_options['otr.general.debug'] = 'on'
         weechat_otr.debug('test')
 
-        self.assertEqual(sys.modules['weechat'].buffer_new_buffers, {
-            'OTR Debug' : {
-                'input_cb' : '',
-                'input_cb_args' : '',
-                'close_cb' : 'debug_buffer_close_cb',
-                'close_cb_args' : '',
-                'buf_sets' : {
-                    'title' : 'OTR Debug',
-                    'localvar_set_no_log' : '1',
-                    }
-                }
-            })
+        self.assertEqual(sys.modules['weechat'].buffer_new_calls, [
+            ('OTR Debug', '', '', 'debug_buffer_close_cb', '')])
+        self.assertEqual(sys.modules['weechat'].buffer_sets, {
+            'OTR Debug':{
+                'title' : 'OTR Debug',
+                'localvar_set_no_log': '1',
+                }})
 
     def test_caches_buffer(self):
         sys.modules['weechat'].config_options['otr.general.debug'] = 'on'
