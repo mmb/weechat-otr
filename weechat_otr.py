@@ -1690,72 +1690,72 @@ def otr_statusbar_cb(data, item, window):
         # will be empty.
         buf = weechat.current_buffer()
 
-    result = ''
+    if not buffer_is_private(buf):
+        return ''
 
-    if buffer_is_private(buf):
-        local_user = irc_user(
-            buffer_get_string(buf, 'localvar_nick'),
-            buffer_get_string(buf, 'localvar_server'))
+    local_user = irc_user(
+        buffer_get_string(buf, 'localvar_nick'),
+        buffer_get_string(buf, 'localvar_server'))
 
-        remote_user = irc_user(
-            buffer_get_string(buf, 'localvar_channel'),
-            buffer_get_string(buf, 'localvar_server'))
+    remote_user = irc_user(
+        buffer_get_string(buf, 'localvar_channel'),
+        buffer_get_string(buf, 'localvar_server'))
 
-        context = ACCOUNTS[local_user].getContext(remote_user)
+    context = ACCOUNTS[local_user].getContext(remote_user)
 
-        encrypted_str = config_string('look.bar.state.encrypted')
-        unencrypted_str = config_string('look.bar.state.unencrypted')
-        authenticated_str = config_string('look.bar.state.authenticated')
-        unauthenticated_str = config_string('look.bar.state.unauthenticated')
-        logged_str = config_string('look.bar.state.logged')
-        notlogged_str = config_string('look.bar.state.notlogged')
+    encrypted_str = config_string('look.bar.state.encrypted')
+    unencrypted_str = config_string('look.bar.state.unencrypted')
+    authenticated_str = config_string('look.bar.state.authenticated')
+    unauthenticated_str = config_string('look.bar.state.unauthenticated')
+    logged_str = config_string('look.bar.state.logged')
+    notlogged_str = config_string('look.bar.state.notlogged')
 
-        bar_parts = []
+    bar_parts = []
 
-        if context.is_encrypted():
-            if encrypted_str:
-                bar_parts.append(''.join([
-                            config_color('status.encrypted'),
-                            encrypted_str,
-                            config_color('status.default')]))
-
-            if context.is_verified():
-                if authenticated_str:
-                    bar_parts.append(''.join([
-                                config_color('status.authenticated'),
-                                authenticated_str,
-                                config_color('status.default')]))
-            elif unauthenticated_str:
-                bar_parts.append(''.join([
-                            config_color('status.unauthenticated'),
-                            unauthenticated_str,
-                            config_color('status.default')]))
-
-            if context.is_logged():
-                if logged_str:
-                    bar_parts.append(''.join([
-                                config_color('status.logged'),
-                                logged_str,
-                                config_color('status.default')]))
-            elif notlogged_str:
-                bar_parts.append(''.join([
-                            config_color('status.notlogged'),
-                            notlogged_str,
-                            config_color('status.default')]))
-
-        elif unencrypted_str:
+    if context.is_encrypted():
+        if encrypted_str:
             bar_parts.append(''.join([
-                        config_color('status.unencrypted'),
-                        unencrypted_str,
+                        config_color('status.encrypted'),
+                        encrypted_str,
                         config_color('status.default')]))
 
-        result = config_string('look.bar.state.separator').join(bar_parts)
+        if context.is_verified():
+            if authenticated_str:
+                bar_parts.append(''.join([
+                            config_color('status.authenticated'),
+                            authenticated_str,
+                            config_color('status.default')]))
+        elif unauthenticated_str:
+            bar_parts.append(''.join([
+                        config_color('status.unauthenticated'),
+                        unauthenticated_str,
+                        config_color('status.default')]))
 
-        if result:
-            result = '{color}{prefix}{result}'.format(
-                color=config_color('status.default'),
-                prefix=config_string('look.bar.prefix'),
-                result=result)
+        if context.is_logged():
+            if logged_str:
+                bar_parts.append(''.join([
+                            config_color('status.logged'),
+                            logged_str,
+                            config_color('status.default')]))
+        elif notlogged_str:
+            bar_parts.append(''.join([
+                        config_color('status.notlogged'),
+                        notlogged_str,
+                        config_color('status.default')]))
+
+    elif unencrypted_str:
+        bar_parts.append(''.join([
+                    config_color('status.unencrypted'),
+                    unencrypted_str,
+                    config_color('status.default')]))
+
+    result = config_string('look.bar.state.separator').join(bar_parts)
+
+    if result:
+        result = '{color}{prefix}{result}'.format(
+            color=config_color('status.default'),
+            prefix=config_string('look.bar.prefix'),
+            result=result)
 
     return result
 
