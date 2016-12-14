@@ -34,6 +34,17 @@ class OtrStatusbarCbTestCase(WeechatOtrTestCase):
 
         self.assertEqual(weechat_otr.otr_statusbar_cb(None, None, window), '')
 
+    def test_encrypted_authenticated_logged(self):
+        context = self.setup_context('me@server', 'nick@server')
+        context.encrypted = True
+        context.verified = True
+        context.logged = True
+
+        self.assertEqual(
+            weechat_otr.otr_statusbar_cb(None, None, None),
+            '(color default)OTR:(color green)SEC(color default),(color green)'
+            'AUTH(color default),(color lightred)LOG(color default)')
+
     def test_encrypted_authenticated_not_logged(self):
         context = self.setup_context('me@server', 'nick@server')
         context.encrypted = True
@@ -45,16 +56,12 @@ class OtrStatusbarCbTestCase(WeechatOtrTestCase):
             '(color default)OTR:(color green)SEC(color default),(color green)'
             'AUTH(color default),(color green)!LOG(color default)')
 
-    def test_encrypted_authenticated_logged(self):
-        context = self.setup_context('me@server', 'nick@server')
-        context.encrypted = True
-        context.verified = True
-        context.logged = True
-
-        self.assertEqual(
-            weechat_otr.otr_statusbar_cb(None, None, None),
-            '(color default)OTR:(color green)SEC(color default),(color green)'
-            'AUTH(color default),(color lightred)LOG(color default)')
+        self.assertEqual(sys.modules['weechat'].buffer_sets, {
+            None: {
+                'localvar_set_otr_encrypted': 'true',
+                'localvar_set_otr_authenticated': 'true',
+                'localvar_set_otr_logged': 'false',
+                }})
 
     def test_encrypted_unauthenticated_logged(self):
         context = self.setup_context('me@server', 'nick@server')
@@ -67,6 +74,13 @@ class OtrStatusbarCbTestCase(WeechatOtrTestCase):
             '(color default)OTR:(color green)SEC(color default),(color lightred)'
             '!AUTH(color default),(color lightred)LOG(color default)')
 
+        self.assertEqual(sys.modules['weechat'].buffer_sets, {
+            None: {
+                'localvar_set_otr_encrypted': 'true',
+                'localvar_set_otr_authenticated': 'false',
+                'localvar_set_otr_logged': 'true',
+                }})
+
     def test_encrypted_unauthenticated_not_logged(self):
         context = self.setup_context('me@server', 'nick@server')
         context.encrypted = True
@@ -77,3 +91,44 @@ class OtrStatusbarCbTestCase(WeechatOtrTestCase):
             weechat_otr.otr_statusbar_cb(None, None, None),
             '(color default)OTR:(color green)SEC(color default),(color lightred)'
             '!AUTH(color default),(color green)!LOG(color default)')
+
+        self.assertEqual(sys.modules['weechat'].buffer_sets, {
+            None: {
+                'localvar_set_otr_encrypted': 'true',
+                'localvar_set_otr_authenticated': 'false',
+                'localvar_set_otr_logged': 'false',
+                }})
+
+    def test_unencrypted_unauthenticated_logged(self):
+        context = self.setup_context('me@server', 'nick@server')
+        context.encrypted = False
+        context.verified = False
+        context.logged = True
+
+        self.assertEqual(
+            weechat_otr.otr_statusbar_cb(None, None, None),
+            '(color default)OTR:(color lightred)!SEC(color default)')
+
+        self.assertEqual(sys.modules['weechat'].buffer_sets, {
+            None: {
+                'localvar_set_otr_encrypted': 'false',
+                'localvar_set_otr_authenticated': 'false',
+                'localvar_set_otr_logged': 'true',
+                }})
+
+    def test_unencrypted_unauthenticated_not_logged(self):
+        context = self.setup_context('me@server', 'nick@server')
+        context.encrypted = False
+        context.verified = False
+        context.logged = False
+
+        self.assertEqual(
+            weechat_otr.otr_statusbar_cb(None, None, None),
+            '(color default)OTR:(color lightred)!SEC(color default)')
+
+        self.assertEqual(sys.modules['weechat'].buffer_sets, {
+            None: {
+                'localvar_set_otr_encrypted': 'false',
+                'localvar_set_otr_authenticated': 'false',
+                'localvar_set_otr_logged': 'false',
+                }})

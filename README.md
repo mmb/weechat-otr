@@ -62,6 +62,17 @@ Or on Arch run
 
     sudo pacman --needed -S python2-pip python2-wheel python2-keyring base-devel
 
+## Buffer Local Variables
+
+The script will set the following buffer local variables:
+
+- `localvar_set_otr_encrypted` - whether the buffer is OTR encrypted (true or false)
+- `localvar_set_otr_authenticated` - whether the buffer is OTR authenticated (true or false)
+- `localvar_set_otr_logged` - whether the buffer is logged (true or false)
+
+These match what is shown in the status bar and can be used by remote interfaces
+via the WeeChat relay protocol or by other scripts.
+
 ## Support
 
 IRC channel: `#weechat-otr` on Freenode

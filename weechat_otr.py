@@ -1745,6 +1745,21 @@ def otr_statusbar_cb(data, item, window):
             prefix=config_string('look.bar.prefix'),
             result=result)
 
+    if context.is_encrypted():
+        weechat.buffer_set(buf, 'localvar_set_otr_encrypted', 'true')
+    else:
+        weechat.buffer_set(buf, 'localvar_set_otr_encrypted', 'false')
+
+    if context.is_verified():
+        weechat.buffer_set(buf, 'localvar_set_otr_authenticated', 'true')
+    else:
+        weechat.buffer_set(buf, 'localvar_set_otr_authenticated', 'false')
+
+    if context.is_logged():
+        weechat.buffer_set(buf, 'localvar_set_otr_logged', 'true')
+    else:
+        weechat.buffer_set(buf, 'localvar_set_otr_logged', 'false')
+
     return result
 
 def bar_config_update_cb(data, option):
