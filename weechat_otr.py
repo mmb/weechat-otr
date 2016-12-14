@@ -546,6 +546,10 @@ def get_context(account_name, context_name):
     """Return a context from an account."""
     return ACCOUNTS[account_name].getContext(context_name)
 
+def get_server_context(server, peer_nick):
+    """Return the context for the current server user and peer."""
+    return get_context(current_user(server), irc_user(peer_nick, server))
+
 class AccountDict(collections.defaultdict):
     """Dictionary that adds missing keys as IrcOtrAccount instances."""
 
@@ -1186,10 +1190,7 @@ def message_in_cb(data, modifier, modifier_data, string):
 
     server = PYVER.to_unicode(modifier_data)
 
-    from_user = irc_user(parsed['from_nick'], server)
-    local_user = current_user(server)
-
-    context = get_context(local_user, from_user)
+    context = get_server_context(server, parsed['from_nick'])
 
     context.in_assembler.add(parsed['text'])
 
@@ -1249,10 +1250,7 @@ def message_out_cb(data, modifier, modifier_data, string):
 
         server = PYVER.to_unicode(modifier_data)
 
-        to_user = irc_user(parsed['to_nick'], server)
-        local_user = current_user(server)
-
-        context = get_context(local_user, to_user)
+        context = get_server_context(server, parsed['to_nick'])
         is_query = OTR_QUERY_RE.search(parsed['text'])
 
         parsed_text_bytes = to_bytes(parsed['text'])
@@ -1351,7 +1349,7 @@ def command_cb(data, buf, args):
         nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
-            context = get_context(current_user(server), irc_user(nick, server))
+            context = get_server_context(server, nick)
             # We need to wall disable_logging() here so that no OTR-related
             # buffer messages get logged at any point. disable_logging() will
             # be called again when effectively switching to encrypted, but
@@ -1375,7 +1373,7 @@ def command_cb(data, buf, args):
         nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
-            context = get_context(current_user(server), irc_user(nick, server))
+            context = get_server_context(server, nick)
             context.disconnect()
 
             result = weechat.WEECHAT_RC_OK
@@ -1384,7 +1382,7 @@ def command_cb(data, buf, args):
         nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
-            context = get_context(current_user(server), irc_user(nick, server))
+            context = get_server_context(server, nick)
             if context.is_encrypted():
                 context.print_buffer(
                     'This conversation is encrypted.', 'success')
@@ -1424,7 +1422,7 @@ def command_cb(data, buf, args):
             if secret:
                 secret = PYVER.to_str(secret)
 
-            context = get_context(current_user(server), irc_user(nick, server))
+            context = get_server_context(server, nick)
             context.smpGotSecret(secret)
 
             result = weechat.WEECHAT_RC_OK
@@ -1455,7 +1453,7 @@ def command_cb(data, buf, args):
             else:
                 return weechat.WEECHAT_RC_ERROR
 
-            context = get_context(current_user(server), irc_user(nick, server))
+            context = get_server_context(server, nick)
 
             if secret:
                 secret = PYVER.to_str(secret)
@@ -1486,7 +1484,7 @@ def command_cb(data, buf, args):
             else:
                 return weechat.WEECHAT_RC_ERROR
 
-            context = get_context(current_user(server), irc_user(nick, server))
+            context = get_server_context(server, nick)
 
             if context.in_smp:
                 try:
@@ -1504,7 +1502,7 @@ def command_cb(data, buf, args):
         nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
-            context = get_context(current_user(server), irc_user(nick, server))
+            context = get_server_context(server, nick)
 
             if context.crypto.theirPubkey is not None:
                 context.setCurrentTrust('verified')
@@ -1522,7 +1520,7 @@ def command_cb(data, buf, args):
         nick, server = default_peer_args(arg_parts[1:3], buf)
 
         if nick is not None and server is not None:
-            context = get_context(current_user(server), irc_user(nick, server))
+            context = get_server_context(server, nick)
 
             if context.crypto.theirPubkey is not None:
                 context.setCurrentTrust('')
@@ -1542,7 +1540,7 @@ def command_cb(data, buf, args):
         nick, server = default_peer_args([], buf)
         if len(arg_parts) == 1:
             if nick is not None and server is not None:
-                context = get_context(current_user(server), irc_user(nick, server))
+                context = get_server_context(server, nick)
 
                 if context.is_encrypted():
                     if context.is_logged():
@@ -1566,7 +1564,7 @@ def command_cb(data, buf, args):
 
         if len(arg_parts) == 2:
             if nick is not None and server is not None:
-                context = get_context(current_user(server), irc_user(nick, server))
+                context = get_server_context(server, nick)
 
                 if arg_parts[1] == 'start' and \
                         not context.is_logged() and \
@@ -1603,7 +1601,7 @@ def command_cb(data, buf, args):
             nick, server = default_peer_args([], buf)
 
             if nick is not None and server is not None:
-                context = get_context(current_user(server), irc_user(nick, server))
+                context = get_server_context(server, nick)
 
                 context.print_buffer(context.format_policies())
             else:
@@ -1615,7 +1613,7 @@ def command_cb(data, buf, args):
             nick, server = default_peer_args([], buf)
 
             if nick is not None and server is not None:
-                context = get_context(current_user(server), irc_user(nick, server))
+                context = get_server_context(server, nick)
 
                 context.print_buffer(format_default_policies())
             else:
@@ -1627,7 +1625,7 @@ def command_cb(data, buf, args):
             nick, server = default_peer_args([], buf)
 
             if nick is not None and server is not None:
-                context = get_context(current_user(server), irc_user(nick, server))
+                context = get_server_context(server, nick)
 
                 policy_var = context.policy_config_option(arg_parts[1].lower())
 
@@ -1651,7 +1649,7 @@ def command_cb(data, buf, args):
                 value=arg_parts[3]))
 
             if nick is not None and server is not None:
-                context = get_context(current_user(server), irc_user(nick, server))
+                context = get_server_context(server, nick)
 
                 context.print_buffer(format_default_policies())
             else:
@@ -1796,7 +1794,7 @@ def buffer_closing_cb(data, signal, signal_data):
     nick, server = default_peer_args([], signal_data)
 
     if nick is not None and server is not None:
-        context = get_context(current_user(server), irc_user(nick, server))
+        context = get_server_context(server, nick)
         context.disconnect()
 
         result = weechat.WEECHAT_RC_OK
