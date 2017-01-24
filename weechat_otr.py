@@ -2032,7 +2032,7 @@ if weechat.register(
             'smp abort [NICK SERVER] || '
             'trust [NICK SERVER] || '
             'distrust [NICK SERVER] || '
-            'log [on|off] || '
+            'log [start|stop] || '
             'policy [POLICY on|off] || '
             'fingerprint [SEARCH|all]',
             '',
