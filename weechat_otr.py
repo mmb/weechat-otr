@@ -2045,7 +2045,7 @@ if weechat.register(
             'smp abort %(nick) %(irc_servers) %-||'
             'trust %(nick) %(irc_servers) %-||'
             'distrust %(nick) %(irc_servers) %-||'
-            'log on|off %-||'
+            'log start|stop %-||'
             'policy %(otr_policy) on|off %-||'
             'fingerprint all %-||',
             'command_cb',
