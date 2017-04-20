@@ -1,3 +1,13 @@
+1.9.0
+	2017-04-19
+
+	Fix completion for log command.
+
+	Fix error in log command help (thanks @w2ak).
+
+	Set buffer local vars with OTR conversation status. These can be used by
+	remote interfaces like Glowing Bear.
+
 1.8.0
 	2015-12-21
 
