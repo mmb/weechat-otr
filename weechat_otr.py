@@ -280,7 +280,7 @@ def get_prefix():
 
 def debug(msg):
     """Send a debug message to the OTR debug buffer."""
-    debug_option = weechat.config_get(config_prefix('general.debug'))
+    debug_option = config_get(config_prefix('general.debug'))
     global otr_debug_buffer
 
     if weechat.config_boolean(debug_option):
@@ -401,13 +401,17 @@ def config_prefix(option):
 
 def config_color(option):
     """Get the color of a color config option."""
-    return weechat.color(weechat.config_color(weechat.config_get(
+    return weechat.color(weechat.config_color(config_get(
             config_prefix('color.{}'.format(option)))))
 
 def config_string(option):
     """Get the string value of a config option with utf-8 decode."""
     return PYVER.to_unicode(weechat.config_string(
-        weechat.config_get(config_prefix(option))))
+        config_get(config_prefix(option))))
+
+def config_get(option):
+    """Get the value of a WeeChat config option."""
+    return weechat.config_get(PYVER.to_str(option))
 
 def buffer_get_string(buf, prop):
     """Wrap weechat.buffer_get_string() with utf-8 encode/decode."""
@@ -620,19 +624,17 @@ class IrcContext(potr.context.Context):
         elif key_lower == 'send_tag' and self.no_send_tag():
             result = False
         else:
-            option = weechat.config_get(
-                PYVER.to_str(self.policy_config_option(key)))
+            option = config_get(self.policy_config_option(key))
 
             if option == '':
-                option = weechat.config_get(
-                    PYVER.to_str(self.user.policy_config_option(key)))
+                option = config_get(self.user.policy_config_option(key))
 
             if option == '':
-                option = weechat.config_get(config_prefix('.'.join(
+                option = config_get(config_prefix('.'.join(
                     ['policy', self.peer_server, key_lower])))
 
             if option == '':
-                option = weechat.config_get(
+                option = config_get(
                     config_prefix('policy.default.{}'.format(key_lower)))
 
             result = bool(weechat.config_boolean(option))
@@ -740,7 +742,7 @@ class IrcContext(potr.context.Context):
 
     def hint(self, msg):
         """Print a message to the buffer but only when hints are enabled."""
-        hints_option = weechat.config_get(config_prefix('general.hints'))
+        hints_option = config_get(config_prefix('general.hints'))
 
         if weechat.config_boolean(hints_option):
             self.print_buffer(msg, 'hint')
@@ -892,7 +894,7 @@ Note: You can safely omit specifying the peer and server when
 
         buf = self.buffer()
 
-        if not weechat.config_get(self.get_logger_option_name(buf)):
+        if not config_get(self.get_logger_option_name(buf)):
             result = -1
         else:
             result = 0
