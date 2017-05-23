@@ -2001,12 +2001,13 @@ def dependency_versions():
         python_version=platform.python_version(),
         weechat_version=weechat.info_get('version', ''))
 
-def excepthook(typ, value, traceback):
+def excepthook(typ, value, tracebak):
+    """Add dependency versions to tracebacks."""
     sys.stderr.write('Versions: ')
     sys.stderr.write(dependency_versions())
     sys.stderr.write('\n')
 
-    sys.__excepthook__(typ, value, traceback)
+    sys.__excepthook__(typ, value, tracebak)
 
 sys.excepthook = excepthook
 
