@@ -86,7 +86,7 @@ class PythonVersion3(object):
         import html.parser
         self.html_parser = html.parser
         if self.minor >= 4:
-            self.html_parser_init_kwargs = { 'convert_charrefs' : True }
+            self.html_parser_init_kwargs = {'convert_charrefs' : True}
         else:
             self.html_parser_init_kwargs = {}
 
@@ -1165,7 +1165,7 @@ class TableFormatter(object):
     def add_row(self, row):
         """Add a row to the table."""
         self.rows.append(row)
-        row_widths = [ len(s) for s in row ]
+        row_widths = [len(s) for s in row]
         if self.max_widths is None:
             self.max_widths = row_widths
         else:
@@ -1173,12 +1173,12 @@ class TableFormatter(object):
 
     def format(self):
         """Return the formatted table as a string."""
-        return '\n'.join([ self.format_row(row) for row in self.rows ])
+        return '\n'.join([self.format_row(row) for row in self.rows])
 
     def format_row(self, row):
         """Format a single row as a string."""
         return ' |'.join(
-            [ s.ljust(self.max_widths[i]) for i, s in enumerate(row) ])
+            [s.ljust(self.max_widths[i]) for i, s in enumerate(row)])
 
 def message_in_cb(data, modifier, modifier_data, string):
     """Incoming message callback"""
