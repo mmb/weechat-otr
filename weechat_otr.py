@@ -169,9 +169,9 @@ OTR_QUERY_RE = re.compile(r'\?OTR(\?|\??v[a-z\d]*\?)')
 
 POLICIES = {
     'allow_v2' : 'allow OTR protocol version 2, effectively enable OTR '
-        'since v2 is the only supported version',
+                 'since v2 is the only supported version',
     'require_encryption' : 'refuse to send unencrypted messages when OTR is '
-        'enabled',
+                           'enabled',
     'log' : 'enable logging of OTR conversations',
     'send_tag' : 'advertise your OTR capability using the whitespace tag',
     'html_escape' : 'escape HTML special characters in outbound messages',
@@ -284,8 +284,8 @@ def debug(msg):
 
     if weechat.config_boolean(debug_option):
         if not otr_debug_buffer:
-            otr_debug_buffer = weechat.buffer_new("OTR Debug", "", "",
-                "debug_buffer_close_cb", "")
+            otr_debug_buffer = weechat.buffer_new(
+                "OTR Debug", "", "", "debug_buffer_close_cb", "")
             weechat.buffer_set(otr_debug_buffer, 'title', 'OTR Debug')
             weechat.buffer_set(otr_debug_buffer, 'localvar_set_no_log', '1')
         prnt(otr_debug_buffer, ('{script} debug\t{text}'.format(
@@ -306,8 +306,8 @@ def current_user(server_name):
 def irc_user(nick, server):
     """Build an IRC user string from a nick and server."""
     return '{nick}@{server}'.format(
-            nick=nick.lower(),
-            server=server)
+        nick=nick.lower(),
+        server=server)
 
 def isupport_value(server, feature):
     """Get the value of an IRC server feature."""
@@ -395,13 +395,13 @@ def first_instance(objs, klass):
 def config_prefix(option):
     """Add the config prefix to an option and return the full option name."""
     return '{script}.{option}'.format(
-            script=SCRIPT_NAME,
-            option=option)
+        script=SCRIPT_NAME,
+        option=option)
 
 def config_color(option):
     """Get the color of a color config option."""
     return weechat.color(weechat.config_color(config_get_prefixed(
-            'color.{}'.format(option))))
+        'color.{}'.format(option))))
 
 def config_string(option):
     """Get the string value of a config option with utf-8 decode."""
@@ -473,9 +473,9 @@ def format_default_policies():
 
     for policy, desc in sorted(POLICIES.items()):
         buf.write('  {policy} ({desc}) : {value}\n'.format(
-                policy=policy,
-                desc=desc,
-                value=config_string('policy.default.{}'.format(policy))))
+            policy=policy,
+            desc=desc,
+            value=config_string('policy.default.{}'.format(policy))))
 
     buf.write('Change default policies with: /otr policy default NAME on|off')
 
@@ -511,8 +511,8 @@ def show_account_fingerprints():
     table_formatter = TableFormatter()
     for account in accounts():
         table_formatter.add_row([
-          account.name,
-          str(account.getPrivkey())])
+            account.name,
+            str(account.getPrivkey())])
     print_buffer('', table_formatter.format())
 
 def show_peer_fingerprints(grep=None):
@@ -531,10 +531,10 @@ def show_peer_fingerprints(grep=None):
             for fingerprint, trust in sorted(peer_data.items()):
                 if grep is None or grep in peer:
                     table_formatter.add_row([
-                      peer,
-                      account.name,
-                      potr.human_hash(fingerprint),
-                      trust_descs[trust],
+                        peer,
+                        account.name,
+                        potr.human_hash(fingerprint),
+                        trust_descs[trust],
                     ])
     print_buffer('', table_formatter.format())
 
@@ -615,8 +615,8 @@ class IrcContext(potr.context.Context):
     def policy_config_option(self, policy):
         """Get the option name of a policy option for this context."""
         return config_prefix('.'.join([
-                    'policy', self.peer_server, self.user.nick, self.peer_nick,
-                    policy.lower()]))
+            'policy', self.peer_server, self.user.nick, self.peer_nick,
+            policy.lower()]))
 
     def getPolicy(self, key):
         """Get the value of a policy option for this context."""
@@ -738,8 +738,8 @@ class IrcContext(potr.context.Context):
         # add [nick] prefix if we have only a server buffer for the query
         if self.peer_nick and not buffer_is_private(buf):
             msg = '[{nick}] {msg}'.format(
-                    nick=self.peer_nick,
-                    msg=msg)
+                nick=self.peer_nick,
+                msg=msg)
 
         print_buffer(buf, msg, level)
 
@@ -1003,7 +1003,7 @@ Note: You can safely omit specifying the peer and server when
         debug(('no_send_tag', no_send_tag_regex, self.peer_nick))
         if no_send_tag_regex:
             return re.match(no_send_tag_regex, self.peer_nick, re.IGNORECASE)
- 
+
     def __repr__(self):
         return PYVER.to_str(('<{} {:x} peer_nick={c.peer_nick} '
             'peer_server={c.peer_server}>').format(
