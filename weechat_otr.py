@@ -202,6 +202,7 @@ otr_debug_buffer = None
 # The patched version also skips OTR tagging for CTCP messages because it
 # breaks the CTCP format.
 def patched__bytes__(self):
+    """Patched potr.proto.TaggedPlainText.__bytes__."""
     # Do not tag CTCP messages.
     if self.msg.startswith(b'\x01') and \
         self.msg.endswith(b'\x01'):
@@ -326,8 +327,8 @@ def is_a_channel(channel, server):
 
     return channel.startswith(prefixes)
 
-# Exception class for PRIVMSG parsing exceptions.
 class PrivmsgParseException(Exception):
+    """Exception class for PRIVMSG parsing exceptions."""
     pass
 
 def parse_irc_privmsg(message, server):
