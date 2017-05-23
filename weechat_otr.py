@@ -68,8 +68,7 @@ class PythonVersion2(object):
         """Convert a utf-8 encoded string to a Unicode."""
         if isinstance(strng, unicode):
             return strng
-        else:
-            return strng.decode('utf-8', 'replace')
+        return strng.decode('utf-8', 'replace')
 
     def to_str(self, strng):
         """Convert a Unicode to a utf-8 encoded string."""
@@ -110,8 +109,7 @@ class PythonVersion3(object):
         """Convert a utf-8 encoded string to unicode."""
         if isinstance(strng, bytes):
             return strng.decode('utf-8', 'replace')
-        else:
-            return strng
+        return strng
 
     def to_str(self, strng):
         """Convert a Unicode to a utf-8 encoded string."""
@@ -1983,8 +1981,7 @@ def weechat_version_ok():
             current_version=weechat.info_get('version', ''))
         prnt('', error_message)
         return False
-    else:
-        return True
+    return True
 
 SCRIPT_VERSION = git_info() or SCRIPT_VERSION
 
