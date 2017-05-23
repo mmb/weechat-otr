@@ -1,2 +1,3 @@
 [REPORTS]
+max-line-length=80
 output-format=colorized
