@@ -804,16 +804,16 @@ Respond with: /otr smp respond <answer>""".format(
                 if self.smpIsSuccess():
 
                     if self.smp_question:
-                        self.smp_finish('SMP verification succeeded.',
-                            'success')
+                        self.smp_finish(
+                            'SMP verification succeeded.', 'success')
                         if not self.is_verified:
                             self.print_buffer(
-                            """You may want to authenticate your peer by asking your own question:
+                                """You may want to authenticate your peer by asking your own question:
 /otr smp ask <'question'> 'secret'""")
 
                     else:
-                        self.smp_finish('SMP verification succeeded.',
-                            'success')
+                        self.smp_finish(
+                            'SMP verification succeeded.', 'success')
 
                 else:
                     self.smp_finish('SMP verification failed.', 'error')
@@ -930,7 +930,8 @@ Note: You can safely omit specifying the peer and server when
             if self.is_logged():
                 weechat.command(self.buffer(), '/mute logger disable')
                 self.print_buffer(
-                    'Logs have been temporarily disabled for the session. They will be restored upon finishing the OTR session.')
+                    'Logs have been temporarily disabled for the session. '
+                    'They will be restored upon finishing the OTR session.')
 
             return previous_log_level
 
@@ -1080,8 +1081,7 @@ class IrcOtrAccount(potr.context.Account):
                     debug(('trust write', uid, self.name,
                            IrcOtrAccount.PROTOCOL, fpr, trust))
                     fpr_file.write(PYVER.to_str('\t'.join(
-                            (uid, self.name, IrcOtrAccount.PROTOCOL, fpr,
-                             trust))))
+                        (uid, self.name, IrcOtrAccount.PROTOCOL, fpr, trust))))
                     fpr_file.write('\n')
 
     def end_all_private(self):
@@ -1093,7 +1093,7 @@ class IrcOtrAccount(potr.context.Account):
     def policy_config_option(self, policy):
         """Get the option name of a policy option for this account."""
         return config_prefix('.'.join([
-                    'policy', self.server, self.nick, policy.lower()]))
+            'policy', self.server, self.nick, policy.lower()]))
 
 class IrcHTMLParser(PYVER.html_parser.HTMLParser):
     """A simple HTML parser that throws away anything but newlines and links"""
@@ -1284,12 +1284,12 @@ def message_out_cb(data, modifier, modifier_data, string):
                 not is_query and \
                 context.getPolicy('require_encryption'):
                 context.print_buffer(
-                   'Your message will not be sent, because policy requires an '
-                   'encrypted connection.', 'error')
+                    'Your message will not be sent, because policy requires an '
+                    'encrypted connection.', 'error')
                 context.hint(
-                   'Wait for the OTR connection or change the policy to allow '
-                   'clear-text messages:\n'
-                   '/policy set require_encryption off')
+                    'Wait for the OTR connection or change the policy to allow '
+                    'clear-text messages:\n'
+                    '/policy set require_encryption off')
 
             try:
                 ret = context.sendMessage(
@@ -1993,13 +1993,13 @@ def dependency_versions():
         'Python {python_version}, '
         'WeeChat {weechat_version}'
         ).format(
-        script_version=SCRIPT_VERSION,
-        potr_major=potr.VERSION[0],
-        potr_minor=potr.VERSION[1],
-        potr_patch=potr.VERSION[2],
-        potr_sub=potr.VERSION[3],
-        python_version=platform.python_version(),
-        weechat_version=weechat.info_get('version', ''))
+            script_version=SCRIPT_VERSION,
+            potr_major=potr.VERSION[0],
+            potr_minor=potr.VERSION[1],
+            potr_patch=potr.VERSION[2],
+            potr_sub=potr.VERSION[3],
+            python_version=platform.python_version(),
+            weechat_version=weechat.info_get('version', ''))
 
 def excepthook(typ, value, tracebak):
     """Add dependency versions to tracebacks."""
