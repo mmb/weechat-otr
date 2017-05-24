@@ -1289,7 +1289,7 @@ def message_out_cb(data, modifier, modifier_data, string):
                 context.hint(
                     'Wait for the OTR connection or change the policy to allow '
                     'clear-text messages:\n'
-                    '/policy set require_encryption off')
+                    '/otr policy require_encryption off')
 
             try:
                 ret = context.sendMessage(
