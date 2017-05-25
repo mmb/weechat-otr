@@ -5,7 +5,6 @@
 from __future__ import unicode_literals
 
 import os
-import re
 import sys
 
 from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
