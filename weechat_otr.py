@@ -1312,6 +1312,7 @@ def message_out_cb(data, modifier, modifier_data, string):
                     raise
 
         weechat.bar_item_update(SCRIPT_NAME)
+    # pylint: disable=bare-except
     except:
         try:
             print_buffer('', traceback.format_exc(), 'error')
@@ -1320,6 +1321,7 @@ def message_out_cb(data, modifier, modifier_data, string):
             context.print_buffer(
                 'Failed to send message. See core buffer for traceback.',
                 'error')
+        # pylint: disable=bare-except
         except:
             pass
 
