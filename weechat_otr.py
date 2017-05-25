@@ -1346,11 +1346,7 @@ def command_cb(data, buf, args):
     """Parse and dispatch WeeChat OTR commands."""
     result = weechat.WEECHAT_RC_ERROR
 
-    try:
-        arg_parts = [PYVER.to_unicode(arg) for arg in shlex.split(args)]
-    except:
-        debug("Command parsing error.")
-        return result
+    arg_parts = [PYVER.to_unicode(arg) for arg in shlex.split(args)]
 
     if len(arg_parts) in (1, 3) and arg_parts[0] in ('start', 'refresh'):
         nick, server = default_peer_args(arg_parts[1:3], buf)
