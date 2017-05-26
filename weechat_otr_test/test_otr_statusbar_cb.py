@@ -30,7 +30,8 @@ class OtrStatusbarCbTestCase(WeechatOtrTestCase):
 
     def test_buffer_not_private(self):
         window = weechat_otr_test.mock_window.MockWindow()
-        sys.modules['weechat'].window_get_pointers[(window, 'buffer')] = 'non_private_buffer'
+        sys.modules['weechat'].window_get_pointers[(window, 'buffer')] = \
+                'non_private_buffer'
 
         self.assertEqual(weechat_otr.otr_statusbar_cb(None, None, window), '')
 
@@ -71,8 +72,9 @@ class OtrStatusbarCbTestCase(WeechatOtrTestCase):
 
         self.assertEqual(
             weechat_otr.otr_statusbar_cb(None, None, None),
-            '(color default)OTR:(color green)SEC(color default),(color lightred)'
-            '!AUTH(color default),(color lightred)LOG(color default)')
+            '(color default)OTR:(color green)SEC(color default),'
+            '(color lightred)!AUTH(color default),(color lightred)LOG'
+            '(color default)')
 
         self.assertEqual(sys.modules['weechat'].buffer_sets, {
             None: {
@@ -89,8 +91,9 @@ class OtrStatusbarCbTestCase(WeechatOtrTestCase):
 
         self.assertEqual(
             weechat_otr.otr_statusbar_cb(None, None, None),
-            '(color default)OTR:(color green)SEC(color default),(color lightred)'
-            '!AUTH(color default),(color green)!LOG(color default)')
+            '(color default)OTR:(color green)SEC(color default),'
+            '(color lightred)!AUTH(color default),(color green)!LOG'
+            '(color default)')
 
         self.assertEqual(sys.modules['weechat'].buffer_sets, {
             None: {

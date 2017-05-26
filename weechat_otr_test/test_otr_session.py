@@ -4,12 +4,12 @@
 
 from __future__ import unicode_literals
 
+import sys
+
 from weechat_otr_test.session_test_case import SessionTestCase
 
 import weechat_otr_test.recording_account
 import weechat_otr
-
-import sys
 
 class OtrSessionTestCase(SessionTestCase):
 
@@ -27,8 +27,8 @@ class OtrSessionTestCase(SessionTestCase):
         context1 = account2.getContext('nick@server')
         context2 = account1.getContext('nick2@server')
 
-        weechat_otr.message_in_cb(None, None, 'server',
-            ':nick2!user@host PRIVMSG nick :?OTRv2?')
+        weechat_otr.message_in_cb(
+            None, None, 'server', ':nick2!user@host PRIVMSG nick :?OTRv2?')
 
         sys.modules['weechat'].set_server_current_nick('server', 'nick2')
         self.send_all('nick', 'nick2', context2.injected)
@@ -45,12 +45,13 @@ class OtrSessionTestCase(SessionTestCase):
         self.assertTrue(context1.is_encrypted())
         self.assertTrue(context2.is_encrypted())
 
-        weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG nick2 :hi')
+        weechat_otr.message_out_cb(
+            None, None, 'server', ':nick!user@host PRIVMSG nick2 :hi')
 
         sys.modules['weechat'].set_server_current_nick('server', 'nick2')
 
-        result = weechat_otr.message_in_cb(None, None, 'server',
+        result = weechat_otr.message_in_cb(
+            None, None, 'server',
             ':nick!user@host PRIVMSG nick2 :%s' % context2.injected.pop())
 
         self.assertEqual(result, ':nick!user@host PRIVMSG nick2 :hi')
@@ -91,7 +92,8 @@ class OtrSessionTestCase(SessionTestCase):
         context1 = account2.getContext('gefährte@server')
         context2 = account1.getContext('gefährte2@server')
 
-        weechat_otr.message_in_cb(None, None, 'server',
+        weechat_otr.message_in_cb(
+            None, None, 'server',
             ':gefährte2!user@host PRIVMSG gefährte :?OTRv2?')
 
         sys.modules['weechat'].set_server_current_nick('server', 'gefährte2')
@@ -109,12 +111,13 @@ class OtrSessionTestCase(SessionTestCase):
         self.assertTrue(context1.is_encrypted())
         self.assertTrue(context2.is_encrypted())
 
-        weechat_otr.message_out_cb(None, None, 'server',
-            ':gefährte!user@host PRIVMSG gefährte2 :hi')
+        weechat_otr.message_out_cb(
+            None, None, 'server', ':gefährte!user@host PRIVMSG gefährte2 :hi')
 
         sys.modules['weechat'].set_server_current_nick('server', 'gefährte2')
 
-        result = weechat_otr.message_in_cb(None, None, 'server',
+        result = weechat_otr.message_in_cb(
+            None, None, 'server',
             ':gefährte!user@host PRIVMSG gefährte2 :%s' % \
             context2.injected.pop())
 
@@ -135,8 +138,8 @@ class OtrSessionTestCase(SessionTestCase):
         context1 = account2.getContext('nick@server')
         context2 = account1.getContext('nick2@server')
 
-        weechat_otr.message_in_cb(None, None, 'server',
-            ':nick2!user@host PRIVMSG nick :?OTRv2?')
+        weechat_otr.message_in_cb(
+            None, None, 'server', ':nick2!user@host PRIVMSG nick :?OTRv2?')
 
         sys.modules['weechat'].set_server_current_nick('server', 'nick2')
         self.send_all('nick', 'nick2', context2.injected)
@@ -154,12 +157,13 @@ class OtrSessionTestCase(SessionTestCase):
         self.assertTrue(context2.is_encrypted())
 
         sys.modules['weechat'].set_server_current_nick('server', 'NiCk')
-        weechat_otr.message_out_cb(None, None, 'server',
-            ':NiCk!user@host PRIVMSG nick2 :hi')
+        weechat_otr.message_out_cb(
+            None, None, 'server', ':NiCk!user@host PRIVMSG nick2 :hi')
 
         sys.modules['weechat'].set_server_current_nick('server', 'nick2')
 
-        result = weechat_otr.message_in_cb(None, None, 'server',
+        result = weechat_otr.message_in_cb(
+            None, None, 'server',
             ':NiCk!user@host PRIVMSG nick2 :%s' % context2.injected.pop())
 
         self.assertEqual(result, ':NiCk!user@host PRIVMSG nick2 :hi')
@@ -178,8 +182,8 @@ class OtrSessionTestCase(SessionTestCase):
         context1 = account2.getContext('nick@server')
         context2 = account1.getContext('nick2@server')
 
-        weechat_otr.message_in_cb(None, None, 'server',
-            ':nick2!user@host PRIVMSG nick :?OTRv2?')
+        weechat_otr.message_in_cb(
+            None, None, 'server', ':nick2!user@host PRIVMSG nick :?OTRv2?')
 
         sys.modules['weechat'].set_server_current_nick('server', 'nick2')
         self.send_all('nick', 'nick2', context2.injected)
@@ -196,12 +200,13 @@ class OtrSessionTestCase(SessionTestCase):
         self.assertTrue(context1.is_encrypted())
         self.assertTrue(context2.is_encrypted())
 
-        weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG NiCk2 :hi')
+        weechat_otr.message_out_cb(
+            None, None, 'server', ':nick!user@host PRIVMSG NiCk2 :hi')
 
         sys.modules['weechat'].set_server_current_nick('server', 'nick2')
 
-        result = weechat_otr.message_in_cb(None, None, 'server',
+        result = weechat_otr.message_in_cb(
+            None, None, 'server',
             ':nick!user@host PRIVMSG nick2 :%s' % context2.injected.pop())
 
         self.assertEqual(result, ':nick!user@host PRIVMSG nick2 :hi')

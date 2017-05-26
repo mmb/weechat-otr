@@ -5,12 +5,12 @@
 
 from __future__ import unicode_literals
 
+import sys
+
 from weechat_otr_test.session_test_case import SessionTestCase
 
 import weechat_otr_test.recording_account
 import weechat_otr
-
-import sys
 
 class OtrSessionTestCase(SessionTestCase):
 
@@ -40,8 +40,8 @@ class OtrSessionTestCase(SessionTestCase):
             ],
         }
 
-        weechat_otr.message_in_cb(None, None, 'server',
-            ':nick2!user@host PRIVMSG nick :?OTRv2?')
+        weechat_otr.message_in_cb(
+            None, None, 'server', ':nick2!user@host PRIVMSG nick :?OTRv2?')
 
         sys.modules['weechat'].set_server_current_nick('server', 'nick2')
         self.send_all('nick', 'nick2', context2.injected)
@@ -59,7 +59,7 @@ class OtrSessionTestCase(SessionTestCase):
 
         self.assertIn(
             ('server_nick_buffer',
-                '/mute unset logger.level.irc.server_nick_buffer_name'),
+             '/mute unset logger.level.irc.server_nick_buffer_name'),
             sys.modules['weechat'].commands)
 
     def test_log_level_return_to_previous(self):
@@ -91,8 +91,8 @@ class OtrSessionTestCase(SessionTestCase):
             ],
         }
 
-        weechat_otr.message_in_cb(None, None, 'server',
-            ':nick2!user@host PRIVMSG nick :?OTRv2?')
+        weechat_otr.message_in_cb(
+            None, None, 'server', ':nick2!user@host PRIVMSG nick :?OTRv2?')
 
         sys.modules['weechat'].set_server_current_nick('server', 'nick2')
         self.send_all('nick', 'nick2', context2.injected)

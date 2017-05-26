@@ -18,7 +18,9 @@ class TableFormatterTestCase(WeechatOtrTestCase):
         table_formatter.add_row(['a', 'bb', 'c'])
         table_formatter.add_row(['a', 'b', 'ccc'])
 
-        self.assertEqual(table_formatter.format(),
+        self.assertEqual(
+            table_formatter.format(),
+            # pylint: disable=trailing-whitespace
             """a |b  |c  
 a |bb |c  
 a |b  |ccc""")

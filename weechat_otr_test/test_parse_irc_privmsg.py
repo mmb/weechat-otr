@@ -28,8 +28,7 @@ class ParseIrcPrivmsgTestCase(WeechatOtrTestCase):
 
     def test_parse_irc_privmsg_channel_ampersand(self):
         sys.modules['weechat'].infos[
-            ('server,CHANTYPES',)][
-            'irc_server_isupport_value'] += '&'
+            ('server,CHANTYPES',)]['irc_server_isupport_value'] += '&'
 
         result = weechat_otr.parse_irc_privmsg(
             ':nick!user@host PRIVMSG &channel :test', 'server')
@@ -87,7 +86,7 @@ class ParseIrcPrivmsgTestCase(WeechatOtrTestCase):
     def test_parse_irc_privmsg_not_privmsg(self):
         with self.assertRaises(weechat_otr.PrivmsgParseException):
             weechat_otr.parse_irc_privmsg(
-            ':nick!user@host OTHERCOMMAND nick2 the message', 'server')
+                ':nick!user@host OTHERCOMMAND nick2 the message', 'server')
 
     def test_parse_irc_privmsg_command_case_insensitive(self):
         result = weechat_otr.parse_irc_privmsg(
