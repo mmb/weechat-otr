@@ -21,12 +21,14 @@ class ShutdownTestCase(WeechatOtrTestCase):
 
     def test_debug_buffer_on(self):
         sys.modules['weechat'].config_options['otr.general.debug'] = 'on'
+        sys.modules['weechat'].buffer_search_returns = ['OTR Debug']
         weechat_otr.debug('test')
 
         self.assertPrinted('OTR Debug', 'otr debug\ttest')
 
     def test_debug_buffer_non_ascii(self):
         sys.modules['weechat'].config_options['otr.general.debug'] = 'on'
+        sys.modules['weechat'].buffer_search_returns = ['OTR Debug']
         weechat_otr.debug('gefährte')
 
         self.assertPrinted('OTR Debug',
@@ -34,10 +36,11 @@ class ShutdownTestCase(WeechatOtrTestCase):
 
     def test_creates_buffer(self):
         sys.modules['weechat'].config_options['otr.general.debug'] = 'on'
+        sys.modules['weechat'].buffer_search_returns = [None]
         weechat_otr.debug('test')
 
         self.assertEqual(sys.modules['weechat'].buffer_new_calls, [
-            ('OTR Debug', '', '', 'debug_buffer_close_cb', '')])
+            ('OTR Debug', '', '', '', '')])
         self.assertEqual(sys.modules['weechat'].buffer_sets, {
             'OTR Debug':{
                 'title' : 'OTR Debug',
@@ -46,12 +49,8 @@ class ShutdownTestCase(WeechatOtrTestCase):
 
     def test_caches_buffer(self):
         sys.modules['weechat'].config_options['otr.general.debug'] = 'on'
+        sys.modules['weechat'].buffer_search_returns = [None, 'OTR Debug']
         weechat_otr.debug('test1')
         weechat_otr.debug('test2')
 
         self.assertEqual(1, len(sys.modules['weechat'].buffer_new_calls))
-
-    def test_close_callback(self):
-        result = weechat_otr.debug_buffer_close_cb(None, None)
-        self.assertEqual(sys.modules['weechat'].WEECHAT_RC_OK, result)
-        self.assertIsNone(weechat_otr.otr_debug_buffer)

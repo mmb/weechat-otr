@@ -89,6 +89,8 @@ class MockWeechat(types.ModuleType):
         self.config_free_calls = []
         self.buffer_new_calls = []
         self.buffer_sets = {}
+        self.buffer_search_calls = []
+        self.buffer_search_returns = []
         self.info_hashtables = {}
         self.info_get_hashtable_raise = None
         self.infolists = {}
@@ -129,6 +131,10 @@ class MockWeechat(types.ModuleType):
 
     def buffer_get_string(self, buf, string):
         return self.buffers[buf].get(string)
+
+    def buffer_search(self, plugin, name):
+        self.buffer_search_calls.append((plugin, name))
+        return self.buffer_search_returns.pop(0)
 
     def command(self, *args):
         self.commands.append(args)

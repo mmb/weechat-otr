@@ -188,9 +188,6 @@ PLAIN_ACTION_RE = re.compile('^'+ACTION_PREFIX+'(?P<text>.*)$')
 
 IRC_SANITIZE_TABLE = dict((ord(char), None) for char in '\n\r\x00')
 
-global otr_debug_buffer
-otr_debug_buffer = None
-
 # Patch potr.proto.TaggedPlaintext to not end plaintext tags in a space.
 #
 # When POTR adds OTR tags to plaintext it puts them at the end of the message.
@@ -280,24 +277,18 @@ def get_prefix():
 def debug(msg):
     """Send a debug message to the OTR debug buffer."""
     debug_option = config_get_prefixed('general.debug')
-    global otr_debug_buffer
 
-    if weechat.config_boolean(debug_option):
-        if not otr_debug_buffer:
-            otr_debug_buffer = weechat.buffer_new(
-                "OTR Debug", "", "", "debug_buffer_close_cb", "")
-            weechat.buffer_set(otr_debug_buffer, 'title', 'OTR Debug')
-            weechat.buffer_set(otr_debug_buffer, 'localvar_set_no_log', '1')
-        prnt(otr_debug_buffer, ('{script} debug\t{text}'.format(
-            script=SCRIPT_NAME,
-            text=PYVER.unicode(msg)
-            )))
+    if not weechat.config_boolean(debug_option):
+        return
 
-def debug_buffer_close_cb(data, buf):
-    """Set the OTR debug buffer to None."""
-    global otr_debug_buffer
-    otr_debug_buffer = None
-    return weechat.WEECHAT_RC_OK
+    debug_buffer = weechat.buffer_search('python', 'OTR Debug')
+    if not debug_buffer:
+        debug_buffer = weechat.buffer_new('OTR Debug', '', '', '', '')
+        weechat.buffer_set(debug_buffer, 'title', 'OTR Debug')
+        weechat.buffer_set(debug_buffer, 'localvar_set_no_log', '1')
+
+    prnt(debug_buffer, ('{script} debug\t{text}'.format(
+        script=SCRIPT_NAME, text=PYVER.unicode(msg))))
 
 def current_user(server_name):
     """Get the nick and server of the current user on a server."""
