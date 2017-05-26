@@ -896,7 +896,7 @@ Note: You can safely omit specifying the peer and server when
 
         buf = self.buffer()
 
-        if not config_get(self.get_logger_option_name(buf)):
+        if not config_get(self.get_logger_option_name()):
             result = -1
         else:
             result = 0
@@ -910,8 +910,9 @@ Note: You can safely omit specifying the peer and server when
 
         return result
 
-    def get_logger_option_name(self, buf):
-        """Returns the logger config option for the specified buffer."""
+    def get_logger_option_name(self):
+        """Returns the logger config option for this context's buffer."""
+        buf = self.buffer()
         name = buffer_get_string(buf, 'name')
         plugin = buffer_get_string(buf, 'plugin')
 
@@ -953,7 +954,7 @@ Note: You can safely omit specifying the peer and server when
                 previous_log_level))
 
         if previous_log_level == -1:
-            logger_option_name = self.get_logger_option_name(buf)
+            logger_option_name = self.get_logger_option_name()
             self.print_buffer(
                 'Restoring buffer logging value to default', 'warning')
             weechat.command(buf, '/mute unset {}'.format(
