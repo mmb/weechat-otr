@@ -32,12 +32,12 @@ class TestExcepthook(WeechatOtrTestCase):
             'Python {python_version}, '
             'WeeChat 9.8.7\n'
             ).format(
-            script_version=weechat_otr.SCRIPT_VERSION,
-            potr_major=potr.VERSION[0],
-            potr_minor=potr.VERSION[1],
-            potr_patch=potr.VERSION[2],
-            potr_sub=potr.VERSION[3],
-            python_version=platform.python_version())
+                script_version=weechat_otr.SCRIPT_VERSION,
+                potr_major=potr.VERSION[0],
+                potr_minor=potr.VERSION[1],
+                potr_patch=potr.VERSION[2],
+                potr_sub=potr.VERSION[3],
+                python_version=platform.python_version())
 
         self.assertIn(version_str, new_stderr.getvalue())
 

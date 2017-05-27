@@ -5,12 +5,12 @@
 
 from __future__ import unicode_literals
 
+import sys
+
 from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
 import weechat_otr_test.mock_account
 
 import weechat_otr
-
-import sys
 
 class ShutdownTestCase(WeechatOtrTestCase):
 
@@ -34,27 +34,28 @@ class ShutdownTestCase(WeechatOtrTestCase):
         weechat_otr.shutdown()
 
         sections = sorted([
-          ('color', ),
-          ('policy', ),
-          ('look', ),
-          ('general', )
-          ])
+            ('color', ),
+            ('policy', ),
+            ('look', ),
+            ('general', )
+            ])
 
-        self.assertEqual(sections,
+        self.assertEqual(
+            sections,
             sorted(sys.modules['weechat'].config_section_free_options_calls))
 
     def test_frees_config_sections(self):
         weechat_otr.shutdown()
 
         sections = sorted([
-          ('color', ),
-          ('policy', ),
-          ('look', ),
-          ('general', )
-          ])
+            ('color', ),
+            ('policy', ),
+            ('look', ),
+            ('general', )
+            ])
 
-        self.assertEqual(sections,
-            sorted(sys.modules['weechat'].config_section_free_calls))
+        self.assertEqual(
+            sections, sorted(sys.modules['weechat'].config_section_free_calls))
 
     def test_frees_config_file(self):
         weechat_otr.shutdown()

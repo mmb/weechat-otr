@@ -17,7 +17,8 @@ class ContextTestCase(WeechatOtrTestCase):
         context = weechat_otr.IrcContext(account, 'nick@server')
         context.print_buffer('a message from the script')
 
-        self.assertPrinted('server_nick_buffer',
+        self.assertPrinted(
+            'server_nick_buffer',
             'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
             '(color default)a message from the script')
 
@@ -26,7 +27,8 @@ class ContextTestCase(WeechatOtrTestCase):
         context = weechat_otr.IrcContext(account, 'nick@server')
         context.print_buffer('gefährte')
 
-        self.assertPrinted('server_nick_buffer',
+        self.assertPrinted(
+            'server_nick_buffer',
             weechat_otr.PYVER.to_str(
-              'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
-              '(color default)gefährte'))
+                'eval(${color:default}:! ${color:brown}otr${color:default} '
+                '!:)\t(color default)gefährte'))

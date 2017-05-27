@@ -5,12 +5,12 @@
 
 from __future__ import unicode_literals
 
+import os.path
+import sys
+
 from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
 
 import weechat_otr
-
-import os.path
-import sys
 
 class FingerprintTestCase(WeechatOtrTestCase):
 
@@ -28,8 +28,8 @@ class FingerprintTestCase(WeechatOtrTestCase):
             ' !:)\t'
             '(color default)nick2@server2 |{fp2}\r\n'
             '(color default)nick@server   |{fp1}').format(
-              fp1=account1.getPrivkey(),
-              fp2=account2.getPrivkey()))
+                fp1=account1.getPrivkey(),
+                fp2=account2.getPrivkey()))
 
     def test_fingerprint_pattern(self):
         fpr_path1 = os.path.join(
@@ -38,10 +38,10 @@ class FingerprintTestCase(WeechatOtrTestCase):
             'nick@server.fpr')
         with open(fpr_path1, 'w') as f:
             for fields in [
-                ['notamachxxx@server', 'nick@server', 'irc', 'fp123', ''],
-                ['matchxxxxxx@server', 'nick@server', 'irc', 'fp123', ''],
-                ['beforematch@server', 'nick@server', 'irc', 'fp123', ''],
-                ['before@servermatch', 'nick@server', 'irc', 'fp123', ''],
+                    ['notamachxxx@server', 'nick@server', 'irc', 'fp123', ''],
+                    ['matchxxxxxx@server', 'nick@server', 'irc', 'fp123', ''],
+                    ['beforematch@server', 'nick@server', 'irc', 'fp123', ''],
+                    ['before@servermatch', 'nick@server', 'irc', 'fp123', ''],
                 ]:
                 f.write("\t".join(fields))
                 f.write("\n")
@@ -70,9 +70,9 @@ class FingerprintTestCase(WeechatOtrTestCase):
             'nick@server.fpr')
         with open(fpr_path1, 'w') as f:
             for fields in [
-                ['peer1@server', 'nick@server', 'irc', 'fp111', ''],
-                ['peer2@server', 'nick@server', 'irc', 'fp222', 'smp'],
-                ['peer3@server', 'nick@server', 'irc', 'fp333', 'verified'],
+                    ['peer1@server', 'nick@server', 'irc', 'fp111', ''],
+                    ['peer2@server', 'nick@server', 'irc', 'fp222', 'smp'],
+                    ['peer3@server', 'nick@server', 'irc', 'fp333', 'verified'],
                 ]:
                 f.write("\t".join(fields))
                 f.write("\n")
@@ -86,7 +86,8 @@ class FingerprintTestCase(WeechatOtrTestCase):
             'nick2@server2.fpr')
         with open(fpr_path2, 'w') as f:
             for fields in [
-                ['peer4@server2', 'nick2@server2', 'irc', 'fp444', 'verified'],
+                    ['peer4@server2', 'nick2@server2', 'irc', 'fp444',
+                     'verified'],
                 ]:
                 f.write("\t".join(fields))
                 f.write("\n")

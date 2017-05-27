@@ -13,6 +13,7 @@ import weechat_otr_test.mock_weechat
 sys.modules['weechat'] = weechat_otr_test.mock_weechat.MockWeechat(
     tempfile.mkdtemp())
 
+# pylint: disable=wrong-import-position
 import weechat_otr
 
 class WeechatOtrTestCase(unittest.TestCase):

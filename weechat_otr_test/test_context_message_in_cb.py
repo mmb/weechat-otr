@@ -6,9 +6,9 @@
 from __future__ import unicode_literals
 
 from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
+import weechat_otr_test.raising_account
 
 import weechat_otr
-import weechat_otr_test.raising_account
 
 class ContextMessageInCbTestCase(WeechatOtrTestCase):
 
@@ -22,6 +22,7 @@ class ContextMessageInCbTestCase(WeechatOtrTestCase):
         result = weechat_otr.message_in_cb(
             None, None, 'server', ':friend!user@host PRIVMSG nick :test')
 
-        self.assertEqual(result,
+        self.assertEqual(
+            result,
             ':friend!user@host PRIVMSG nick :Unencrypted message received: '
             '/me lols')

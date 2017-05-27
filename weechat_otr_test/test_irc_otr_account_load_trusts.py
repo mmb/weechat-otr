@@ -5,12 +5,12 @@
 
 from __future__ import unicode_literals
 
+import os.path
+import sys
+
 from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
 
 import weechat_otr
-
-import os.path
-import sys
 
 class IrcOtrAccountLoadTrustsTestCase(WeechatOtrTestCase):
 
@@ -24,5 +24,5 @@ class IrcOtrAccountLoadTrustsTestCase(WeechatOtrTestCase):
                 "gefährte@server\tnick@server\tirc\tfp123\tverified\n"))
 
         account1 = weechat_otr.ACCOUNTS['nick@server']
-        self.assertEqual('verified', 
-            account1.getTrust('gefährte@server', 'fp123'))
+        self.assertEqual(
+            'verified', account1.getTrust('gefährte@server', 'fp123'))

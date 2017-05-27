@@ -12,10 +12,9 @@ class SessionTestCase(WeechatOtrTestCase):
 
     def send_all(self, from_nick, to_nick, messages):
         # pylint: disable=no-self-use
-        while True:
-            if len(messages) == 0:
-                break
-            weechat_otr.message_in_cb(None, None, 'server',
+        while messages:
+            weechat_otr.message_in_cb(
+                None, None, 'server',
                 ':{from_nick}!user@host PRIVMSG {to_nick} :{message}'.format(
                     from_nick=from_nick,
                     to_nick=to_nick,

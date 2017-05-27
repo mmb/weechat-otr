@@ -6,14 +6,13 @@
 
 from __future__ import unicode_literals
 
+import sys
+
 from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
-
-import weechat_otr
-
 import weechat_otr_test.mock_account
 import weechat_otr_test.mock_context
 
-import sys
+import weechat_otr
 
 class BufferClosedTestCase(WeechatOtrTestCase):
 

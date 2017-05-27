@@ -14,7 +14,7 @@ from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
 import weechat_otr
 
 def create_arg_test_method(command, num_args):
-    def f(self):
+    def f(_):
         sys.modules['weechat'].infos.update({
             ('arg2',) : {'irc_nick' : ''},
             ('arg2,arg1',) : {'irc_buffer' : 'arg2_arg1_buffer'},
@@ -30,7 +30,8 @@ def create_arg_test_method(command, num_args):
         args = ["arg{i}".format(i=i) for i in range(1, num_args + 1)]
         arg_str = ' '.join(args)
         try:
-            weechat_otr.command_cb(None, None,
+            weechat_otr.command_cb(
+                None, None,
                 "{command} {args}".format(command=command, args=arg_str))
         except potr.context.NotEncryptedError:
             pass

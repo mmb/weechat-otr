@@ -17,17 +17,19 @@ import weechat_otr
 class MessageOutCbTestCase(WeechatOtrTestCase):
 
     def test_message_out_cb(self):
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG friend :hello')
+        result = weechat_otr.message_out_cb(
+            None, None, 'server', ':nick!user@host PRIVMSG friend :hello')
         self.assertEqual(result, 'PRIVMSG friend :hello')
 
     def test_message_out_cb_send_tag_non_ascii(self):
         sys.modules['weechat'].config_options[
             'otr.policy.server.nick.friend.send_tag'] = 'on'
 
-        result = weechat_otr.message_out_cb(None, None, 'server',
+        result = weechat_otr.message_out_cb(
+            None, None, 'server',
             ":nick!user@host PRIVMSG friend :\xc3")
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+        self.assertEqual(
+            weechat_otr.PYVER.to_unicode(result),
             "PRIVMSG friend :\xc3 \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
     def test_message_out_cb_send_tag_alis(self):
@@ -85,9 +87,11 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
         sys.modules['weechat'].config_options[
             'otr.policy.default.send_tag'] = 'on'
 
-        result = weechat_otr.message_out_cb(None, None, 'server',
+        result = weechat_otr.message_out_cb(
+            None, None, 'server',
             ':nick!user@host PRIVMSG friend :\x01CTCP VERSION\x01')
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+        self.assertEqual(
+            weechat_otr.PYVER.to_unicode(result),
             'PRIVMSG friend :\x01CTCP VERSION\x01')
 
     def test_message_out_cb_no_send_tag_regex_non_ascii(self):
@@ -103,14 +107,16 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
         sys.modules['weechat'].config_options[
             'otr.general.no_send_tag_regex'] = weechat_otr.PYVER.to_str('')
 
-        result = weechat_otr.message_out_cb(None, None, 'server',
+        result = weechat_otr.message_out_cb(
+            None, None, 'server',
             weechat_otr.PYVER.to_str(":nick!user@host PRIVMSG friend :hi"))
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+        self.assertEqual(
+            weechat_otr.PYVER.to_unicode(result),
             "PRIVMSG friend :hi \t  \t\t\t\t \t \t \t    \t\t  \t \t")
 
     def test_message_out_cb_nick_with_at(self):
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG @#chan :hello')
+        result = weechat_otr.message_out_cb(
+            None, None, 'server', ':nick!user@host PRIVMSG @#chan :hello')
         self.assertEqual(result, ':nick!user@host PRIVMSG @#chan :hello')
 
     def test_require_encryption(self):
@@ -118,14 +124,16 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
             'otr.policy.default.require_encryption' : 'on'
         })
 
-        weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG nick2 :hello')
+        weechat_otr.message_out_cb(
+            None, None, 'server', ':nick!user@host PRIVMSG nick2 :hello')
 
-        self.assertPrinted('server_nick2_buffer',
+        self.assertPrinted(
+            'server_nick2_buffer',
             'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
             '(color lightred)Your message will not be sent, because policy '
             'requires an encrypted connection.')
-        self.assertPrinted('server_nick2_buffer',
+        self.assertPrinted(
+            'server_nick2_buffer',
             'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
             '(color lightblue)Wait for the OTR connection or change the '
             'policy to allow clear-text messages:\r\n(color '
@@ -137,14 +145,16 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
             'otr.policy.default.require_encryption' : 'on'
         })
 
-        weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG nick2 :hello')
+        weechat_otr.message_out_cb(
+            None, None, 'server', ':nick!user@host PRIVMSG nick2 :hello')
 
-        self.assertNotPrinted('server_nick2_buffer',
+        self.assertNotPrinted(
+            'server_nick2_buffer',
             'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
             '(color lightred)Your message will not be sent, because policy '
             'requires an encrypted connection.')
-        self.assertNotPrinted('server_nick2_buffer',
+        self.assertNotPrinted(
+            'server_nick2_buffer',
             'eval(${color:default}:! ${color:brown}otr${color:default} !:)\t'
             '(color lightblue)Wait for the OTR connection or change the '
             'policy to allow clear-text messages:\r\n(color '
@@ -153,15 +163,15 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
     def test_exception_raised_returns_empty_string(self):
         sys.modules['weechat'].info_get_hashtable_raise = Exception('test')
 
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG nick2 :hello')
+        result = weechat_otr.message_out_cb(
+            None, None, 'server', ':nick!user@host PRIVMSG nick2 :hello')
         self.assertEqual(result, '')
 
     def test_exception_raised_prints_traceback(self):
         sys.modules['weechat'].info_get_hashtable_raise = Exception('test')
 
-        weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG nick2 :hello')
+        weechat_otr.message_out_cb(
+            None, None, 'server', ':nick!user@host PRIVMSG nick2 :hello')
         self.assertPrintedContains('', 'Exception: test')
 
     def test_exception_raised_prints_versions(self):
@@ -174,24 +184,25 @@ class MessageOutCbTestCase(WeechatOtrTestCase):
             'Python {python_version}, '
             'WeeChat 9.8.7'
             ).format(
-            script_version=weechat_otr.SCRIPT_VERSION,
-            potr_major=potr.VERSION[0],
-            potr_minor=potr.VERSION[1],
-            potr_patch=potr.VERSION[2],
-            potr_sub=potr.VERSION[3],
-            python_version=platform.python_version())
+                script_version=weechat_otr.SCRIPT_VERSION,
+                potr_major=potr.VERSION[0],
+                potr_minor=potr.VERSION[1],
+                potr_patch=potr.VERSION[2],
+                potr_sub=potr.VERSION[3],
+                python_version=platform.python_version())
 
-        weechat_otr.message_out_cb(None, None, 'server',
-            ':nick!user@host PRIVMSG nick2 :hello')
+        weechat_otr.message_out_cb(
+            None, None, 'server', ':nick!user@host PRIVMSG nick2 :hello')
         self.assertPrintedContains('', version_str)
 
     def assertNickIsNotTagged(self, nick):
         sys.modules['weechat'].config_options[
             'otr.policy.default.send_tag'] = 'on'
 
-        result = weechat_otr.message_out_cb(None, None, 'server',
-            weechat_otr.PYVER.to_str(
-            ':nick!user@host PRIVMSG {nick} :send friend hi'.format(
-            nick=nick)))
-        self.assertEqual(weechat_otr.PYVER.to_unicode(result),
+        result = weechat_otr.message_out_cb(
+            None, None, 'server', weechat_otr.PYVER.to_str(
+                ':nick!user@host PRIVMSG {nick} :send friend hi'.format(
+                    nick=nick)))
+        self.assertEqual(
+            weechat_otr.PYVER.to_unicode(result),
             'PRIVMSG {nick} :send friend hi'.format(nick=nick))

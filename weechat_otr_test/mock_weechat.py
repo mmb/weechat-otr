@@ -142,8 +142,7 @@ class MockWeechat(types.ModuleType):
     def config_boolean(self, val):
         if val == 'on':
             return 1
-        else:
-            return 0
+        return 0
 
     def config_get(self, key):
         return self.config_options.get(key, '')
@@ -196,7 +195,9 @@ class MockWeechat(types.ModuleType):
     def info_get_hashtable(self, name, args):
         # pylint: disable=too-many-branches
         # pylint: disable=too-many-statements
+        # pylint: disable=too-many-nested-blocks
         if self.info_get_hashtable_raise:
+            # pylint: disable=raising-bad-type
             raise self.info_get_hashtable_raise
         if name in self.info_hashtables:
             return self.info_hashtables[name].pop()
@@ -344,3 +345,11 @@ class MockWeechat(types.ModuleType):
 
     def window_get_pointer(self, *args):
         return self.window_get_pointers[args]
+
+    def add_channel_prefix(self, prefix):
+        self.infos[('server,CHANTYPES',)]['irc_server_isupport_value'] += \
+                prefix
+
+    def server_no_chantypes(self):
+        self.infos[('server,CHANTYPES',)]['irc_server_isupport_value'] = ''
+        self.infos[('server,STATUSMSG',)]['irc_server_isupport_value'] = ''

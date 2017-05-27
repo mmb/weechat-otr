@@ -5,11 +5,11 @@
 
 from __future__ import unicode_literals
 
+import sys
+
 from weechat_otr_test.weechat_otr_test_case import WeechatOtrTestCase
 
 import weechat_otr
-
-import sys
 
 class ShutdownTestCase(WeechatOtrTestCase):
 
@@ -31,8 +31,8 @@ class ShutdownTestCase(WeechatOtrTestCase):
         sys.modules['weechat'].buffer_search_returns = ['OTR Debug']
         weechat_otr.debug('gefährte')
 
-        self.assertPrinted('OTR Debug',
-            weechat_otr.PYVER.to_str('otr debug\tgefährte'))
+        self.assertPrinted(
+            'OTR Debug', weechat_otr.PYVER.to_str('otr debug\tgefährte'))
 
     def test_creates_buffer(self):
         sys.modules['weechat'].config_options['otr.general.debug'] = 'on'
