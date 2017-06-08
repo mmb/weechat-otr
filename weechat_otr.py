@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
-# otr - WeeChat script for Off-the-Record IRC messaging
-#
-# DISCLAIMER: To the best of my knowledge this script securely provides OTR
-# messaging in WeeChat, but I offer no guarantee. Please report any security
-# holes you find.
-#
-# Copyright (c) 2012-2015 Matthew M. Boedicker <matthewm@boedicker.org>
-#                         Nils Görs <weechatter@arcor.de>
-#                         Daniel "koolfy" Faucon <koolfy@koolfy.be>
-#                         Felix Eckhofer <felix@tribut.de>
-#
-# Report issues at https://github.com/mmb/weechat-otr
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+"""otr - WeeChat script for Off-the-Record IRC messaging
 
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+DISCLAIMER: To the best of my knowledge this script securely provides OTR
+messaging in WeeChat, but I offer no guarantee. Please report any security
+holes you find.
 
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Copyright (c) 2012-2015 Matthew M. Boedicker <matthewm@boedicker.org>
+                        Nils Görs <weechatter@arcor.de>
+                        Daniel "koolfy" Faucon <koolfy@koolfy.be>
+                        Felix Eckhofer <felix@tribut.de>
+
+Report issues at https://github.com/mmb/weechat-otr
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+# pylint: disable=too-many-lines
 
 from __future__ import unicode_literals
 
@@ -37,6 +40,9 @@ import traceback
 import shlex
 import shutil
 import sys
+
+import potr
+import weechat
 
 class PythonVersion2(object):
     """Python 2 version of code that must differ between Python 2 and 3."""
@@ -119,10 +125,6 @@ if sys.version_info.major >= 3:
     PYVER = PythonVersion3(sys.version_info.minor)
 else:
     PYVER = PythonVersion2()
-
-import weechat
-
-import potr
 
 SCRIPT_NAME = 'otr'
 SCRIPT_DESC = 'Off-the-Record messaging for IRC'
@@ -778,7 +780,7 @@ Respond with: /otr smp respond <secret>""")
                 self.print_buffer(
                     """Peer has requested SMP verification: {msg}
 Respond with: /otr smp respond <answer>""".format(
-                        msg=PYVER.to_unicode(smp1q.msg)))
+    msg=PYVER.to_unicode(smp1q.msg)))
             elif first_instance(tlvs, potr.proto.SMP2TLV):
                 if not self.in_smp:
                     debug('Received unexpected SMP2')
@@ -799,9 +801,9 @@ Respond with: /otr smp respond <answer>""".format(
                             'SMP verification succeeded.', 'success')
                         if not self.is_verified:
                             self.print_buffer(
-                                """You may want to authenticate your peer by asking your own question:
-/otr smp ask <'question'> 'secret'""")
-
+                                'You may want to authenticate your peer by '
+                                'asking your own question:\n'
+                                "/otr smp ask <'question'> 'secret'")
                     else:
                         self.smp_finish(
                             'SMP verification succeeded.', 'success')
@@ -811,7 +813,8 @@ Respond with: /otr smp respond <answer>""".format(
 
     def verify_instructions(self):
         """Generate verification instructions for user."""
-        return """You can verify that this contact is who they claim to be in one of the following ways:
+        return """You can verify that this contact is who they claim to be in
+one of the following ways:
 
 1) Verify each other's fingerprints using a secure channel:
   Your fingerprint : {your_fp}
@@ -828,12 +831,11 @@ Note: You can safely omit specifying the peer and server when
       executing these commands from the appropriate conversation
       buffer
 """.format(
-        your_fp=self.user.getPrivkey(),
-        peer=self.peer,
-        peer_nick=self.peer_nick,
-        peer_server=self.peer_server,
-        peer_fp=potr.human_hash(
-            self.crypto.theirPubkey.cfingerprint()))
+    your_fp=self.user.getPrivkey(),
+    peer=self.peer,
+    peer_nick=self.peer_nick,
+    peer_server=self.peer_server,
+    peer_fp=potr.human_hash(self.crypto.theirPubkey.cfingerprint()))
 
     def is_encrypted(self):
         """Return True if the conversation with this context's peer is
@@ -997,9 +999,9 @@ Note: You can safely omit specifying the peer and server when
             return re.match(no_send_tag_regex, self.peer_nick, re.IGNORECASE)
 
     def __repr__(self):
-        return PYVER.to_str(('<{} {:x} peer_nick={c.peer_nick} '
-            'peer_server={c.peer_server}>').format(
-                self.__class__.__name__, id(self), c=self))
+        return PYVER.to_str((
+            '<{} {:x} peer_nick={c.peer_nick} peer_server={c.peer_server}>'
+            ).format(self.__class__.__name__, id(self), c=self))
 
 class IrcOtrAccount(potr.context.Account):
     """Account class for OTR over IRC."""
@@ -1488,9 +1490,8 @@ def command_cb(data, buf, args):
                     context.smpAbort()
                 except potr.context.NotEncryptedError:
                     context.print_buffer(
-                        'There is currently no encrypted session with {}.'.format(
-                            context.peer),
-                        'error')
+                        'There is currently no encrypted session with {}.'
+                        .format(context.peer), 'error')
                 else:
                     debug('SMP aborted')
                     context.smp_finish('SMP aborted.')
