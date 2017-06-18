@@ -1210,7 +1210,7 @@ def message_in_cb(data, modifier, modifier_data, string):
             context.handle_tlvs(tlvs)
         except potr.context.ErrorReceived as err:
             context.print_buffer('Received OTR error: {}'.format(
-                PYVER.to_unicode(err.args[0].error)), 'error')
+                PYVER.to_unicode(err.args[0])), 'error')
         except potr.context.NotEncryptedError:
             context.print_buffer(
                 'Received encrypted data but no private session established.',
