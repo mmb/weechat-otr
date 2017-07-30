@@ -1,3 +1,15 @@
+1.9.1
+	2017-07-30
+
+	Fix potr ErrorReceived printing bug.
+
+	Argument parsing errors now raise exceptions.
+
+	Fix require_encryption policy hint.
+
+	Fix traceback caused by non-ASCII nick
+	(https://github.com/mmb/weechat-otr/issues/133).
+
 1.9.0
 	2017-04-19
 
