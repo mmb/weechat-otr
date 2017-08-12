@@ -113,15 +113,21 @@ class MockWeechat(types.ModuleType):
 
     def snapshot_weechat_dir(self):
         tar_io = io.BytesIO()
-        with tarfile.open(fileobj=tar_io, mode='w') as tar:
-            tar.add(self.weechat_dir, '.')
+        # Note that we cannot use "with tarfile.open" due to lack of support
+        # for context manager in Python 2.6
+        tar = tarfile.open(fileobj=tar_io, mode='w')
+        tar.add(self.weechat_dir, '.')
+        tar.close()
         self.weechat_dir_tar = tar_io.getvalue()
 
     def restore_weechat_dir(self):
         shutil.rmtree(self.weechat_dir)
         tar_io = io.BytesIO(self.weechat_dir_tar)
-        with tarfile.open(fileobj=tar_io) as tar:
-            tar.extractall(self.weechat_dir)
+        # Note that we cannot use "with tarfile.open" due to lack of support
+        # for context manager in Python 2.6
+        tar = tarfile.open(fileobj=tar_io)
+        tar.extractall(self.weechat_dir)
+        tar.close()
 
     def bar_item_new(*args):
         return 'bar item'
@@ -298,13 +304,13 @@ class MockWeechat(types.ModuleType):
         os.mkdir(os.path.join(self.weechat_dir, name), mode)
 
     def string_eval_expression(self, expr, pointers, extra_vars, options):
-        return 'eval({})'.format(expr)
+        return 'eval({0})'.format(expr)
 
     def config_color(self, key):
         return key
 
     def color(self, name):
-        return '(color {})'.format(name)
+        return '(color {0})'.format(name)
 
     def prnt(self, buf, message):
         self.printed.setdefault(buf, []).append(message)
