@@ -2031,11 +2031,11 @@ def git_info():
                 '--git-dir', git_dir,
                 '--work-tree', script_dir,
                 'describe', '--dirty', '--always',
-                ], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+                ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output = process.communicate()[0]
             if output:
                 result = PYVER.to_unicode(output).lstrip('v').rstrip()
-        except (OSError):
+        except OSError:
             pass
 
     return result
