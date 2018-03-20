@@ -1827,7 +1827,7 @@ def buffer_closing_cb(data, signal, signal_data):
 def init_config():
     """Set up configuration options and load config file."""
     global CONFIG_FILE
-    CONFIG_FILE = weechat.config_new(SCRIPT_NAME, 'config_reload_cb', '')
+    CONFIG_FILE = weechat.config_new(SCRIPT_NAME, '', '')
 
     global CONFIG_SECTIONS
     CONFIG_SECTIONS = {}
@@ -1993,13 +1993,6 @@ def init_config():
             0, 0, default, default, 0, '', '', '', '', '', '')
 
     weechat.config_read(CONFIG_FILE)
-
-def config_reload_cb(data, config_file):
-    """/reload callback to reload config from file."""
-    free_all_config()
-    init_config()
-
-    return weechat.WEECHAT_CONFIG_READ_OK
 
 def free_all_config():
     """Free all config options, sections and config file."""
